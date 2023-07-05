@@ -534,8 +534,12 @@ namespace TSMapEditor.Rendering
             if (tile.Structure != null && tile.Structure.Position == tile.CoordsToPoint())
             {
                 gameObjectsToRender.Add(tile.Structure);
-                foreach (var anim in tile.Structure.Anims)
+
+                foreach (var anim in tile.Structure.ActiveAnims)
                     gameObjectsToRender.Add(anim);
+
+                if (tile.Structure.TurretAnim != null)
+                    gameObjectsToRender.Add(tile.Structure.TurretAnim);
             }
 
             tile.DoForAllInfantry(i => gameObjectsToRender.Add(i));
