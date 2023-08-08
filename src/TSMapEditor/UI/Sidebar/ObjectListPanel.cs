@@ -134,7 +134,7 @@ namespace TSMapEditor.UI.Sidebar
             {
                 var objectType = objectTypeList[i];
 
-                if (!objectType.EditorVisible)
+                if (!objectType.EditorVisible || Map.EditorConfig.EditorRulesIni.KeyExists("IndividualIgnore", objectType.ININame))
                     continue;
 
                 if (objectType.WhatAmI() == RTTIType.BuildingType)
@@ -172,6 +172,7 @@ namespace TSMapEditor.UI.Sidebar
 
                         string ownerName = owners[ownerIndex];
                         ownerName = Map.EditorConfig.EditorRulesIni.GetStringValue("ObjectCategoryOverrides", ownerName, ownerName);
+                        ownerName = Map.EditorConfig.EditorRulesIni.GetStringValue("IndividualCategoryOverrides", objectType.ININame, Map.EditorConfig.EditorRulesIni.GetStringValue("ObjectCategoryOverrides", ownerName, ownerName));
 
                         House house = Map.StandardHouses.Find(h => h.ININame == ownerName);
                         if (house != null)
