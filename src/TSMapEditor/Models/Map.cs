@@ -597,31 +597,34 @@ namespace TSMapEditor.Models
         {
             Waypoints.Add(waypoint);
             var cell = GetTile(waypoint.Position.X, waypoint.Position.Y);
-            if (cell.Waypoint != null)
-            {
-                throw new InvalidOperationException($"Cell at {cell.CoordsToPoint()} already has a waypoint, skipping adding waypoint {waypoint.Identifier}");
-            }
+            //if (cell.Waypoint != null)
+            //{
+            //    throw new InvalidOperationException($"Cell at {cell.CoordsToPoint()} already has a waypoint, skipping adding waypoint {waypoint.Identifier}");
+            //}
 
-            cell.Waypoint = waypoint;
+            cell.Waypoints.Add(waypoint);
         }
 
         public void RemoveWaypoint(Waypoint waypoint)
         {
             var tile = GetTile(waypoint.Position);
-            if (tile.Waypoint == waypoint)
+            if (tile.Waypoints.Contains(waypoint))
             {
                 Waypoints.Remove(waypoint);
-                tile.Waypoint = null;
+                tile.Waypoints.Remove(waypoint);
             }
         }
 
-        public void RemoveWaypointFrom(Point2D cellCoords)
+        public void RemoveWaypointsFrom(Point2D cellCoords)
         {
             var tile = GetTile(cellCoords);
-            if (tile.Waypoint != null)
+            if (tile.Waypoints.Count > 0)
             {
-                Waypoints.Remove(tile.Waypoint);
-                tile.Waypoint = null;
+                foreach (var waypoint in tile.Waypoints)
+                {
+                    Waypoints.Remove(waypoint);
+                }
+                tile.Waypoints.Clear();
             }
         }
 
@@ -954,7 +957,7 @@ namespace TSMapEditor.Models
 
             MapTile cell = GetTile(newCoords);
             if (movable.WhatAmI() == RTTIType.Waypoint)
-                return cell.Waypoint == null;
+                return true;
 
             return cell.CanAddObject((GameObject)movable);
         }
@@ -1004,9 +1007,9 @@ namespace TSMapEditor.Models
                 return;
             }
 
-            if (tile.Waypoint != null)
+            if (tile.Waypoints.Count > 0)
             {
-                RemoveWaypoint(tile.Waypoint);
+                RemoveWaypointsFrom(tile.CoordsToPoint());
                 return;
             }
         }
