@@ -600,7 +600,7 @@ namespace TSMapEditor.Models
             if (cell.Waypoints.Count > 0)
             {
                 //throw new InvalidOperationException($"Cell at {cell.CoordsToPoint()} already has a waypoint, skipping adding waypoint {waypoint.Identifier}");
-                Logger.Log($"NOTE: Waypoint {waypoint.Identifier} exists on the cell {cell.CoordsToPoint()} that already has other waypoints.");
+                Logger.Log($"NOTE: Waypoint {waypoint.Identifier} exists in the cell {cell.CoordsToPoint()} that already has other waypoints.");
             }
 
             cell.Waypoints.Add(waypoint);
@@ -870,23 +870,26 @@ namespace TSMapEditor.Models
         public void PlaceAircraft(Aircraft aircraft)
         {
             var cell = GetTile(aircraft.Position);
-            if (cell.Aircraft != null)
-                throw new InvalidOperationException("Cannot place an aircraft on a cell that already has an aircraft!");
+            //if (cell.Aircraft != null)
+            //    throw new InvalidOperationException("Cannot place an aircraft on a cell that already has an aircraft!");
 
-            cell.Aircraft = aircraft;
+            cell.Aircraft.Add(aircraft);
             Aircraft.Add(aircraft);
         }
 
         public void RemoveAircraft(Aircraft aircraft)
         {
-            RemoveAircraft(aircraft.Position);
+            var cell = GetTile(aircraft.Position);
+            cell.Aircraft.Remove(aircraft);
+            Aircraft.Remove(aircraft);
         }
 
-        public void RemoveAircraft(Point2D cellCoords)
+        public void RemoveAircraftFrom(Point2D cellCoords)
         {
             var cell = GetTile(cellCoords);
-            Aircraft.Remove(cell.Aircraft);
-            cell.Aircraft = null;
+            cell.DoForAllAircraft(aircraft => Aircraft.Remove(aircraft));
+
+            cell.Aircraft.Clear();
         }
 
         public void MoveAircraft(Aircraft aircraft, Point2D newCoords)
@@ -981,9 +984,9 @@ namespace TSMapEditor.Models
                 }
             }
 
-            if (tile.Aircraft != null)
+            if (tile.Aircraft.Count > 0)
             {
-                RemoveAircraft(tile.Aircraft);
+                RemoveAircraftFrom(tile.CoordsToPoint());
                 return;
             }
 

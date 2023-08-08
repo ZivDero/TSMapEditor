@@ -119,11 +119,7 @@ namespace TSMapEditor.UI
                     Constants.UIDefaultFont, baseTextColor));
             }
 
-            if (MapTile.Aircraft != null)
-            {
-                AddObjectInformation("Aircraft: ", MapTile.Aircraft);
-            }
-
+            MapTile.DoForAllAircraft(aircraft => AddObjectInformation("Aircraft: ", aircraft));
             MapTile.DoForAllVehicles(unit => AddObjectInformation("Vehicle: ", unit));
             MapTile.DoForAllBuildings(structure => AddObjectInformation("Structure: ", structure));
             MapTile.DoForAllInfantry(inf => AddObjectInformation("Infantry: ", inf));

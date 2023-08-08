@@ -354,7 +354,7 @@ namespace TSMapEditor.Initialization
                     {
                         //isClear = false;
                         //AddMapLoadError($"Building {buildingType.ININame} exists on a cell ({cellCoords}) that already has another building ({tile.Structure.ObjectType.ININame}). Skipping adding it to map.");
-                        Logger.Log($"NOTE: Building {buildingType.ININame} exists on the cell {cellCoords} that already has other buildings.");
+                        Logger.Log($"NOTE: Building {buildingType.ININame} exists in the cell {cellCoords} that already has other buildings.");
                     }
                 }
 
@@ -425,7 +425,7 @@ namespace TSMapEditor.Initialization
                 map.Aircraft.Add(aircraft);
                 var tile = map.GetTile(x, y);
                 if (tile != null)
-                    tile.Aircraft = aircraft;
+                    tile.Aircraft.Add(aircraft);
             }
         }
 
@@ -678,7 +678,7 @@ namespace TSMapEditor.Initialization
                 if (mapCell.Waypoints.Count > 0)
                 {
                     //AddMapLoadError($"Cell at {waypoint.Position} has multiple waypoints placed on it. Skipping adding waypoint #{waypoint.Identifier} there.");
-                    Logger.Log($"NOTE: Waypoint {waypoint.Identifier} exists on the cell {waypoint.Position} that already has other waypoints.");
+                    Logger.Log($"NOTE: Waypoint {waypoint.Identifier} exists in the cell {waypoint.Position} that already has other waypoints.");
                     continue;
                 }
 

@@ -25,9 +25,7 @@ namespace TSMapEditor.Models
         public TerrainObject TerrainObject { get; set; }
         public List<Structure> Structures { get; set; } = new List<Structure>();
         public List<Unit> Vehicles { get; set; } = new List<Unit>();
-        public Unit Vehicle { get; set; }
-        public List<Aircraft> Aircrafts { get; set; } = new List<Aircraft>();
-        public Aircraft Aircraft { get; set; }
+        public List<Aircraft> Aircraft { get; set; } = new List<Aircraft>();
         public Infantry[] Infantry { get; set; } = new Infantry[SubCellCount];
         public TileImage PreviewTileImage { get; set; }
         public int PreviewSubTileIndex { get; set; }
@@ -100,7 +98,7 @@ namespace TSMapEditor.Models
 
         public void DoForAllAircraft(Action<Aircraft> action)
         {
-            foreach (var aircraft in Aircrafts)
+            foreach (var aircraft in Aircraft)
             {
                 action(aircraft);
             }
@@ -154,7 +152,7 @@ namespace TSMapEditor.Models
 
         public bool HasTechno()
         {
-            return Structures.Count > 0 || Vehicles.Count > 0 || Aircrafts.Count > 0 || Array.Exists(Infantry, inf => inf != null);
+            return Structures.Count > 0 || Vehicles.Count > 0 || Aircraft.Count > 0 || Array.Exists(Infantry, inf => inf != null);
         }
 
         public bool HasTechnoThatPassesCheck(Predicate<TechnoBase> predicate)
@@ -170,7 +168,7 @@ namespace TSMapEditor.Models
             var unit = Vehicles.Find(predicate);
             if (unit != null) return unit;
 
-            var aircraft = Aircrafts.Find(predicate);
+            var aircraft = Aircraft.Find(predicate);
             if (aircraft != null) return aircraft;
 
             return Array.Find(Infantry, inf => inf != null && predicate(inf));
@@ -184,8 +182,8 @@ namespace TSMapEditor.Models
             if (Vehicles.Count > 0)
                 return Vehicles[0];
 
-            if (Aircrafts.Count > 0)
-                return Aircrafts[0];
+            if (Aircraft.Count > 0)
+                return Aircraft[0];
 
             return Array.Find(Infantry, inf => inf != null);
         }
@@ -210,7 +208,7 @@ namespace TSMapEditor.Models
             switch (gameObject.WhatAmI())
             {
                 case RTTIType.Aircraft:
-                    return Aircraft == null;
+                    return true;
                 case RTTIType.Building:
                     return true;
                 case RTTIType.Unit:
@@ -229,7 +227,7 @@ namespace TSMapEditor.Models
             switch (abstractObject.WhatAmI())
             {
                 case RTTIType.Aircraft:
-                    return Aircraft == abstractObject;
+                    return Aircraft.Contains((Aircraft)abstractObject);
                 case RTTIType.Terrain:
                     return TerrainObject == abstractObject;
                 case RTTIType.Building:
