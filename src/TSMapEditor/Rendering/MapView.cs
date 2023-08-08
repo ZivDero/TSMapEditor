@@ -528,8 +528,11 @@ namespace TSMapEditor.Rendering
             if (tile.Overlay != null && tile.Overlay.OverlayType != null)
                 gameObjectsToRender.Add(tile.Overlay);
 
-            if (tile.Structure != null && tile.Structure.Position == tile.CoordsToPoint())
-                gameObjectsToRender.Add(tile.Structure);
+            foreach (var structure in tile.Structures)
+            {
+                if (structure.Position == tile.CoordsToPoint())
+                    gameObjectsToRender.Add(structure);
+            }
 
             tile.DoForAllInfantry(i => gameObjectsToRender.Add(i));
 
@@ -1063,8 +1066,8 @@ namespace TSMapEditor.Rendering
         {
             if (tileUnderCursor != null && CursorAction == null)
             {
-                if (tileUnderCursor.Structure != null)
-                    windowController.StructureOptionsWindow.Open(tileUnderCursor.Structure);
+                if (tileUnderCursor.Structures.Count > 0)
+                    windowController.StructureOptionsWindow.Open(tileUnderCursor.Structures[0]);
 
                 if (tileUnderCursor.Vehicle != null)
                     windowController.VehicleOptionsWindow.Open(tileUnderCursor.Vehicle);

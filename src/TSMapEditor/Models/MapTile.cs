@@ -23,6 +23,7 @@ namespace TSMapEditor.Models
         /// </summary>
         public TileImage TileImage { get; set; }
         public TerrainObject TerrainObject { get; set; }
+        public List<Structure> Structures { get; set; } = new List<Structure>();
         public Structure Structure { get; set; }
         public Unit Vehicle { get; set; }
         public Aircraft Aircraft { get; set; }
@@ -33,7 +34,7 @@ namespace TSMapEditor.Models
 
         public Overlay Overlay { get; set; }
         public Smudge Smudge { get; set; }
-        public List<Waypoint> Waypoints { get; set; } = new();
+        public List<Waypoint> Waypoints { get; set; } = new List<Waypoint>();
 
         public CellTag CellTag { get; set; }
 
@@ -67,8 +68,8 @@ namespace TSMapEditor.Models
 
         public void AddObjectsToList(List<AbstractObject> objects)
         {
-            if (Structure != null)
-                objects.Add(Structure);
+            if (Structures.Count > 0)
+                objects.AddRange(Structures);
 
             if (Vehicle != null)
                 objects.Add(Vehicle);
@@ -120,7 +121,7 @@ namespace TSMapEditor.Models
 
         public bool HasTechno()
         {
-            return Structure != null || Vehicle != null || Aircraft != null || Array.Exists(Infantry, inf => inf != null);
+            return Structures.Count > 0 || Vehicle != null || Aircraft != null || Array.Exists(Infantry, inf => inf != null);
         }
 
         public bool HasTechnoThatPassesCheck(Predicate<TechnoBase> predicate)
@@ -130,8 +131,11 @@ namespace TSMapEditor.Models
 
         public TechnoBase GetFirstTechnoThatPassesCheck(Predicate<TechnoBase> predicate)
         {
-            if (Structure != null && predicate(Structure))
-                return Structure;
+            foreach (var structure in Structures)
+            {
+                if (predicate(structure))
+                    return structure;
+            }
 
             if (Vehicle != null && predicate(Vehicle))
                 return Vehicle;
@@ -144,8 +148,8 @@ namespace TSMapEditor.Models
 
         public TechnoBase GetTechno()
         {
-            if (Structure != null)
-                return Structure;
+            if (Structures.Count > 0)
+                return Structures[0];
 
             if (Vehicle != null)
                 return Vehicle;
@@ -178,7 +182,7 @@ namespace TSMapEditor.Models
                 case RTTIType.Aircraft:
                     return Aircraft == null;
                 case RTTIType.Building:
-                    return Structure == null || Structure == gameObject;
+                    return true;
                 case RTTIType.Unit:
                     return Vehicle == null;
                 case RTTIType.Infantry:
@@ -199,7 +203,7 @@ namespace TSMapEditor.Models
                 case RTTIType.Terrain:
                     return TerrainObject == abstractObject;
                 case RTTIType.Building:
-                    return Structure == abstractObject;
+                    return Structures.Contains((Structure)abstractObject);
                 case RTTIType.Unit:
                     return Vehicle == abstractObject;
                 case RTTIType.Infantry:

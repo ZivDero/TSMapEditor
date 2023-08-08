@@ -605,10 +605,11 @@ namespace TSMapEditor.Models
         {
             Waypoints.Add(waypoint);
             var cell = GetTile(waypoint.Position.X, waypoint.Position.Y);
-            //if (cell.Waypoint != null)
-            //{
-            //    throw new InvalidOperationException($"Cell at {cell.CoordsToPoint()} already has a waypoint, skipping adding waypoint {waypoint.Identifier}");
-            //}
+            if (cell.Waypoints.Count > 0)
+            {
+                //throw new InvalidOperationException($"Cell at {cell.CoordsToPoint()} already has a waypoint, skipping adding waypoint {waypoint.Identifier}");
+                Logger.Log($"NOTE: Waypoint {waypoint.Identifier} exists on the cell {cell.CoordsToPoint()} that already has other waypoints.");
+            }
 
             cell.Waypoints.Add(waypoint);
         }
@@ -758,26 +759,26 @@ namespace TSMapEditor.Models
                 if (cell == null)
                     return;
 
-                if (cell.Structure != null)
-                    throw new InvalidOperationException("Cannot place a structure on a cell that already has a structure!");
+                //if (cell.Structure != null)
+                //    throw new InvalidOperationException("Cannot place a structure on a cell that already has a structure!");
 
-                cell.Structure = structure;
+                cell.Structures.Add(structure);
             });
 
             if (structure.ObjectType.ArtConfig.Foundation.Width == 0 && structure.ObjectType.ArtConfig.Foundation.Height == 0)
             {
-                GetTile(structure.Position).Structure = structure;
+                GetTile(structure.Position).Structures.Add(structure);
             }
             
             Structures.Add(structure);
         }
 
-        public void RemoveBuilding(Point2D cellCoords)
+        public void RemoveBuildingsFrom(Point2D cellCoords)
         {
             var cell = GetTile(cellCoords);
 
-            if (cell.Structure != null)
-                RemoveBuilding(cell.Structure);
+            if (cell.Structures.Count > 0)
+                cell.Structures.Clear();
         }
 
         public void RemoveBuilding(Structure structure)
@@ -788,13 +789,13 @@ namespace TSMapEditor.Models
                 if (cell == null)
                     return;
 
-                if (cell.Structure == structure)
-                    cell.Structure = null;
+                if (cell.Structures.Contains(structure))
+                    cell.Structures.Remove(structure);
             });
 
             if (structure.ObjectType.ArtConfig.Foundation.Width == 0 && structure.ObjectType.ArtConfig.Foundation.Height == 0)
             {
-                GetTile(structure.Position).Structure = null;
+                GetTile(structure.Position).Structures.Remove(structure);
             }
 
             Structures.Remove(structure);
@@ -934,7 +935,7 @@ namespace TSMapEditor.Models
         /// <summary>
         /// Determines whether an object can be moved to a specific location.
         /// </summary>
-        /// <param name="gameObject">The object to move.</param>
+        /// <param name="movable">The object to move.</param>
         /// <param name="newCoords">The new coordinates of the object.</param>
         /// <returns>True if the object can be moved, otherwise false.</returns>
         public bool CanMoveObject(IMovable movable, Point2D newCoords)
@@ -949,8 +950,8 @@ namespace TSMapEditor.Models
                     if (foundationCell == null)
                         return;
 
-                    if (foundationCell.Structure != null && foundationCell.Structure != movable)
-                        canPlace = false;
+                    //if (foundationCell.Structure != null && foundationCell.Structure != movable)
+                    //    canPlace = false;
                 });
 
                 if (!canPlace)
@@ -991,9 +992,9 @@ namespace TSMapEditor.Models
                 return;
             }
 
-            if (tile.Structure != null)
+            if (tile.Structures.Count > 0)
             {
-                RemoveBuilding(tile.Structure);
+                RemoveBuildingsFrom(tile.CoordsToPoint());
                 return;
             }
 

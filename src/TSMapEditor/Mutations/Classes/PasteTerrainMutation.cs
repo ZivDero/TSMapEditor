@@ -657,8 +657,8 @@ namespace TSMapEditor.Mutations.Classes
                 if (cell == null)
                     continue;
 
-                if (cell.Structure != null)
-                    continue;
+                //if (cell.Structure != null)
+                //    continue;
 
                 var buildingType = MutationTarget.Map.Rules.BuildingTypes.Find(tt => tt.ININame == copiedStructureEntry.ObjectTypeName);
                 if (buildingType == null)
@@ -670,7 +670,7 @@ namespace TSMapEditor.Mutations.Classes
                     Point2D foundationCellCoords = foundationPoint + cellCoords;
                     MapTile foundationCell = MutationTarget.Map.GetTile(foundationCellCoords);
 
-                    if (foundationCell == null || foundationCell.Structure != null)
+                    if (foundationCell == null)// || foundationCell.Structure != null)
                         isFoundationClear = false;
                 });
 
@@ -774,7 +774,7 @@ namespace TSMapEditor.Mutations.Classes
 
             foreach (Point2D cellCoords in structureCells)
             {
-                MutationTarget.Map.RemoveBuilding(cellCoords);
+                MutationTarget.Map.RemoveBuildingsFrom(cellCoords);
             }
 
             foreach (var infantryInfo in infantryLocations)

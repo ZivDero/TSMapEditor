@@ -129,9 +129,9 @@ namespace TSMapEditor.UI
                 AddObjectInformation("Vehicle: ", MapTile.Vehicle);
             }
 
-            if (MapTile.Structure != null)
-            {
-                AddObjectInformation("Structure: ", MapTile.Structure);
+            foreach (var structure in MapTile.Structures)
+            { 
+                AddObjectInformation("Structure: ", structure);
             }
 
             for (int i = 0; i < MapTile.Infantry.Length; i++)
@@ -140,12 +140,11 @@ namespace TSMapEditor.UI
                     AddObjectInformation("Infantry: ", MapTile.Infantry[i]);
             }
 
-            if (MapTile.Waypoints.Count > 0)
+            foreach (var waypoint in MapTile.Waypoints)
             {
-                foreach (var waypoint in MapTile.Waypoints)
-                    AddWaypointInfo(waypoint);
+                AddWaypointInfo(waypoint);
             }
-
+            
             textRenderer.PrepareTextParts();
 
             Height = textRenderer.Bottom + Constants.UIEmptyBottomSpace;
