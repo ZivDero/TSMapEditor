@@ -133,7 +133,7 @@ namespace TSMapEditor.UI.Sidebar
             {
                 var objectType = objectTypeList[i];
 
-                if (!objectType.EditorVisible || Map.EditorConfig.EditorRulesIni.KeyExists("IndividualIgnore", objectType.ININame))
+                if (!objectType.EditorVisible || Map.EditorConfig.EditorRulesIni.KeyExists("IgnoreTypes", objectType.ININame))
                     continue;
 
                 if (objectType.WhatAmI() == RTTIType.BuildingType)
@@ -152,7 +152,8 @@ namespace TSMapEditor.UI.Sidebar
                 List<Color> remapColors = new List<Color>(1);
                 List<string> categories = new List<string>(1);
 
-                string categoriesString = objectType.EditorCategory;
+                string categoriesString = Map.EditorConfig.EditorRulesIni.GetStringValue("IndividualCategoryOverrides", objectType.ININame, objectType.EditorCategory);
+
                 if (categoriesString == null)
                     categoriesString = objectType.Owner;
 
@@ -171,7 +172,6 @@ namespace TSMapEditor.UI.Sidebar
 
                         string ownerName = owners[ownerIndex];
                         ownerName = Map.EditorConfig.EditorRulesIni.GetStringValue("ObjectCategoryOverrides", ownerName, ownerName);
-                        ownerName = Map.EditorConfig.EditorRulesIni.GetStringValue("IndividualCategoryOverrides", objectType.ININame, Map.EditorConfig.EditorRulesIni.GetStringValue("ObjectCategoryOverrides", ownerName, ownerName));
 
                         House house = Map.StandardHouses.Find(h => h.ININame == ownerName);
                         if (house != null)

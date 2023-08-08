@@ -161,6 +161,10 @@ namespace TSMapEditor.UI.Sidebar
                 TreeViewCategory category = null;
                 TerrainType terrainType = Map.Rules.TerrainTypes[i];
 
+                if (Map.EditorConfig.EditorRulesIni.KeyExists("IgnoreTypes", terrainType.ININame))
+                {
+                    continue;
+                }
                 if (string.IsNullOrEmpty(terrainType.EditorCategory))
                 {
                     category = FindOrMakeCategory("Uncategorized", categories);

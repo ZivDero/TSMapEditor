@@ -172,6 +172,10 @@ namespace TSMapEditor.UI.Sidebar
                 TreeViewCategory category = null;
                 SmudgeType smudgeType = Map.Rules.SmudgeTypes[i];
 
+                if (Map.EditorConfig.EditorRulesIni.KeyExists("IgnoreTypes", smudgeType.ININame))
+                {
+                    continue;
+                }
                 if (string.IsNullOrEmpty(smudgeType.EditorCategory))
                 {
                     category = FindOrMakeCategory("Uncategorized", categories);

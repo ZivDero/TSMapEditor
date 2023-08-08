@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Rampastring.XNAUI;
 using Rampastring.XNAUI.XNAControls;
+using SharpDX.MediaFoundation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -176,6 +177,10 @@ namespace TSMapEditor.UI.Sidebar
                 TreeViewCategory category = null;
                 OverlayType overlayType = Map.Rules.OverlayTypes[i];
 
+                if (Map.EditorConfig.EditorRulesIni.KeyExists("IgnoreTypes", overlayType.ININame))
+                {
+                    continue;
+                }
                 if (string.IsNullOrEmpty(overlayType.EditorCategory))
                 {
                     category = FindOrMakeCategory("Uncategorized", categories);
