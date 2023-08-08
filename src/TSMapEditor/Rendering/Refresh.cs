@@ -114,8 +114,7 @@ namespace TSMapEditor.Rendering
 
                 mapTile.DoForAllInfantry(inf => RedrawFromObject(inf));
                 mapTile.DoForAllVehicles(unit => RedrawFromObject(unit));
-                if (mapTile.Aircraft != null)
-                    RedrawFromObject(mapTile.Aircraft);
+                mapTile.DoForAllAircraft(aircraft => RedrawFromObject(aircraft));
                 if (mapTile.TerrainObject != null)
                     RedrawFromObject(mapTile.TerrainObject);
 

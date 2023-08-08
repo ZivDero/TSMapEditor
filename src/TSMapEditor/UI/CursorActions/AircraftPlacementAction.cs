@@ -45,21 +45,25 @@ namespace TSMapEditor.UI.CursorActions
             aircraft.Position = cellCoords;
 
             var tile = CursorActionTarget.Map.GetTile(cellCoords);
-            if (tile.Aircraft == null)
-            {
-                tile.Aircraft = aircraft;
-                CursorActionTarget.TechnoUnderCursor = aircraft;
-                CursorActionTarget.AddRefreshPoint(cellCoords);
-            }
+            tile.Aircraft.Add(aircraft);
+            CursorActionTarget.TechnoUnderCursor = aircraft;
+            CursorActionTarget.AddRefreshPoint(cellCoords);
+            //if (tile.Aircraft == null)
+            //{
+            //    tile.Aircraft = aircraft;
+            //    CursorActionTarget.TechnoUnderCursor = aircraft;
+            //    CursorActionTarget.AddRefreshPoint(cellCoords);
+            //}
+
         }
 
         public override void PostMapDraw(Point2D cellCoords)
         {
             // Clear preview data
             var tile = CursorActionTarget.Map.GetTile(cellCoords);
-            if (tile.Aircraft == aircraft)
+            if (tile.Aircraft.Contains(aircraft))
             {
-                tile.Aircraft = null;
+                tile.Aircraft.Remove(aircraft);
                 CursorActionTarget.TechnoUnderCursor = null;
                 CursorActionTarget.AddRefreshPoint(cellCoords);
             }
@@ -71,8 +75,8 @@ namespace TSMapEditor.UI.CursorActions
                 throw new InvalidOperationException(nameof(AircraftType) + " cannot be null");
 
             var tile = CursorActionTarget.Map.GetTile(cellPoint);
-            if (tile.Aircraft != null)
-                return;
+            //if (tile.Aircraft != null)
+            //    return;
 
             var mutation = new PlaceAircraftMutation(CursorActionTarget.MutationTarget, AircraftType, cellPoint);
             CursorActionTarget.MutationManager.PerformMutation(mutation);

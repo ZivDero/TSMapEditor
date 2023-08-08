@@ -528,18 +528,15 @@ namespace TSMapEditor.Rendering
             if (tile.Overlay != null && tile.Overlay.OverlayType != null)
                 gameObjectsToRender.Add(tile.Overlay);
 
-            tile.DoForAllBuildings(i =>
+            tile.DoForAllBuildings(structure =>
             {
-                if (i.Position == tile.CoordsToPoint())
-                    gameObjectsToRender.Add(i);
+                if (structure.Position == tile.CoordsToPoint())
+                    gameObjectsToRender.Add(structure);
             });
 
-            tile.DoForAllInfantry(i => gameObjectsToRender.Add(i));
-
-            if (tile.Aircraft != null)
-                gameObjectsToRender.Add(tile.Aircraft);
-
-            tile.DoForAllVehicles(i => gameObjectsToRender.Add(i));
+            tile.DoForAllInfantry(inf => gameObjectsToRender.Add(inf));
+            tile.DoForAllAircraft(aircraft => gameObjectsToRender.Add(aircraft));
+            tile.DoForAllVehicles(unit => gameObjectsToRender.Add(unit));
 
             if (tile.TerrainObject != null)
                 gameObjectsToRender.Add(tile.TerrainObject);
