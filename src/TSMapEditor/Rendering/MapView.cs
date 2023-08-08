@@ -558,19 +558,18 @@ namespace TSMapEditor.Rendering
             if (tile.Overlay != null && tile.Overlay.OverlayType != null)
                 gameObjectsToRender.Add(tile.Overlay);
 
-            foreach (var structure in tile.Structures)
+            tile.DoForAllBuildings(i =>
             {
-                if (structure.Position == tile.CoordsToPoint())
-                    gameObjectsToRender.Add(structure);
-            }
+                if (i.Position == tile.CoordsToPoint())
+                    gameObjectsToRender.Add(i);
+            });
 
             tile.DoForAllInfantry(i => gameObjectsToRender.Add(i));
 
             if (tile.Aircraft != null)
                 gameObjectsToRender.Add(tile.Aircraft);
 
-            if (tile.Vehicle != null)
-                gameObjectsToRender.Add(tile.Vehicle);
+            tile.DoForAllVehicles(i => gameObjectsToRender.Add(i));
 
             if (tile.TerrainObject != null)
                 gameObjectsToRender.Add(tile.TerrainObject);
@@ -1127,8 +1126,8 @@ namespace TSMapEditor.Rendering
                 if (tileUnderCursor.Structures.Count > 0)
                     windowController.StructureOptionsWindow.Open(tileUnderCursor.Structures[0]);
 
-                if (tileUnderCursor.Vehicle != null)
-                    windowController.VehicleOptionsWindow.Open(tileUnderCursor.Vehicle);
+                if (tileUnderCursor.Vehicles.Count > 0)
+                    windowController.VehicleOptionsWindow.Open(tileUnderCursor.Vehicles[0]);
 
                 Infantry infantry = tileUnderCursor.GetFirstInfantry();
                 if (infantry != null)

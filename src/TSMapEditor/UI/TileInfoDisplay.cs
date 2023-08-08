@@ -124,27 +124,11 @@ namespace TSMapEditor.UI
                 AddObjectInformation("Aircraft: ", MapTile.Aircraft);
             }
 
-            if (MapTile.Vehicle != null)
-            {
-                AddObjectInformation("Vehicle: ", MapTile.Vehicle);
-            }
+            MapTile.DoForAllVehicles(unit => AddObjectInformation("Vehicle: ", unit));
+            MapTile.DoForAllBuildings(structure => AddObjectInformation("Structure: ", structure));
+            MapTile.DoForAllInfantry(inf => AddObjectInformation("Infantry: ", inf));
+            MapTile.DoForAllWaypoints(waypoint => AddWaypointInfo(waypoint));
 
-            foreach (var structure in MapTile.Structures)
-            { 
-                AddObjectInformation("Structure: ", structure);
-            }
-
-            for (int i = 0; i < MapTile.Infantry.Length; i++)
-            {
-                if (MapTile.Infantry[i] != null)
-                    AddObjectInformation("Infantry: ", MapTile.Infantry[i]);
-            }
-
-            foreach (var waypoint in MapTile.Waypoints)
-            {
-                AddWaypointInfo(waypoint);
-            }
-            
             textRenderer.PrepareTextParts();
 
             Height = textRenderer.Bottom + Constants.UIEmptyBottomSpace;
