@@ -636,7 +636,9 @@ namespace TSMapEditor.Rendering
                 // if the theater-specific SHP is not found
                 if (shpData == null)
                 {
-                    shpData = fileManager.LoadFile(shpFileName);
+                    string newTheaterShpName = shpFileName.Substring(0, 1) + Theater.NewTheaterBuildingLetter + shpFileName.Substring(2);
+
+                    shpData = fileManager.LoadFile(newTheaterShpName);
                     if (shpData == null)
                     {
                         continue;
