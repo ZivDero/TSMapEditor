@@ -350,10 +350,11 @@ namespace TSMapEditor.Initialization
                         return;
                     }
 
-                    if (tile.Structure != null)
+                    if (tile.Structures.Count > 0)
                     {
-                        isClear = false;
-                        AddMapLoadError($"Building {buildingType.ININame} exists on a cell ({cellCoords}) that already has another building ({tile.Structure.ObjectType.ININame}). Skipping adding it to map.");
+                        //isClear = false;
+                        //AddMapLoadError($"Building {buildingType.ININame} exists on a cell ({cellCoords}) that already has another building ({tile.Structure.ObjectType.ININame}). Skipping adding it to map.");
+                        Logger.Log($"NOTE: Building {buildingType.ININame} exists on the cell {cellCoords} that already has other buildings.");
                     }
                 }
 
@@ -366,7 +367,7 @@ namespace TSMapEditor.Initialization
                 buildingType.ArtConfig.DoForFoundationCoordsOrOrigin(offset =>
                 {
                     var tile = map.GetTile(building.Position + offset);
-                    tile.Structure = building;
+                    tile.Structures.Add(building);
                 });
             }
         }
@@ -673,12 +674,13 @@ namespace TSMapEditor.Initialization
                     AddMapLoadError($"Waypoint {waypoint.Identifier} at {waypoint.Position} is not within the valid map area.");
                     continue;
                 }
-                
-                //if (mapCell.Waypoint != null)
-                //{
-                //    AddMapLoadError($"Cell at {waypoint.Position} has multiple waypoints placed on it. Skipping adding waypoint #{waypoint.Identifier} there.");
-                //    continue;
-                //}
+
+                if (mapCell.Waypoints.Count > 0)
+                {
+                    //AddMapLoadError($"Cell at {waypoint.Position} has multiple waypoints placed on it. Skipping adding waypoint #{waypoint.Identifier} there.");
+                    Logger.Log($"NOTE: Waypoint {waypoint.Identifier} exists on the cell {waypoint.Position} that already has other waypoints.");
+                    continue;
+                }
 
                 map.AddWaypoint(waypoint);
             }

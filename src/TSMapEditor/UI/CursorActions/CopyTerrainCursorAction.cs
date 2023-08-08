@@ -79,8 +79,11 @@ namespace TSMapEditor.UI.CursorActions
 
                     if ((EntryTypes & CopiedEntryType.Structure) == CopiedEntryType.Structure)
                     {
-                        if (cell.Structure != null && cell.Structure.Position == new Point2D(x, y))
-                            copiedMapData.CopiedMapEntries.Add(new CopiedStructureEntry(offset, cell.Structure.ObjectType.ININame, cell.Structure.Owner.ININame, cell.Structure.HP, 0, cell.Structure.Facing, string.Empty));
+                        foreach (var structure in cell.Structures)
+                        {
+                            if (structure.Position == new Point2D(x, y))
+                                copiedMapData.CopiedMapEntries.Add(new CopiedStructureEntry(offset, structure.ObjectType.ININame, structure.Owner.ININame, structure.HP, 0, structure.Facing, string.Empty));
+                        }
                     }
 
                     if ((EntryTypes & CopiedEntryType.Infantry) == CopiedEntryType.Infantry)

@@ -48,33 +48,37 @@ namespace TSMapEditor.UI.CursorActions
             structure.Position = cellCoords;
 
             var tile = CursorActionTarget.Map.GetTile(cellCoords);
-            if (tile.Structure != null)
-                return;
+            tile.Structures.Add(structure);
+            CursorActionTarget.TechnoUnderCursor = structure;
+            CursorActionTarget.AddRefreshPoint(cellCoords, 10);
 
-            bool foundationAreaHasStructure = false;
-            structure.ObjectType.ArtConfig.DoForFoundationCoordsOrOrigin(offset =>
-            {
-                var cell = CursorActionTarget.Map.GetTile(cellCoords + offset);
+            //if (tile.Structure != null)
+            //    return;
 
-                if (cell != null && cell.Structure != null)
-                    foundationAreaHasStructure = true;
-            });
+            //bool foundationAreaHasStructure = false;
+            //structure.ObjectType.ArtConfig.DoForFoundationCoords(offset =>
+            //{
+            //    var cell = CursorActionTarget.Map.GetTile(cellCoords + offset);
 
-            if (!foundationAreaHasStructure)
-            {
-                tile.Structure = structure;
-                CursorActionTarget.TechnoUnderCursor = structure;
-                CursorActionTarget.AddRefreshPoint(cellCoords, 10);
-            }
+            //    if (cell != null && cell.Structure != null)
+            //        foundationAreaHasStructure = true;
+            //});
+
+            //if (!foundationAreaHasStructure)
+            //{
+            //    tile.Structure = structure;
+            //    CursorActionTarget.TechnoUnderCursor = structure;
+            //    CursorActionTarget.AddRefreshPoint(cellCoords, 10);
+            //}
         }
 
         public override void PostMapDraw(Point2D cellCoords)
         {
             // Clear preview data
             var tile = CursorActionTarget.Map.GetTile(cellCoords);
-            if (tile.Structure == structure)
+            if (tile.Structures.Contains(structure))
             {
-                tile.Structure = null;
+                tile.Structures.Remove(structure);
                 CursorActionTarget.TechnoUnderCursor = null;
                 CursorActionTarget.AddRefreshPoint(cellCoords, 10);
             }
@@ -86,14 +90,14 @@ namespace TSMapEditor.UI.CursorActions
                 throw new InvalidOperationException(nameof(BuildingType) + " cannot be null");
 
             var tile = CursorActionTarget.Map.GetTile(cellCoords);
-            if (tile.Structure != null)
-                return;
+            //if (tile.Structure != null)
+            //    return;
 
             bool foundationInvalid = false;
             structure.ObjectType.ArtConfig.DoForFoundationCoords(offset =>
             {
                 var cell = CursorActionTarget.Map.GetTile(cellCoords + offset);
-                if (cell == null || cell.Structure != null)
+                if (cell == null)// || cell.Structure != null)
                     foundationInvalid = true;
             });
 
