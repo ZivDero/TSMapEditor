@@ -1018,9 +1018,9 @@ namespace TSMapEditor.Rendering
                             isDraggingObject = true;
                     }
                 }
-                else if (tileUnderCursor.Waypoint != null)
+                else if (tileUnderCursor.Waypoints.Count > 0)
                 {
-                    draggedOrRotatedObject = tileUnderCursor.Waypoint;
+                    draggedOrRotatedObject = tileUnderCursor.Waypoints[0];
                     isDraggingObject = true;
                 }
             }

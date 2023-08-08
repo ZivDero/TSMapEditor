@@ -26,7 +26,7 @@ namespace TSMapEditor.Mutations.Classes
 
         public override void Undo()
         {
-            MutationTarget.Map.RemoveWaypointFrom(cellCoords);
+            MutationTarget.Map.RemoveWaypointsFrom(cellCoords);
             MutationTarget.AddRefreshPoint(cellCoords, 1);
         }
     }

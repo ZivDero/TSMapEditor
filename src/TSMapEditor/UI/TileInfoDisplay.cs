@@ -140,9 +140,10 @@ namespace TSMapEditor.UI
                     AddObjectInformation("Infantry: ", MapTile.Infantry[i]);
             }
 
-            if (MapTile.Waypoint != null)
+            if (MapTile.Waypoints.Count > 0)
             {
-                AddWaypointInfo(MapTile.Waypoint);
+                foreach (var waypoint in MapTile.Waypoints)
+                    AddWaypointInfo(waypoint);
             }
 
             textRenderer.PrepareTextParts();

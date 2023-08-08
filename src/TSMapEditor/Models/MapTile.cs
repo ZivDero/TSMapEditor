@@ -33,8 +33,7 @@ namespace TSMapEditor.Models
 
         public Overlay Overlay { get; set; }
         public Smudge Smudge { get; set; }
-
-        public Waypoint Waypoint { get; set; }
+        public List<Waypoint> Waypoints { get; set; } = new();
 
         public CellTag CellTag { get; set; }
 
@@ -210,7 +209,7 @@ namespace TSMapEditor.Models
                 case RTTIType.Smudge:
                     return Smudge == abstractObject;
                 case RTTIType.Waypoint:
-                    return Waypoint == abstractObject;
+                    return Waypoints.Contains((Waypoint)abstractObject);
             }
 
             return false;

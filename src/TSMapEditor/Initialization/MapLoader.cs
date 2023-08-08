@@ -676,11 +676,11 @@ namespace TSMapEditor.Initialization
                     continue;
                 }
                 
-                if (mapCell.Waypoint != null)
-                {
-                    AddMapLoadError($"Cell at {waypoint.Position} has multiple waypoints placed on it. Skipping adding waypoint #{waypoint.Identifier} there.");
-                    continue;
-                }
+                //if (mapCell.Waypoint != null)
+                //{
+                //    AddMapLoadError($"Cell at {waypoint.Position} has multiple waypoints placed on it. Skipping adding waypoint #{waypoint.Identifier} there.");
+                //    continue;
+                //}
 
                 map.AddWaypoint(waypoint);
             }
