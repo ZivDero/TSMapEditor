@@ -73,17 +73,16 @@ namespace TSMapEditor.UI.CursorActions
 
                     if ((EntryTypes & CopiedEntryType.Vehicle) == CopiedEntryType.Vehicle)
                     {
-                        if (cell.Vehicle != null)
-                            copiedMapData.CopiedMapEntries.Add(new CopiedVehicleEntry(offset, cell.Vehicle.ObjectType.ININame, cell.Vehicle.Owner.ININame, cell.Vehicle.HP, cell.Vehicle.Veterancy, cell.Vehicle.Facing, cell.Vehicle.Mission));
+                        cell.DoForAllVehicles(unit => copiedMapData.CopiedMapEntries.Add(new CopiedVehicleEntry(offset, unit.ObjectType.ININame, unit.Owner.ININame, unit.HP, unit.Veterancy, unit.Facing, unit.Mission)));
                     }
 
                     if ((EntryTypes & CopiedEntryType.Structure) == CopiedEntryType.Structure)
                     {
-                        foreach (var structure in cell.Structures)
+                        cell.DoForAllBuildings(structure =>
                         {
                             if (structure.Position == new Point2D(x, y))
                                 copiedMapData.CopiedMapEntries.Add(new CopiedStructureEntry(offset, structure.ObjectType.ININame, structure.Owner.ININame, structure.HP, 0, structure.Facing, string.Empty));
-                        }
+                        });
                     }
 
                     if ((EntryTypes & CopiedEntryType.Infantry) == CopiedEntryType.Infantry)

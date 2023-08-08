@@ -778,7 +778,7 @@ namespace TSMapEditor.Models
             var cell = GetTile(cellCoords);
 
             if (cell.Structures.Count > 0)
-                cell.Structures.Clear();
+                cell.DoForAllBuildings(structure => RemoveBuilding(structure));
         }
 
         public void RemoveBuilding(Structure structure)
@@ -811,23 +811,26 @@ namespace TSMapEditor.Models
         public void PlaceUnit(Unit unit)
         {
             var cell = GetTile(unit.Position);
-            if (cell.Vehicle != null)
-                throw new InvalidOperationException("Cannot place a vehicle on a cell that already has a vehicle!");
+            //if (cell.Vehicle != null)
+            //    throw new InvalidOperationException("Cannot place a vehicle on a cell that already has a vehicle!");
 
-            cell.Vehicle = unit;
+            cell.Vehicles.Add(unit);
             Units.Add(unit);
         }
 
         public void RemoveUnit(Unit unit)
         {
-            RemoveUnit(unit.Position);
+            var cell = GetTile(unit.Position);
+            Units.Remove(unit);
+            cell.Vehicles.Remove(unit);
         }
 
-        public void RemoveUnit(Point2D cellCoords)
+        public void RemoveUnitsFrom(Point2D cellCoords)
         {
             var cell = GetTile(cellCoords);
-            Units.Remove(cell.Vehicle);
-            cell.Vehicle = null;
+            cell.DoForAllVehicles(unit => Units.Remove(unit));
+
+            cell.Vehicles.Clear();
         }
 
         public void MoveUnit(Unit unit, Point2D newCoords)
@@ -986,9 +989,9 @@ namespace TSMapEditor.Models
                 return;
             }
 
-            if (tile.Vehicle != null)
+            if (tile.Vehicles.Count > 0)
             {
-                RemoveUnit(tile.Vehicle);
+                RemoveUnitsFrom(tile.CoordsToPoint());
                 return;
             }
 

@@ -616,8 +616,8 @@ namespace TSMapEditor.Mutations.Classes
                 if (cell == null)
                     continue;
 
-                if (cell.Vehicle != null)
-                    continue;
+                //if (cell.Vehicle != null)
+                //    continue;
 
                 var unitType = MutationTarget.Map.Rules.UnitTypes.Find(tt => tt.ININame == copiedVehicleEntry.ObjectTypeName);
                 if (unitType == null)
@@ -769,7 +769,7 @@ namespace TSMapEditor.Mutations.Classes
 
             foreach (Point2D cellCoords in vehicleCells)
             {
-                MutationTarget.Map.RemoveUnit(cellCoords);
+                MutationTarget.Map.RemoveUnitsFrom(cellCoords);
             }
 
             foreach (Point2D cellCoords in structureCells)

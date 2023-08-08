@@ -48,21 +48,25 @@ namespace TSMapEditor.UI.CursorActions
             unit.Position = cellCoords;
 
             var tile = CursorActionTarget.Map.GetTile(cellCoords);
-            if (tile.Vehicle == null)
-            {
-                tile.Vehicle = unit;
-                CursorActionTarget.TechnoUnderCursor = unit;
-                CursorActionTarget.AddRefreshPoint(cellCoords);
-            }
+            tile.Vehicles.Add(unit);
+            CursorActionTarget.TechnoUnderCursor = unit;
+            CursorActionTarget.AddRefreshPoint(cellCoords);
+
+            //if (tile.Vehicle == null)
+            //{
+            //    tile.Vehicle = unit;
+            //    CursorActionTarget.TechnoUnderCursor = unit;
+            //    CursorActionTarget.AddRefreshPoint(cellCoords);
+            //}
         }
 
         public override void PostMapDraw(Point2D cellCoords)
         {
             // Clear preview data
             var tile = CursorActionTarget.Map.GetTile(cellCoords);
-            if (tile.Vehicle == unit)
+            if (tile.Vehicles.Contains(unit))
             {
-                tile.Vehicle = null;
+                tile.Vehicles.Remove(unit);
                 CursorActionTarget.TechnoUnderCursor = null;
                 CursorActionTarget.AddRefreshPoint(cellCoords);
             }
@@ -74,8 +78,8 @@ namespace TSMapEditor.UI.CursorActions
                 throw new InvalidOperationException(nameof(UnitType) + " cannot be null");
 
             var tile = CursorActionTarget.Map.GetTile(cellPoint);
-            if (tile.Vehicle != null)
-                return;
+            //if (tile.Vehicle != null)
+            //    return;
 
             var mutation = new PlaceVehicleMutation(CursorActionTarget.MutationTarget, UnitType, cellPoint);
             CursorActionTarget.MutationManager.PerformMutation(mutation);

@@ -24,8 +24,9 @@ namespace TSMapEditor.Models
         public TileImage TileImage { get; set; }
         public TerrainObject TerrainObject { get; set; }
         public List<Structure> Structures { get; set; } = new List<Structure>();
-        public Structure Structure { get; set; }
+        public List<Unit> Vehicles { get; set; } = new List<Unit>();
         public Unit Vehicle { get; set; }
+        public List<Aircraft> Aircrafts { get; set; } = new List<Aircraft>();
         public Aircraft Aircraft { get; set; }
         public Infantry[] Infantry { get; set; } = new Infantry[SubCellCount];
         public TileImage PreviewTileImage { get; set; }
@@ -71,8 +72,8 @@ namespace TSMapEditor.Models
             if (Structures.Count > 0)
                 objects.AddRange(Structures);
 
-            if (Vehicle != null)
-                objects.Add(Vehicle);
+            if (Structures.Count > 0)
+                objects.AddRange(Vehicles);
         }
 
         public void AddInfantry(Infantry infantry)
@@ -86,6 +87,38 @@ namespace TSMapEditor.Models
             {
                 if (Infantry[i] != null)
                     action(Infantry[i]);
+            }
+        }
+
+        public void DoForAllVehicles(Action<Unit> action)
+        {
+            foreach (var unit in Vehicles)
+            {
+                action(unit);
+            }
+        }
+
+        public void DoForAllAircraft(Action<Aircraft> action)
+        {
+            foreach (var aircraft in Aircrafts)
+            {
+                action(aircraft);
+            }
+        }
+
+        public void DoForAllBuildings(Action<Structure> action)
+        {
+            foreach (var structure in Structures)
+            {
+                action(structure);
+            }
+        }
+
+        public void DoForAllWaypoints(Action<Waypoint> action)
+        {
+            foreach (var waypoint in Waypoints)
+            {
+                action(waypoint);
             }
         }
 
@@ -121,7 +154,7 @@ namespace TSMapEditor.Models
 
         public bool HasTechno()
         {
-            return Structures.Count > 0 || Vehicle != null || Aircraft != null || Array.Exists(Infantry, inf => inf != null);
+            return Structures.Count > 0 || Vehicles.Count > 0 || Aircrafts.Count > 0 || Array.Exists(Infantry, inf => inf != null);
         }
 
         public bool HasTechnoThatPassesCheck(Predicate<TechnoBase> predicate)
@@ -131,17 +164,14 @@ namespace TSMapEditor.Models
 
         public TechnoBase GetFirstTechnoThatPassesCheck(Predicate<TechnoBase> predicate)
         {
-            foreach (var structure in Structures)
-            {
-                if (predicate(structure))
-                    return structure;
-            }
+            var structure = Structures.Find(predicate);
+            if (structure != null) return structure;
 
-            if (Vehicle != null && predicate(Vehicle))
-                return Vehicle;
+            var unit = Vehicles.Find(predicate);
+            if (unit != null) return unit;
 
-            if (Aircraft != null && predicate(Aircraft))
-                return Aircraft;
+            var aircraft = Aircrafts.Find(predicate);
+            if (aircraft != null) return aircraft;
 
             return Array.Find(Infantry, inf => inf != null && predicate(inf));
         }
@@ -151,11 +181,11 @@ namespace TSMapEditor.Models
             if (Structures.Count > 0)
                 return Structures[0];
 
-            if (Vehicle != null)
-                return Vehicle;
+            if (Vehicles.Count > 0)
+                return Vehicles[0];
 
-            if (Aircraft != null)
-                return Aircraft;
+            if (Aircrafts.Count > 0)
+                return Aircrafts[0];
 
             return Array.Find(Infantry, inf => inf != null);
         }
@@ -184,7 +214,7 @@ namespace TSMapEditor.Models
                 case RTTIType.Building:
                     return true;
                 case RTTIType.Unit:
-                    return Vehicle == null;
+                    return true;
                 case RTTIType.Infantry:
                     return GetFreeSubCellSpot() != SubCell.None;
                 case RTTIType.Terrain:
@@ -205,7 +235,7 @@ namespace TSMapEditor.Models
                 case RTTIType.Building:
                     return Structures.Contains((Structure)abstractObject);
                 case RTTIType.Unit:
-                    return Vehicle == abstractObject;
+                    return Vehicles.Contains((Unit)abstractObject);
                 case RTTIType.Infantry:
                     return Array.Exists(Infantry, inf => inf == abstractObject);
                 case RTTIType.Overlay:

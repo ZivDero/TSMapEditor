@@ -488,7 +488,7 @@ namespace TSMapEditor.Initialization
                 map.Units.Add(unit);
                 var tile = map.GetTile(x, y);
                 if (tile != null)
-                    tile.Vehicle = unit;
+                    tile.Vehicles.Add(unit);
             }
 
             // Process follow IDs

@@ -18,15 +18,16 @@ namespace TSMapEditor.Mutations.Classes
 
         private readonly UnitType unitType;
         private readonly Point2D cellCoords;
+        private Unit unit; 
 
         public override void Perform()
         {
             var cell = MutationTarget.Map.GetTileOrFail(cellCoords);
 
-            if (cell.Vehicle != null)
-                throw new InvalidOperationException(nameof(PlaceVehicleMutation) + ": the cell already has a vehicle!");
+            //if (cell.Vehicle != null)
+            //    throw new InvalidOperationException(nameof(PlaceVehicleMutation) + ": the cell already has a vehicle!");
 
-            var unit = new Unit(unitType);
+            unit = new Unit(unitType);
             unit.Owner = MutationTarget.ObjectOwner;
             unit.Position = cellCoords;
             MutationTarget.Map.PlaceUnit(unit);
@@ -36,7 +37,7 @@ namespace TSMapEditor.Mutations.Classes
         public override void Undo()
         {
             var cell = MutationTarget.Map.GetTile(cellCoords);
-            MutationTarget.Map.RemoveUnit(cell.Vehicle);
+            MutationTarget.Map.RemoveUnit(unit);
             MutationTarget.AddRefreshPoint(cellCoords);
         }
     }
