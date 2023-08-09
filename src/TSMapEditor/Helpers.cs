@@ -121,7 +121,11 @@ namespace TSMapEditor
         {
             if (str.Length < 1 || str.Length > 2 ||
                 str[0] < 'A' || str[0] > 'Z' || (str.Length == 2 && (str[1] < 'A' || str[1] > 'Z')))
-                throw new InvalidOperationException("Waypoint values are only valid between A and ZZ. Invalid value: " + str);
+            {
+                //throw new InvalidOperationException("Waypoint values are only valid between A and ZZ. Invalid value: " + str);
+                Logger.Log($"Waypoint values are only valid between A and ZZ. Invalid value: {str}. Converting into 0.");
+                return -1;
+            }
 
             if (str.Length == 1)
                 return str[0] - 'A';
@@ -134,9 +138,7 @@ namespace TSMapEditor
 
         public static string WaypointNumberToAlphabeticalString(int waypointNumber)
         {
-            const int WAYPOINT_MAX = 701;
-
-            if (waypointNumber > WAYPOINT_MAX)
+            if (waypointNumber > Constants.MaxWaypoint)
                 return "A"; // matches 0
 
             const int CharCount = 26;
