@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using Rampastring.XNAUI;
 using Rampastring.XNAUI.XNAControls;
+using TSMapEditor.GameMath;
 using TSMapEditor.Models;
+using TSMapEditor.Rendering;
 using TSMapEditor.UI.Controls;
 
 namespace TSMapEditor.UI.Windows
@@ -12,12 +14,14 @@ namespace TSMapEditor.UI.Windows
     /// </summary>
     public class StructureOptionsWindow : INItializableWindow
     {
-        public StructureOptionsWindow(WindowManager windowManager, Map map) : base(windowManager)
+        public StructureOptionsWindow(WindowManager windowManager, Map map, ICursorActionTarget cursorActionTarget) : base(windowManager)
         {
             this.map = map;
+            this.mutationTarget = cursorActionTarget.MutationTarget;
         }
 
         private readonly Map map;
+        private readonly IMutationTarget mutationTarget;
 
         private EditorNumberTextBox tbStrength;
         private XNACheckBox chkSellable;
@@ -25,6 +29,7 @@ namespace TSMapEditor.UI.Windows
         private XNACheckBox chkPowered;
         private XNACheckBox chkAIRepairable;
         private XNACheckBox chkNominal;
+        private XNADropDown ddFacing;
         private XNADropDown ddSpotlight;
         private XNADropDown ddUpgrade1;
         private XNADropDown ddUpgrade2;
@@ -46,6 +51,7 @@ namespace TSMapEditor.UI.Windows
             chkPowered = FindChild<XNACheckBox>(nameof(chkPowered));
             chkAIRepairable = FindChild<XNACheckBox>(nameof(chkAIRepairable));
             chkNominal = FindChild<XNACheckBox>(nameof(chkNominal));
+            ddFacing = FindChild<XNADropDown>(nameof(ddFacing));
             ddSpotlight = FindChild<XNADropDown>(nameof(ddSpotlight));
             ddUpgrade1 = FindChild<XNADropDown>(nameof(ddUpgrade1));
             ddUpgrade2 = FindChild<XNADropDown>(nameof(ddUpgrade2));
@@ -109,6 +115,11 @@ namespace TSMapEditor.UI.Windows
             dropDown.SelectedIndex = index + 1;
         }
 
+        private void FetchFacing(XNADropDown dropDown)
+        {
+            dropDown.SelectedIndex = structure.Facing / 32;
+        }
+
         private void RefreshValues()
         {
             var possibleUpgrades = map.Rules.BuildingTypes.FindAll(bt => !string.IsNullOrWhiteSpace(bt.PowersUpBuilding) &&
@@ -124,6 +135,7 @@ namespace TSMapEditor.UI.Windows
             chkPowered.Checked = structure.Powered;
             chkAIRepairable.Checked = structure.AIRepairable;
             chkNominal.Checked = structure.Nominal;
+            FetchFacing(ddFacing);
             ddSpotlight.SelectedIndex = (int)structure.Spotlight;
             FetchUpgrade(ddUpgrade1, 0, possibleUpgrades);
             FetchUpgrade(ddUpgrade2, 1, possibleUpgrades);
@@ -140,11 +152,14 @@ namespace TSMapEditor.UI.Windows
             structure.Powered = chkPowered.Checked;
             structure.AIRepairable = chkAIRepairable.Checked;
             structure.Nominal = chkNominal.Checked;
+            structure.Facing = Convert.ToByte(ddFacing.SelectedIndex * 32);
             structure.Spotlight = (SpotlightType)ddSpotlight.SelectedIndex;
             structure.Upgrades[0] = (BuildingType)ddUpgrade1.SelectedItem.Tag;
             structure.Upgrades[1] = (BuildingType)ddUpgrade2.SelectedItem.Tag;
             structure.Upgrades[2] = (BuildingType)ddUpgrade3.SelectedItem.Tag;
             structure.AttachedTag = (Tag)attachedTagSelector.Tag;
+
+            mutationTarget.AddRefreshPoint(structure.Position, 10);
 
             Hide();
         }
