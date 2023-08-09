@@ -124,7 +124,7 @@ namespace TSMapEditor
             {
                 //throw new InvalidOperationException("Waypoint values are only valid between A and ZZ. Invalid value: " + str);
                 Logger.Log($"Waypoint values are only valid between A and ZZ. Invalid value: {str}. Converting into 0.");
-                return -1;
+                return 0;
             }
 
             if (str.Length == 1)
