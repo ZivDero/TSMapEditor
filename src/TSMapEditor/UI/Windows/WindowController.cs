@@ -113,13 +113,13 @@ namespace TSMapEditor.UI.Windows
             LocalVariablesWindow = new LocalVariablesWindow(windowParentControl.WindowManager, map);
             Windows.Add(LocalVariablesWindow);
 
-            StructureOptionsWindow = new StructureOptionsWindow(windowParentControl.WindowManager, map);
+            StructureOptionsWindow = new StructureOptionsWindow(windowParentControl.WindowManager, map, cursorActionTarget);
             Windows.Add(StructureOptionsWindow);
 
             VehicleOptionsWindow = new VehicleOptionsWindow(windowParentControl.WindowManager, map, editorState, cursorActionTarget);
             Windows.Add(VehicleOptionsWindow);
 
-            InfantryOptionsWindow = new InfantryOptionsWindow(windowParentControl.WindowManager, map);
+            InfantryOptionsWindow = new InfantryOptionsWindow(windowParentControl.WindowManager, map, cursorActionTarget);
             Windows.Add(InfantryOptionsWindow);
 
             HousesWindow = new HousesWindow(windowParentControl.WindowManager, map);

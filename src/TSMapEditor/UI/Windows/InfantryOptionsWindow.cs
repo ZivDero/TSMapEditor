@@ -3,21 +3,25 @@ using Rampastring.XNAUI.XNAControls;
 using System;
 using System.Globalization;
 using TSMapEditor.Models;
+using TSMapEditor.Rendering;
 using TSMapEditor.UI.Controls;
 
 namespace TSMapEditor.UI.Windows
 {
     public class InfantryOptionsWindow : INItializableWindow
     {
-        public InfantryOptionsWindow(WindowManager windowManager, Map map) : base(windowManager)
+        public InfantryOptionsWindow(WindowManager windowManager, Map map, ICursorActionTarget cursorActionTarget) : base(windowManager)
         {
             this.map = map;
+            this.mutationTarget = cursorActionTarget.MutationTarget;
         }
 
         private readonly Map map;
+        private readonly IMutationTarget mutationTarget;
 
         private EditorNumberTextBox tbStrength;
         private XNADropDown ddMission;
+        private XNADropDown ddFacing;
         private XNADropDown ddVeterancy;
         private EditorNumberTextBox tbGroup;
         private XNACheckBox chkOnBridge;
@@ -36,6 +40,7 @@ namespace TSMapEditor.UI.Windows
 
             tbStrength = FindChild<EditorNumberTextBox>(nameof(tbStrength));
             ddMission = FindChild<XNADropDown>(nameof(ddMission));
+            ddFacing = FindChild<XNADropDown>(nameof(ddFacing));
             ddVeterancy = FindChild<XNADropDown>(nameof(ddVeterancy));
             tbGroup = FindChild<EditorNumberTextBox>(nameof(tbGroup));
             chkOnBridge = FindChild<XNACheckBox>(nameof(chkOnBridge));
@@ -77,11 +82,16 @@ namespace TSMapEditor.UI.Windows
             RefreshValues();
             Show();
         }
+        private void FetchFacing(XNADropDown dropDown)
+        {
+            dropDown.SelectedIndex = infantry.Facing / 32;
+        }
 
         private void RefreshValues()
         {
             tbStrength.Value = infantry.HP;
             ddMission.SelectedIndex = ddMission.Items.FindIndex(item => item.Text == infantry.Mission);
+            FetchFacing(ddFacing);
             int veterancyIndex = ddVeterancy.Items.FindIndex(i => (int)i.Tag == infantry.Veterancy);
             ddVeterancy.SelectedIndex = Math.Max(0, veterancyIndex);
             tbGroup.Value = infantry.Group;
@@ -96,12 +106,15 @@ namespace TSMapEditor.UI.Windows
         {
             infantry.HP = Math.Min(Constants.ObjectHealthMax, Math.Max(tbStrength.Value, 0));
             infantry.Mission = ddMission.SelectedItem == null ? infantry.Mission : ddMission.SelectedItem.Text;
+            infantry.Facing = Convert.ToByte(ddFacing.SelectedIndex * 32);
             infantry.Veterancy = (int)ddVeterancy.SelectedItem.Tag;
             infantry.Group = tbGroup.Value;
             infantry.High = chkOnBridge.Checked;
             infantry.AutocreateNoRecruitable = chkAutocreateNoRecruitable.Checked;
             infantry.AutocreateYesRecruitable = chkAutocreateYesRecruitable.Checked;
             infantry.AttachedTag = (Tag)attachedTagSelector.Tag;
+
+            mutationTarget.AddRefreshPoint(infantry.Position, 3);
 
             Hide();
         }
