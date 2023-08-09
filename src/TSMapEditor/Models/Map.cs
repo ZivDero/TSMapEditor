@@ -197,6 +197,7 @@ namespace TSMapEditor.Models
 
             LoadedINI = mapIni ?? throw new ArgumentNullException(nameof(mapIni));
             Rules.InitFromINI(mapIni, initializer, true);
+            Rules.SolveDependencies();
             InitEditorConfig();
 
             InitializeArt(artIni, artFirestormIni);
