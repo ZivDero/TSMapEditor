@@ -264,35 +264,12 @@ namespace TSMapEditor.UI
                     Constants.UIDefaultFont, Color.White));
             textRenderer.AddTextPart(new XNATextPart(techno.Owner.ININame, Constants.UIBoldFont, techno.Owner.XNAColor));
 
-            int id = -1;
-            switch (techno.WhatAmI())
-            {
-                case RTTIType.Unit:
-                    id = map.Units.IndexOf(techno as Unit);
-                    break;
-
-                case RTTIType.Aircraft:
-                    id = map.Aircraft.IndexOf(techno as Aircraft);
-                    break;
-
-                case RTTIType.Infantry:
-                    id = map.Infantry.IndexOf(techno as Infantry);
-                    break;
-
-                case RTTIType.Building:
-                    id = map.Structures.IndexOf(techno as Structure);
-                    break;
-            }
-
-            if (id != -1)
-            {
-                textRenderer.AddTextPart(new XNATextPart("ID: " + id, Constants.UIDefaultFont, Color.White));
-                textRenderer.AddTextPart(new XNATextPart("Facing: " + techno.Facing, Constants.UIDefaultFont, Color.White));
-            }
-            
             if (techno.WhatAmI() == RTTIType.Unit)
             {
                 var unit = techno as Unit;
+                int id = map.Units.IndexOf(unit);
+                textRenderer.AddTextPart(new XNATextPart("ID: " + id, Constants.UIDefaultFont, Color.White));
+                textRenderer.AddTextPart(new XNATextPart("Facing: " + techno.Facing, Constants.UIDefaultFont, Color.White));
 
                 if (unit.FollowerUnit != null)
                 {
