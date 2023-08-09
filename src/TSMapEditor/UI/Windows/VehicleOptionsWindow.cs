@@ -19,17 +19,14 @@ namespace TSMapEditor.UI.Windows
             this.map = map;
             this.editorState = editorState;
             this.setFollowerCursorAction = new SetFollowerCursorAction(cursorActionTarget);
-            this.mutationTarget = cursorActionTarget.MutationTarget;
         }
 
         private readonly Map map;
         private readonly EditorState editorState;
         private readonly SetFollowerCursorAction setFollowerCursorAction;
-        private readonly IMutationTarget mutationTarget;
 
         private EditorNumberTextBox tbStrength;
         private XNADropDown ddMission;
-        private XNADropDown ddFacing;
         private XNADropDown ddVeterancy;
         private EditorNumberTextBox tbGroup;
         private EditorPopUpSelector followerSelector;
@@ -49,7 +46,6 @@ namespace TSMapEditor.UI.Windows
 
             tbStrength = FindChild<EditorNumberTextBox>(nameof(tbStrength));
             ddMission = FindChild<XNADropDown>(nameof(ddMission));
-            ddFacing = FindChild<XNADropDown>(nameof(ddFacing));
             ddVeterancy = FindChild<XNADropDown>(nameof(ddVeterancy));
             tbGroup = FindChild<EditorNumberTextBox>(nameof(tbGroup));
             followerSelector = FindChild<EditorPopUpSelector>(nameof(followerSelector));
@@ -107,16 +103,11 @@ namespace TSMapEditor.UI.Windows
             RefreshValues();
             Show();
         }
-        private void FetchFacing(XNADropDown dropDown)
-        {
-            dropDown.SelectedIndex = unit.Facing / 32;
-        }
 
         private void RefreshValues()
         {
             tbStrength.Value = unit.HP;
             ddMission.SelectedIndex = ddMission.Items.FindIndex(item => item.Text == unit.Mission);
-            FetchFacing(ddFacing);
             int veterancyIndex = ddVeterancy.Items.FindIndex(i => (int)i.Tag == unit.Veterancy);
             ddVeterancy.SelectedIndex = Math.Max(0, veterancyIndex);
             tbGroup.Value = unit.Group;
@@ -133,7 +124,6 @@ namespace TSMapEditor.UI.Windows
         {
             unit.HP = Math.Min(Constants.ObjectHealthMax, Math.Max(tbStrength.Value, 0));
             unit.Mission = ddMission.SelectedItem == null ? unit.Mission : ddMission.SelectedItem.Text;
-            unit.Facing = Convert.ToByte(ddFacing.SelectedIndex * 32);
             unit.Veterancy = (int)ddVeterancy.SelectedItem.Tag;
             unit.Group = tbGroup.Value;
             unit.FollowerUnit = followerSelector.Tag as Unit;
@@ -141,8 +131,6 @@ namespace TSMapEditor.UI.Windows
             unit.AutocreateNoRecruitable = chkAutocreateNoRecruitable.Checked;
             unit.AutocreateYesRecruitable = chkAutocreateYesRecruitable.Checked;
             unit.AttachedTag = (Tag)attachedTagSelector.Tag;
-            
-            mutationTarget.AddRefreshPoint(unit.Position, 5);
 
             Hide();
         }
