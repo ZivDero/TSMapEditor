@@ -92,6 +92,28 @@ namespace TSMapEditor.Models
             AnimTypes.ForEach(a => initializer.ReadObjectTypeArtPropertiesFromINI(a, iniFile, a.ININame));
         }
 
+        public List<HouseType> GetStandardCountries()
+        {
+            var countries = new List<HouseType>();
+
+            foreach (HouseType country in Countries)
+            {
+                HouseType newCountry = new HouseType(country, country.ININame);
+                countries.Add(newCountry);
+            }
+
+            return countries;
+        }
+
+        public HouseType GetStandardCountry(string iniName)
+        {
+            var country = Countries.Find(c => c.ININame == iniName);
+            if (country == null)
+                return null;
+
+            return new HouseType( country, country.ININame);
+        }
+
         public List<House> GetStandardHouses()
         {
             var houses = new List<House>();
