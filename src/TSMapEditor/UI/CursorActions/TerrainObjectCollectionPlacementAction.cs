@@ -15,10 +15,10 @@ namespace TSMapEditor.UI.CursorActions
         public override string GetName() => "Place TerrainObject Collection";
 
         private TerrainObject terrainObject;
-        private TerrainObjectCollection _terrainObjectCollection;
+        private TerrainObjectCollection terrainObjectCollection;
         public TerrainObjectCollection TerrainObjectCollection
         {
-            get => _terrainObjectCollection;
+            get => terrainObjectCollection;
             set
             {
                 if (value.Entries.Length == 0)
@@ -26,8 +26,8 @@ namespace TSMapEditor.UI.CursorActions
                     throw new InvalidOperationException($"Terrain object collection {value.Name} has no terrain object entries!");
                 }
 
-                _terrainObjectCollection = value;
-                terrainObject = new TerrainObject(_terrainObjectCollection.Entries[0].TerrainType);
+                terrainObjectCollection = value;
+                terrainObject = new TerrainObject(terrainObjectCollection.Entries[0].TerrainType);
             }
         }
 

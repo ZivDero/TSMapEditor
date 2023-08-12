@@ -19,25 +19,25 @@ namespace TSMapEditor.UI.CursorActions
 
         private Infantry infantry;
 
-        private InfantryType _infantryType;
+        private InfantryType infantryType;
         
 
         public InfantryType InfantryType
         {
-            get => _infantryType;
+            get => infantryType;
             set
             {
-                if (_infantryType != value)
+                if (infantryType != value)
                 {
-                    _infantryType = value;
+                    infantryType = value;
 
-                    if (_infantryType == null)
+                    if (infantryType == null)
                     {
                         infantry = null;
                     }
                     else
                     {
-                        infantry = new Infantry(_infantryType) { Owner = CursorActionTarget.MutationTarget.ObjectOwner };
+                        infantry = new Infantry(infantryType) { Owner = CursorActionTarget.MutationTarget.ObjectOwner };
                     }
                 }
             }
@@ -73,23 +73,23 @@ namespace TSMapEditor.UI.CursorActions
             }
         }
 
-        public override void LeftDown(Point2D cellPoint)
+        public override void LeftDown(Point2D cellCoords)
         {
             if (InfantryType == null)
                 throw new InvalidOperationException(nameof(InfantryType) + " cannot be null");
 
-            var tile = CursorActionTarget.Map.GetTile(cellPoint);
+            var tile = CursorActionTarget.Map.GetTile(cellCoords);
             SubCell freeSubCell = tile.GetFreeSubCellSpot();
             if (freeSubCell == SubCell.None)
                 return;
 
-            var mutation = new PlaceInfantryMutation(CursorActionTarget.MutationTarget, InfantryType, cellPoint, freeSubCell);
+            var mutation = new PlaceInfantryMutation(CursorActionTarget.MutationTarget, InfantryType, cellCoords, freeSubCell);
             CursorActionTarget.MutationManager.PerformMutation(mutation);
         }
 
-        public override void LeftClick(Point2D cellPoint)
+        public override void LeftClick(Point2D cellCoords)
         {
-            LeftDown(cellPoint);
+            LeftDown(cellCoords);
         }
     }
 }

@@ -20,15 +20,15 @@ namespace TSMapEditor.UI.CursorActions
 
         public event EventHandler OverlayTypeChanged;
 
-        private OverlayType _overlayType;
+        private OverlayType overlayType;
         public OverlayType OverlayType 
         { 
-            get => _overlayType; 
+            get => overlayType; 
             set
             {
-                if (_overlayType != value)
+                if (overlayType != value)
                 {
-                    _overlayType = value;
+                    overlayType = value;
                     OverlayTypeChanged?.Invoke(this, EventArgs.Empty);
                 }
             } 
