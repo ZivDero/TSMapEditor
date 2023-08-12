@@ -218,7 +218,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             if (shadowFrameIndex > 0 && shadowFrameIndex < drawParams.Graphics.Frames.Length)
             {
                 DrawObjectImage(gameObject, drawParams, drawParams.Graphics, shadowFrameIndex,
-                    new Color(0, 0, 0, 128), false, Color.White, drawPoint, initialYDrawPointWithoutCellHeight);
+                    new Color(0, 0, 0, 128), false, Color.Gray, drawPoint, initialYDrawPointWithoutCellHeight);
             }
         }
 

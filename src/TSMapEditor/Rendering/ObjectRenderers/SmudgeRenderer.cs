@@ -19,7 +19,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
 
         protected override void Render(Smudge gameObject, int yDrawPointWithoutCellHeight, Point2D drawPoint, CommonDrawParams commonDrawParams)
         {
-            DrawObjectImage(gameObject, commonDrawParams, commonDrawParams.Graphics, 0, Color.White, false, Color.White, drawPoint, yDrawPointWithoutCellHeight);
+            DrawObjectImage(gameObject, commonDrawParams, commonDrawParams.Graphics, 0, Color.White, false, Color.Gray, drawPoint, yDrawPointWithoutCellHeight);
         }
     }
 }

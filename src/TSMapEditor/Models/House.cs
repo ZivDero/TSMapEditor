@@ -52,7 +52,7 @@ namespace TSMapEditor.Models
     {
         private const int MaxBaseNodeCount = 1000;
 
-        public override RTTIType WhatAmI() => RTTIType.HouseType;
+        public override RTTIType WhatAmI() => RTTIType.House;
 
         public House(string iniName)
         {
@@ -63,22 +63,29 @@ namespace TSMapEditor.Models
         public string ININame { get; set; }
         public int IQ { get; set; }
         public string Edge { get; set; }
-        public string Color { get; set; } = "White";
+        public string Color { get; set; } = "Grey";
         public string Allies { get; set; }
         public int Credits { get; set; }
-        public int ActsLike { get; set; } = -1;
+        public string Country { get; set; } // This is for YR
+        public int? ActsLike { get; set; } // This is for TS
         public int TechLevel { get; set; }
         public int PercentBuilt { get; set; }
         public bool PlayerControl { get; set; }
-        public string Side { get; set; }
+        public string Side { get; set; } // Only in TS
 
-        [INI(false)]
-        public int ID { get; set; }
-
-        [INI(false)]
-        public Color XNAColor { get; set; } = Microsoft.Xna.Framework.Color.White;
+        [INI(false)] public HouseType CountryClass { get; set; }
+        [INI(false)] public bool IsPlayerHouse { get; set; } = false;
+        [INI(false)] public Color XNAColor { get; set; } = Microsoft.Xna.Framework.Color.Gray;
 
         public List<BaseNode> BaseNodes { get; } = new List<BaseNode>();
+        public void CopyFromOtherHouse(House baseHouse)
+        {
+            foreach (var property in typeof(House).GetProperties())
+            {
+                if (property.Name != "BaseNodes" && property.Name != "CountryClass")
+                    property.SetValue(this, property.GetValue(baseHouse));
+            }
+        }
 
         public void ReadFromIniSection(IniSection iniSection)
         {
@@ -99,6 +106,12 @@ namespace TSMapEditor.Models
 
         public void WriteToIniSection(IniSection iniSection)
         {
+            if (ININame.StartsWith("Spawn") && ININame.Length <= 6)
+            {
+                iniSection.SetStringValue("Color", Color);
+                return;
+            }
+
             WritePropertiesToIniSection(iniSection);
 
             // Write base nodes

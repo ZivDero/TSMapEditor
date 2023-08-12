@@ -1,5 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using Rampastring.Tools;
+﻿using Rampastring.Tools;
 using Rampastring.XNAUI;
 using Rampastring.XNAUI.XNAControls;
 using System;
@@ -22,11 +21,13 @@ namespace TSMapEditor.UI.Windows
         private readonly Map map;
 
         private XNADropDown ddHouseOfHumanPlayer;
+        private XNADropDown ddMapMode;
         private EditorListBox lbHouseList;
         private EditorTextBox tbName;
         private XNADropDown ddIQ;
         private XNADropDown ddMapEdge;
         private XNADropDown ddSide;
+        private EditorTextBox tbCountry;
         private XNADropDown ddActsLike;
         private XNADropDown ddColor;
         private XNADropDown ddTechnologyLevel;
@@ -40,6 +41,8 @@ namespace TSMapEditor.UI.Windows
         private House editedHouse;
 
         private GenerateStandardHousesWindow generateStandardHousesWindow;
+        private NewHouseWindow newHouseWindow;
+        private EditCountryWindow editCountryWindow;
 
         public override void Initialize()
         {
@@ -47,11 +50,13 @@ namespace TSMapEditor.UI.Windows
             base.Initialize();
 
             ddHouseOfHumanPlayer = FindChild<XNADropDown>(nameof(ddHouseOfHumanPlayer));
+            ddMapMode = FindChild<XNADropDown>(nameof(ddMapMode));
             lbHouseList = FindChild<EditorListBox>(nameof(lbHouseList));
             tbName = FindChild<EditorTextBox>(nameof(tbName));
             ddIQ = FindChild<XNADropDown>(nameof(ddIQ));
             ddMapEdge = FindChild<XNADropDown>(nameof(ddMapEdge));
             ddSide = FindChild<XNADropDown>(nameof(ddSide));
+            tbCountry = FindChild<EditorTextBox>(nameof(tbCountry));
             ddActsLike = FindChild<XNADropDown>(nameof(ddActsLike));
             ddColor = FindChild<XNADropDown>(nameof(ddColor));
             ddTechnologyLevel = FindChild<XNADropDown>(nameof(ddTechnologyLevel));
@@ -66,7 +71,7 @@ namespace TSMapEditor.UI.Windows
             for (int i = 0; i < map.Rules.Sides.Count; i++)
             {
                 string sideName = map.Rules.Sides[i];
-                string sideString = i + " " + sideName;
+                string sideString = $"{i} {sideName}";
                 ddSide.AddItem(new XNADropDownItem() { Text = sideString, Tag = sideName });
                 ddActsLike.AddItem(new XNADropDownItem() { Text = sideString, Tag = i });
             }
@@ -76,23 +81,78 @@ namespace TSMapEditor.UI.Windows
                 ddColor.AddItem(rulesColor.Name, rulesColor.XNAColor);
             }
 
+            if (Constants.UseCountries)
+            {
+                ddActsLike.Visible = false;
+                FindChild<XNALabel>("lblActsLike").Visible = false;
+                ddSide.Visible = false;
+                FindChild<XNALabel>("lblSide").Visible = false;
+            }
+            else
+            {
+                FindChild<EditorButton>("btnEditCountry").Visible = false;
+                tbCountry.Visible = false;
+                FindChild<XNALabel>("lblCountry").Visible = false;
+
+                ddMapMode.AddItem("Cooperative (TS)");
+            }
+
+            if (!map.Basic.MultiplayerOnly)
+                ddMapMode.SelectedIndex = 0;
+            else if (map.TsCoop && ddMapMode.Items.Count >= 2)
+                ddMapMode.SelectedIndex = 2;
+            else
+                ddMapMode.SelectedIndex = 1;
+
+            tbName.InputEnabled = false;
+            tbCountry.InputEnabled = false;
+
             FindChild<EditorButton>("btnAddHouse").LeftClick += BtnAddHouse_LeftClick;
             FindChild<EditorButton>("btnDeleteHouse").LeftClick += BtnDeleteHouse_LeftClick;
             FindChild<EditorButton>("btnStandardHouses").LeftClick += BtnStandardHouses_LeftClick;
+            FindChild<EditorButton>("btnEditCountry").LeftClick += BtnEditCountry_LeftClick;
             FindChild<EditorButton>("btnMakeHouseRepairBuildings").LeftClick += BtnMakeHouseRepairBuildings_LeftClick;
             FindChild<EditorButton>("btnMakeHouseNotRepairBuildings").LeftClick += BtnMakeHouseNotRepairBuildings_LeftClick;
 
             ddHouseOfHumanPlayer.SelectedIndexChanged += DdHouseOfHumanPlayer_SelectedIndexChanged;
+            ddMapMode.SelectedIndexChanged += DdMapMode_SelectedIndexChanged;
             lbHouseList.SelectedIndexChanged += LbHouseList_SelectedIndexChanged;
 
             generateStandardHousesWindow = new GenerateStandardHousesWindow(WindowManager, map);
-            var darkeningPanel = DarkeningPanel.InitializeAndAddToParentControlWithChild(WindowManager, Parent, generateStandardHousesWindow);
-            darkeningPanel.Hidden += DarkeningPanel_Hidden;
+            newHouseWindow = new NewHouseWindow(WindowManager, map);
+            editCountryWindow = new EditCountryWindow(WindowManager, map);
+
+            var generateStandardHousesDarkeningPanel = DarkeningPanel.InitializeAndAddToParentControlWithChild(WindowManager, Parent, generateStandardHousesWindow);
+            generateStandardHousesDarkeningPanel.Hidden += GenerateStandardHousesDarkeningPanel_Hidden;
+
+            var newHouseWindowDarkeningPanel = DarkeningPanel.InitializeAndAddToParentControlWithChild(WindowManager, Parent, newHouseWindow);
+            newHouseWindowDarkeningPanel.Hidden += NewHouseWindowDarkeningPanel_Hidden;
+
+            var editCountryWindowDarkeningPanel = DarkeningPanel.InitializeAndAddToParentControlWithChild(WindowManager, Parent, editCountryWindow);
+            editCountryWindowDarkeningPanel.Hidden += EditCountryWindowDarkeningPanel_Hidden;
         }
 
-        private void DarkeningPanel_Hidden(object sender, EventArgs e)
+        private void BtnEditCountry_LeftClick(object sender, EventArgs e)
+        {
+            if (editedHouse != null && editedHouse.CountryClass != null && !editedHouse.IsPlayerHouse)
+                editCountryWindow.Open(editedHouse.CountryClass);
+        }
+
+        private void GenerateStandardHousesDarkeningPanel_Hidden(object sender, EventArgs e)
         {
             ListHouses();
+        }
+
+        private void NewHouseWindowDarkeningPanel_Hidden(object sender, EventArgs e)
+        {
+            if (newHouseWindow.Success)
+            {
+                ListHouses();
+            }
+        }
+        private void EditCountryWindowDarkeningPanel_Hidden(object sender, EventArgs e)
+        {
+            RefreshHouseInfo();
         }
 
         private void DdHouseOfHumanPlayer_SelectedIndexChanged(object sender, System.EventArgs e)
@@ -104,63 +164,79 @@ namespace TSMapEditor.UI.Windows
             }
 
             map.Basic.Player = ddHouseOfHumanPlayer.SelectedItem.Text;
+            CheckAddStandardHouse(editedHouse);
+        }
+
+        private void DdMapMode_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            switch (ddMapMode.SelectedIndex)
+            {
+                case 0:
+                    map.Basic.MultiplayerOnly = false;
+                    map.TsCoop = false;
+                    break;
+                case 1:
+                default:
+                    map.Basic.MultiplayerOnly = true;
+                    map.TsCoop = false;
+                    break;
+                case 2:
+                    map.Basic.MultiplayerOnly = true;
+                    map.TsCoop = true;
+                    break;
+            }
+
+            ListHouses();
+            CheckAddStandardHouse(editedHouse);
         }
 
         private void BtnAddHouse_LeftClick(object sender, System.EventArgs e)
         {
-            map.AddHouse(new House("NewHouse") 
-            { 
-                ActsLike = 0,
-                Allies = "NewHouse",
-                Color = map.Rules.Colors[0].Name,
-                Credits = 0, 
-                Edge = "North", 
-                ID = map.Houses.Count, 
-                IQ = 0, 
-                PercentBuilt = 100, 
-                PlayerControl = false, 
-                Side = map.Rules.Sides[0], 
-                TechLevel = 10, 
-                XNAColor = Color.White 
-            });
-
-            ListHouses();
-            lbHouseList.SelectedIndex = lbHouseList.Items.Count - 1;
+            newHouseWindow.Open();
         }
 
         private void BtnDeleteHouse_LeftClick(object sender, System.EventArgs e)
         {
-            if (editedHouse != null)
+            if (editedHouse == null)
+                return;
+
+            if (map.PlayerHouses.Contains(editedHouse))
+                return;
+
+            if (map.StandardHouses.Contains(editedHouse))
             {
-                if (map.DeleteHouse(editedHouse))
-                {
-                    editedHouse = null;
-                    ListHouses();
-                    lbHouseList.SelectedIndex = -1;
-                }
+                editedHouse.CopyFromOtherHouse(map.Rules.GetStandardHouse(editedHouse.CountryClass));
+                if (!map.Houses.Contains(editedHouse))
+                    return;
             }
+
+            map.DeleteCountry(editedHouse.CountryClass);
+            map.DeleteHouse(editedHouse);
+
+            lbHouseList.SelectedIndex -= 1;
+            ListHouses();
+
+            RefreshHouseInfo();
+
         }
 
         private void BtnStandardHouses_LeftClick(object sender, System.EventArgs e)
         {
-            if (map.Houses.Count > 0)
-            {
-                EditorMessageBox.Show(WindowManager,
-                    "Houses already exist",
-                    "Cannot generate standard because the map already has one or more houses specified." + Environment.NewLine + Environment.NewLine +
-                    "If you want to generate standard houses, please delete the existing houses first.", MessageBoxButtons.OK);
+            foreach (var house in map.StandardHouses)
+                map.AddStandardHouse(house);
 
-                return;
-            }
+            var selectedItem = lbHouseList.SelectedItem.Tag;
+            ListHouses();
+            lbHouseList.SelectedIndex = lbHouseList.Items.FindIndex(i => i.Tag == selectedItem);
 
-            generateStandardHousesWindow.Open();
+            RefreshHouseInfo();
         }
 
         private void BtnMakeHouseRepairBuildings_LeftClick(object sender, EventArgs e)
         {
             if (editedHouse == null)
             {
-                EditorMessageBox.Show(WindowManager, "No House Selected", "Select a house first.", MessageBoxButtons.OK);
+                EditorMessageBox.Show(WindowManager, "No Country Selected", "Select a house first.", MessageBoxButtons.OK);
                 return;
             }
 
@@ -175,7 +251,7 @@ namespace TSMapEditor.UI.Windows
         {
             if (editedHouse == null)
             {
-                EditorMessageBox.Show(WindowManager, "No House Selected", "Select a house first.", MessageBoxButtons.OK);
+                EditorMessageBox.Show(WindowManager, "No Country Selected", "Select a house first.", MessageBoxButtons.OK);
                 return;
             }
 
@@ -237,10 +313,19 @@ namespace TSMapEditor.UI.Windows
             ddIQ.SelectedIndex = ddIQ.Items.FindIndex(item => Conversions.IntFromString(item.Text, -1) == editedHouse.IQ);
             ddMapEdge.SelectedIndex = ddMapEdge.Items.FindIndex(item => item.Text == editedHouse.Edge);
             ddSide.SelectedIndex = map.Rules.Sides.FindIndex(s => s == editedHouse.Side);
-            if (editedHouse.ActsLike < map.Rules.Sides.Count)
-                ddActsLike.SelectedIndex = editedHouse.ActsLike;
+
+            if (Constants.UseCountries)
+            {
+                tbCountry.Text = editedHouse.Country;
+                tbCountry.TextColor = editedHouse.CountryClass.XNAColor;
+            }
             else
-                ddActsLike.SelectedIndex = -1;
+            {
+                if (editedHouse.ActsLike < map.Rules.Sides.Count)
+                    ddActsLike.SelectedIndex = editedHouse.ActsLike ?? -1;
+                else
+                    ddActsLike.SelectedIndex = -1;
+            }
 
             ddColor.SelectedIndex = ddColor.Items.FindIndex(item => item.Text == editedHouse.Color);
             ddTechnologyLevel.SelectedIndex = ddTechnologyLevel.Items.FindIndex(item => Conversions.IntFromString(item.Text, -1) == editedHouse.TechLevel);
@@ -266,26 +351,31 @@ namespace TSMapEditor.UI.Windows
         {
             editedHouse.ININame = tbName.Text;
             ListHouses();
+            CheckAddStandardHouse(editedHouse);
         }
 
         private void DdIQ_SelectedIndexChanged(object sender, System.EventArgs e)
         {
             editedHouse.IQ = Conversions.IntFromString(ddIQ.SelectedItem.Text, -1);
+            CheckAddStandardHouse(editedHouse);
         }
 
         private void DdMapEdge_SelectedIndexChanged(object sender, System.EventArgs e)
         {
             editedHouse.Edge = ddMapEdge.SelectedItem?.Text;
+            CheckAddStandardHouse(editedHouse);
         }
 
         private void DdSide_SelectedIndexChanged(object sender, System.EventArgs e)
         {
             editedHouse.Side = (string)ddSide.SelectedItem.Tag;
+            CheckAddStandardHouse(editedHouse);
         }
 
         private void DdActsLike_SelectedIndexChanged(object sender, System.EventArgs e)
         {
             editedHouse.ActsLike = ddActsLike.SelectedIndex;
+            CheckAddStandardHouse(editedHouse);
         }
 
         private void DdColor_SelectedIndexChanged(object sender, System.EventArgs e)
@@ -293,32 +383,49 @@ namespace TSMapEditor.UI.Windows
             editedHouse.Color = ddColor.SelectedItem.Text;
             editedHouse.XNAColor = ddColor.SelectedItem.TextColor.Value;
             map.HouseColorUpdated(editedHouse);
+
+            if (!Constants.UseCountries || editedHouse.IsPlayerHouse)
+            {
+                editedHouse.CountryClass.Color = ddColor.SelectedItem.Text;
+                editedHouse.CountryClass.XNAColor = ddColor.SelectedItem.TextColor.Value;
+                map.CountryColorUpdated(editedHouse.CountryClass);
+            }
+
+            if (Constants.UseCountries)
+                RefreshHouseInfo();
+
             ListHouses();
+            CheckAddStandardHouse(editedHouse);
         }
 
         private void DdTechnologyLevel_SelectedIndexChanged(object sender, System.EventArgs e)
         {
             editedHouse.TechLevel = Conversions.IntFromString(ddTechnologyLevel.SelectedItem.Text, -1);
+            CheckAddStandardHouse(editedHouse);
         }
 
         private void DdPercentBuilt_SelectedIndexChanged(object sender, System.EventArgs e)
         {
             editedHouse.PercentBuilt = Conversions.IntFromString(ddPercentBuilt.SelectedItem.Text, 100);
+            CheckAddStandardHouse(editedHouse);
         }
 
         private void TbAllies_TextChanged(object sender, System.EventArgs e)
         {
             editedHouse.Allies = tbAllies.Text;
+            CheckAddStandardHouse(editedHouse);
         }
 
         private void TbMoney_TextChanged(object sender, System.EventArgs e)
         {
             editedHouse.Credits = tbMoney.Value;
+            CheckAddStandardHouse(editedHouse);
         }
 
         private void ChkPlayerControl_CheckedChanged(object sender, System.EventArgs e)
         {
             editedHouse.PlayerControl = chkPlayerControl.Checked;
+            CheckAddStandardHouse(editedHouse);
         }
 
         public void Open()
@@ -329,12 +436,16 @@ namespace TSMapEditor.UI.Windows
 
         private void ListHouses()
         {
+            object selectedItem = null;
+            if (lbHouseList.SelectedItem != null)
+                selectedItem = lbHouseList.SelectedItem.Tag;
+
             lbHouseList.Clear();
             ddHouseOfHumanPlayer.Items.Clear();
 
             ddHouseOfHumanPlayer.AddItem("None");
 
-            foreach (House house in map.Houses)
+            foreach (House house in map.GetHouses())
             {
                 lbHouseList.AddItem(
                     new XNAListBoxItem()
@@ -344,11 +455,24 @@ namespace TSMapEditor.UI.Windows
                         Tag = house
                     }
                 );
-
-                ddHouseOfHumanPlayer.AddItem(house.ININame, house.XNAColor);
             }
 
+            foreach (House house in map.GetHouses(true))
+                ddHouseOfHumanPlayer.AddItem(house.ININame, house.XNAColor);
+
             ddHouseOfHumanPlayer.SelectedIndex = map.Houses.FindIndex(h => h.ININame == map.Basic.Player) + 1;
+
+            lbHouseList.SelectedIndex = lbHouseList.Items.FindIndex(i => i.Tag == selectedItem);
+        }
+
+        private void CheckAddStandardHouse(House house)
+        {
+            if (house != null && map.StandardHouses.Contains(house))
+            {
+                map.AddStandardHouse(house);
+
+                ListHouses();
+            }
         }
 
         private void RefreshHouseStats()

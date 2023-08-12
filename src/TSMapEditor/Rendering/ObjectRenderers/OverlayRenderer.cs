@@ -21,7 +21,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
         {
             int tiberiumIndex = gameObject.OverlayType.GetTiberiumIndex();
 
-            Color remapColor = Color.White;
+            Color remapColor = Color.Gray;
             if (tiberiumIndex > -1 && tiberiumIndex < Map.Rules.TiberiumTypes.Count)
                 remapColor = Map.Rules.TiberiumTypes[tiberiumIndex].XNAColor;
 

@@ -903,7 +903,7 @@ namespace TSMapEditor.Rendering
             ObjectImage graphics = TheaterGraphics.BuildingTextures[graphicalBaseNode.BuildingType.Index];
             Color replacementColor = Color.DarkBlue;
             string iniName = graphicalBaseNode.BuildingType.ININame;
-            Color remapColor = graphicalBaseNode.BuildingType.ArtConfig.Remapable ? graphicalBaseNode.Owner.XNAColor : Color.White;
+            Color remapColor = graphicalBaseNode.BuildingType.ArtConfig.Remapable ? graphicalBaseNode.Owner.XNAColor : Color.Gray;
 
             const float opacity = 0.25f;
 
