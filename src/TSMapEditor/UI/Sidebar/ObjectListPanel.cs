@@ -133,7 +133,7 @@ namespace TSMapEditor.UI.Sidebar
             {
                 var objectType = objectTypeList[i];
 
-                if (!objectType.EditorVisible || Map.EditorConfig.EditorRulesIni.KeyExists("IgnoreTypes", objectType.ININame))
+                if (!objectType.EditorVisible || Map.EditorConfig.EditorRulesIni.GetBooleanValue("IgnoreTypes", objectType.ININame, false))
                     continue;
 
                 if (objectType.WhatAmI() == RTTIType.BuildingType)

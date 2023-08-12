@@ -172,7 +172,7 @@ namespace TSMapEditor.UI.Sidebar
                 TreeViewCategory category = null;
                 SmudgeType smudgeType = Map.Rules.SmudgeTypes[i];
 
-                if (Map.EditorConfig.EditorRulesIni.KeyExists("IgnoreTypes", smudgeType.ININame))
+                if (Map.EditorConfig.EditorRulesIni.GetBooleanValue("IgnoreTypes", smudgeType.ININame, false))
                 {
                     continue;
                 }

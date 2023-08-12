@@ -161,7 +161,7 @@ namespace TSMapEditor.UI.Sidebar
                 TreeViewCategory category = null;
                 TerrainType terrainType = Map.Rules.TerrainTypes[i];
 
-                if (Map.EditorConfig.EditorRulesIni.KeyExists("IgnoreTypes", terrainType.ININame))
+                if (Map.EditorConfig.EditorRulesIni.GetBooleanValue("IgnoreTypes", terrainType.ININame, false))
                 {
                     continue;
                 }

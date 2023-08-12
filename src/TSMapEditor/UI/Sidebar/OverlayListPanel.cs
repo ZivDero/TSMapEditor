@@ -177,7 +177,7 @@ namespace TSMapEditor.UI.Sidebar
                 TreeViewCategory category = null;
                 OverlayType overlayType = Map.Rules.OverlayTypes[i];
 
-                if (Map.EditorConfig.EditorRulesIni.KeyExists("IgnoreTypes", overlayType.ININame))
+                if (Map.EditorConfig.EditorRulesIni.GetBooleanValue("IgnoreTypes", overlayType.ININame, false))
                 {
                     continue;
                 }
