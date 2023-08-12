@@ -6,10 +6,10 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using TSMapEditor.CCEngine;
+using TSMapEditor.Extensions;
 using TSMapEditor.GameMath;
 using TSMapEditor.Initialization;
 using TSMapEditor.Rendering;
-using TSMapEditor.Extensions;
 
 namespace TSMapEditor.Models
 {
@@ -751,9 +751,6 @@ namespace TSMapEditor.Models
                 if (cell == null)
                     return;
 
-                //if (cell.Structure != null)
-                //    throw new InvalidOperationException("Cannot place a structure on a cell that already has a structure!");
-
                 cell.Structures.Add(structure);
             });
 
@@ -803,8 +800,6 @@ namespace TSMapEditor.Models
         public void PlaceUnit(Unit unit)
         {
             var cell = GetTile(unit.Position);
-            //if (cell.Vehicle != null)
-            //    throw new InvalidOperationException("Cannot place a vehicle on a cell that already has a vehicle!");
 
             cell.Vehicles.Add(unit);
             Units.Add(unit);
@@ -870,8 +865,6 @@ namespace TSMapEditor.Models
         public void PlaceAircraft(Aircraft aircraft)
         {
             var cell = GetTile(aircraft.Position);
-            //if (cell.Aircraft != null)
-            //    throw new InvalidOperationException("Cannot place an aircraft on a cell that already has an aircraft!");
 
             cell.Aircraft.Add(aircraft);
             Aircraft.Add(aircraft);
@@ -940,9 +933,10 @@ namespace TSMapEditor.Models
         /// </summary>
         /// <param name="movable">The object to move.</param>
         /// <param name="newCoords">The new coordinates of the object.</param>
-        /// <param name="considerSelf">Determines whether the object itself can be considered as blocking placement of the object.</param>
+        /// <param name="blocksSelf">Determines whether the object itself can be considered as blocking placement of the object.</param>
+        /// <param name="overlapObjects">Determines whether multiple objects of the same type should be allowed to exist in the same cell.</param>
         /// <returns>True if the object can be moved, otherwise false.</returns>
-        public bool CanPlaceObjectAt(IMovable movable, Point2D newCoords, bool considerSelf)
+        public bool CanPlaceObjectAt(IMovable movable, Point2D newCoords, bool blocksSelf, bool overlapObjects)
         {
             if (movable.WhatAmI() == RTTIType.Building)
             {
@@ -954,19 +948,15 @@ namespace TSMapEditor.Models
                     if (foundationCell == null)
                         return;
 
-                    //if (foundationCell.Structure != null && foundationCell.Structure != movable)
-                    //    canPlace = false;
+                    if (!foundationCell.CanAddObject((GameObject)movable, blocksSelf, overlapObjects))
+                        canPlace = false;
                 });
 
-                if (!canPlace)
-                    return false;
+                return canPlace;
             }
 
             MapTile cell = GetTile(newCoords);
-            if (movable.WhatAmI() == RTTIType.Waypoint)
-                return true;
-
-            return cell.CanAddObject((GameObject)movable);
+            return cell.CanAddObject((GameObject)movable, blocksSelf, overlapObjects);
         }
 
         public void DeleteObjectFromCell(Point2D cellCoords)

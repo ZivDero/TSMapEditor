@@ -993,15 +993,16 @@ namespace TSMapEditor.Rendering
                         {
                             // If the clone modifier is held down, attempt cloning the object.
                             // Otherwise, move the dragged object.
+                            bool overlapObjects = KeyboardCommands.Instance.OverlapObjects.AreKeysOrModifiersDown(Keyboard);
                             if (KeyboardCommands.Instance.CloneObject.AreKeysOrModifiersDown(Keyboard))
                             {
-                                if (Map.CanPlaceObjectAt(draggedOrRotatedObject, tileUnderCursor.CoordsToPoint(), true))
+                                if (Map.CanPlaceObjectAt(draggedOrRotatedObject, tileUnderCursor.CoordsToPoint(), true, overlapObjects))
                                 {
                                     var mutation = new CloneObjectMutation(MutationTarget, draggedOrRotatedObject, tileUnderCursor.CoordsToPoint());
                                     MutationManager.PerformMutation(mutation);
                                 }
                             }
-                            else if (Map.CanPlaceObjectAt(draggedOrRotatedObject, tileUnderCursor.CoordsToPoint(), false))
+                            else if (Map.CanPlaceObjectAt(draggedOrRotatedObject, tileUnderCursor.CoordsToPoint(), false, overlapObjects))
                             {
                                 var mutation = new MoveObjectMutation(MutationTarget, draggedOrRotatedObject, tileUnderCursor.CoordsToPoint());
                                 MutationManager.PerformMutation(mutation);
@@ -1239,9 +1240,10 @@ namespace TSMapEditor.Rendering
             if (isDraggingObject)
             {
                 bool isCloning = KeyboardCommands.Instance.CloneObject.AreKeysOrModifiersDown(Keyboard);
+                bool overlapObjects = KeyboardCommands.Instance.OverlapObjects.AreKeysOrModifiersDown(Keyboard);
 
                 Color lineColor = isCloning ? new Color(0, 255, 255) : Color.White;
-                if (!Map.CanPlaceObjectAt(draggedOrRotatedObject, tileUnderCursor.CoordsToPoint(), isCloning))
+                if (!Map.CanPlaceObjectAt(draggedOrRotatedObject, tileUnderCursor.CoordsToPoint(), isCloning, overlapObjects))
                     lineColor = Color.Red;
 
                 Point2D cameraAndCellCenterOffset = new Point2D(-Camera.TopLeftPoint.X + Constants.CellSizeX / 2,

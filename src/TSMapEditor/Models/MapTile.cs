@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using TSMapEditor.GameMath;
 using TSMapEditor.Models.MapFormat;
 using TSMapEditor.Rendering;
@@ -203,20 +204,30 @@ namespace TSMapEditor.Models
         /// <summary>
         /// Determines whether a specific game object can be assigned to this tile.
         /// </summary>
-        public bool CanAddObject(GameObject gameObject)
+        public bool CanAddObject(GameObject gameObject, bool blocksSelf, bool overlapObjects)
         {
             switch (gameObject.WhatAmI())
             {
-                case RTTIType.Aircraft:
-                    return true;
                 case RTTIType.Building:
+                {
+                    bool multipleStructuresExist = Structures.Count > 1;
+                    bool anotherExists = Structures.Count == 1 && !Structures.Contains((Structure)gameObject);
+                    bool clone = Structures.Count == 1 && Structures.Contains((Structure)gameObject) && blocksSelf;
+
+                        if ((multipleStructuresExist || anotherExists || clone) && !overlapObjects)
+                        return false;
                     return true;
+                }
                 case RTTIType.Unit:
-                    return true;
+                    return Vehicles.Count == 0 || overlapObjects;
+                case RTTIType.Aircraft:
+                    return Aircraft.Count == 0 || overlapObjects;
                 case RTTIType.Infantry:
                     return GetFreeSubCellSpot() != SubCell.None;
                 case RTTIType.Terrain:
                     return TerrainObject == null;
+                case RTTIType.Waypoint:
+                    return true;
             }
 
             return false;

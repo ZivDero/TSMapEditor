@@ -352,8 +352,6 @@ namespace TSMapEditor.Initialization
 
                     if (tile.Structures.Count > 0)
                     {
-                        //isClear = false;
-                        //AddMapLoadError($"Building {buildingType.ININame} exists on a cell ({cellCoords}) that already has another building ({tile.Structure.ObjectType.ININame}). Skipping adding it to map.");
                         Logger.Log($"NOTE: Building {buildingType.ININame} exists in the cell {cellCoords} that already has other buildings.");
                     }
                 }
@@ -677,7 +675,6 @@ namespace TSMapEditor.Initialization
 
                 if (mapCell.Waypoints.Count > 0)
                 {
-                    //AddMapLoadError($"Cell at {waypoint.Position} has multiple waypoints placed on it. Skipping adding waypoint #{waypoint.Identifier} there.");
                     Logger.Log($"NOTE: Waypoint {waypoint.Identifier} exists in the cell {waypoint.Position} that already has other waypoints.");
                     continue;
                 }
