@@ -56,7 +56,7 @@ namespace TSMapEditor.Models
         public string GetHintText()
         {
             var stringBuilder = new StringBuilder();
-            stringBuilder.Append("Owner: " + (House == null ? Constants.NoneValue2 : House.ININame));
+            stringBuilder.Append("Owner: " + (Country == null ? Constants.NoneValue2 : Country.ININame));
             stringBuilder.Append(Environment.NewLine + Environment.NewLine);
             stringBuilder.Append("Script: " + (Script == null ? Constants.NoneValue2 : Script.Name));
             stringBuilder.Append(Environment.NewLine + Environment.NewLine);
