@@ -62,7 +62,7 @@ namespace TSMapEditor.Models
         {
             foreach (var property in typeof(HouseType).GetProperties())
             {
-                if (property.Name != "BaseNodes" && property.Name != "CountryClass")
+                if (property.Name != "ININame")
                     property.SetValue(this, property.GetValue(baseCountry));
             }
         }

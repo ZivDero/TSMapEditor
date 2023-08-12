@@ -2,6 +2,7 @@
 using Rampastring.XNAUI;
 using Rampastring.XNAUI.XNAControls;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using TSMapEditor.Models;
 using TSMapEditor.UI.Controls;
@@ -203,21 +204,27 @@ namespace TSMapEditor.UI.Windows
             if (map.PlayerHouses.Contains(editedHouse))
                 return;
 
+            if (map.StandardCountries.Contains(editedHouse.CountryClass))
+            {
+                editedHouse.CountryClass.CopyFromOtherCountry(map.Rules.GetStandardCountry(editedHouse.CountryClass.ININame));
+            }
+
             if (map.StandardHouses.Contains(editedHouse))
             {
+                editedHouse.BaseNodes.Clear();
                 editedHouse.CopyFromOtherHouse(map.Rules.GetStandardHouse(editedHouse.CountryClass));
                 if (!map.Houses.Contains(editedHouse))
                     return;
             }
 
-            map.DeleteCountry(editedHouse.CountryClass);
-            map.DeleteHouse(editedHouse);
+            if (map.DeleteCountry(editedHouse.CountryClass))
+                RefreshHouseInfo();
 
-            lbHouseList.SelectedIndex -= 1;
-            ListHouses();
-
-            RefreshHouseInfo();
-
+            if (map.DeleteHouse(editedHouse))
+            {
+                lbHouseList.SelectedIndex -= 1;
+                ListHouses();
+            }
         }
 
         private void BtnStandardHouses_LeftClick(object sender, System.EventArgs e)
