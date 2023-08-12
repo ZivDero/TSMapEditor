@@ -356,7 +356,8 @@ namespace TSMapEditor.UI.Windows
             }
 
             ddHouse.AddItem("<all>");
-            map.GetHouses().ForEach(house => ddHouse.AddItem(house.ININame, Helpers.GetHouseUITextColor(house)));
+            map.GetCountries().ForEach(country => ddHouse.AddItem(country.ININame, country.HasDarkHouseColor() ? UISettings.ActiveSettings.AltColor : country.XNAColor));
+            // map.GetHouses().ForEach(house => ddHouse.AddItem(house.ININame, Helpers.GetHouseUITextColor(house)));
 
             LbAITriggers_SelectedIndexChanged(this, EventArgs.Empty);
         }
