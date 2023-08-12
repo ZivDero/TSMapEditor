@@ -57,6 +57,6 @@ namespace TSMapEditor.Models
 
         public virtual bool Remapable() => false;
 
-        public virtual Color GetRemapColor() => Color.White;
+        public virtual Color GetRemapColor() => Color.Gray;
     }
 }

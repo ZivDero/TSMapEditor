@@ -15,7 +15,7 @@
         public string Name { get; set; }
         public TeamType PrimaryTeam { get; set; }
         public string OwnerName { get; set; }
-        public House Owner { get; set; }
+        public HouseType Owner { get; set; }
         public int TechLevel { get; set; }
         public AITriggerConditionType ConditionType { get; set; }
         public TechnoType ConditionObject { get; set; }

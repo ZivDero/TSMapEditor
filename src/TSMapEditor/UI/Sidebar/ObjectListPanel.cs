@@ -161,7 +161,7 @@ namespace TSMapEditor.UI.Sidebar
                 if (string.IsNullOrWhiteSpace(categoriesString))
                 {
                     categories.Add("Uncategorized");
-                    remapColors.Add(Color.White);
+                    remapColors.Add(Color.Gray);
                 }
                 else
                 {
@@ -169,7 +169,7 @@ namespace TSMapEditor.UI.Sidebar
 
                     for (int ownerIndex = 0; ownerIndex < owners.Length; ownerIndex++)
                     {
-                        Color remapColor = Color.White;
+                        Color remapColor = Color.Gray;
 
                         string ownerName = owners[ownerIndex];
                         ownerName = Map.EditorConfig.EditorRulesIni.GetStringValue("ObjectCategoryOverrides", ownerName, ownerName);
@@ -177,7 +177,7 @@ namespace TSMapEditor.UI.Sidebar
                         House house = Map.StandardHouses.Find(h => h.ININame == ownerName);
                         if (house != null)
                         {
-                            int actsLike = house.ActsLike;
+                            int actsLike = house.ActsLike ?? -1;
                             if (actsLike > -1)
                                 ownerName = Map.StandardHouses[actsLike].ININame;
                         }

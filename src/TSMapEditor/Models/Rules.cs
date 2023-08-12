@@ -2,7 +2,6 @@
 using Rampastring.Tools;
 using System;
 using System.Collections.Generic;
-using TSMapEditor.GameMath;
 using TSMapEditor.Initialization;
 using TSMapEditor.Models.ArtConfig;
 
@@ -17,6 +16,7 @@ namespace TSMapEditor.Models
         public List<TerrainType> TerrainTypes = new List<TerrainType>();
         public List<OverlayType> OverlayTypes = new List<OverlayType>();
         public List<SmudgeType> SmudgeTypes = new List<SmudgeType>();
+        public List<HouseType> Countries = new List<HouseType>();
 
         public List<string> Sides = new List<string>();
         public List<InfantrySequence> InfantrySequences = new List<InfantrySequence>();
@@ -55,59 +55,20 @@ namespace TSMapEditor.Models
             Weapons.ForEach(w => initializer.ReadObjectTypePropertiesFromINI(w, iniFile));
             AnimTypes.ForEach(a => initializer.ReadObjectTypePropertiesFromINI(a, iniFile));
 
-            var colorsSection = iniFile.GetSection("Colors");
-            if (colorsSection != null)
-            {
-                foreach (var kvp in colorsSection.Keys)
-                {
-                    Colors.Add(new RulesColor(kvp.Key, kvp.Value));
-                }
-            }
-
-            var tiberiumsSection = iniFile.GetSection("Tiberiums");
-            if (tiberiumsSection != null && !isMapIni)
-            {
-                for (int i = 0; i < tiberiumsSection.Keys.Count; i++)
-                {
-                    var kvp = tiberiumsSection.Keys[i];
-                    var tiberiumType = new TiberiumType(kvp.Value, i);
-
-                    var tiberiumTypeSection = iniFile.GetSection(kvp.Value);
-                    if (tiberiumTypeSection != null)
-                    {
-                        tiberiumType.ReadPropertiesFromIniSection(tiberiumTypeSection);
-
-                        TiberiumTypes.Add(tiberiumType);
-                        var rulesColor = Colors.Find(c => c.Name == tiberiumType.Color);
-                        if (rulesColor != null)
-                            tiberiumType.XNAColor = rulesColor.XNAColor;
-                    }
-                }
-            }
-
-            var sidesSection = iniFile.GetSection("Sides");
-            if (sidesSection != null)
-            {
-                foreach (var kvp in sidesSection.Keys)
-                {
-                    Sides.Add(kvp.Value);
-                }
-            }
+            InitColors(iniFile);
 
             if (!isMapIni)
             {
-                // Don't load local variables defined in the map as globals
-
-                IniSection variableNamesSection = iniFile.GetSection("VariableNames");
-                if (variableNamesSection != null)
-                {
-                    for (int i = 0; i < variableNamesSection.Keys.Count; i++)
-                    {
-                        var kvp = variableNamesSection.Keys[i];
-                        GlobalVariables.Add(new GlobalVariable(i, kvp.Value));
-                    }
-                }
+                InitFromTypeSection(iniFile, Constants.UseCountries ? "Countries" : "Houses", Countries);
+                Countries.ForEach(ot => initializer.ReadObjectTypePropertiesFromINI(ot, iniFile));
+                Countries.ForEach(ot => InitHouseType(ot, isMapIni));
             }
+
+            InitTiberiums(iniFile, isMapIni);
+            InitSides(iniFile, isMapIni);
+
+            if (!isMapIni) // Don't load local variables defined in the map as globals
+                InitGlobalVariables(iniFile);
         }
 
         public void InitArt(IniFile iniFile, IInitializer initializer)
@@ -131,48 +92,196 @@ namespace TSMapEditor.Models
             AnimTypes.ForEach(a => initializer.ReadObjectTypeArtPropertiesFromINI(a, iniFile, a.ININame));
         }
 
-        public List<House> GetStandardHouses(IniFile iniFile)
+        public List<House> GetStandardHouses()
         {
-            var houses = GetHousesFrom(iniFile, "Houses");
-            if (houses.Count > 0)
-                return houses;
-
-            return GetHousesFrom(iniFile, "Countries");
-        }
-
-        public List<House> GetHousesFrom(IniFile iniFile, string sectionName)
-        {
-            var housesSection = iniFile.GetSection(sectionName);
-            if (housesSection == null)
-                return new List<House>(0);
-
             var houses = new List<House>();
 
-            foreach (var kvp in housesSection.Keys)
+            foreach (HouseType country in Countries)
             {
-                string houseName = kvp.Value;
-                var house = new House(houseName);
-                InitHouse(iniFile, house);
-                houses.Add(house);
+                houses.Add(GetStandardHouse(country));
             }
 
             return houses;
         }
 
-        private void InitHouse(IniFile iniFile, House house)
+        public House GetStandardHouse(HouseType country)
         {
-            var section = iniFile.GetSection(house.ININame);
-            if (section == null)
-                return;
+            House house = new House(country.ININame)
+            {
+                Allies = country.ININame,
+                Color = country.Color,
+                XNAColor = country.XNAColor,
+                Credits = 0,
+                Edge = "North",
+                IQ = 0,
+                PercentBuilt = 100,
+                PlayerControl = false,
+                TechLevel = 10
+            };
 
-            house.ReadPropertiesFromIniSection(iniFile.GetSection(house.ININame));
-            //house.Name = iniFile.GetStringValue(house.ININame, "Name", house.ININame);
-            //house.Color = iniFile.GetStringValue(house.ININame, "Color", "Grey");
-            var color = Colors.Find(c => c.Name == house.Color);
-            if (color == null)
-                house.XNAColor = Color.Black;
+            if (Constants.UseCountries)
+            {
+                // RA2/YR Houses only have a country field
+                house.Country = country.ININame;
+            }
             else
-                house.XNAColor = color.XNAColor;
+            {
+                // TS Houses contain ActsLike and Side
+                int sideIndex = Sides.FindIndex(side => side == country.Side);
+                if (sideIndex == -1)
+                    sideIndex = 0;
+
+                house.ActsLike = sideIndex;
+                house.Side = country.Side;
+            }
+
+            return house;
+        }
+
+        public List<House> GetPlayerHouses()
+        {
+            List<House> houses = new List<House>();
+            if (Constants.UseCountries)
+            {
+                string letters = "ABCDEFGH";
+                for (int i = 0; i < 8; i++)
+                {
+                    House house = new House($"<Player @ {letters[i]}>")
+                    {
+                        Country = $"<Player @ {letters[i]}>",
+                        IsPlayerHouse = true,
+                        Color = "Grey",
+                        XNAColor = Color.Gray
+                    };
+
+                    houses.Add(house);
+                }
+            }
+            else
+            {
+                for (int i = 0; i < 8; i++)
+                {
+                    House house = new House($"Spawn{i + 1}")
+                    {
+                        Country = $"Spawn{i + 1}",
+                        IsPlayerHouse = true,
+                        Color = "Grey",
+                        XNAColor = Color.Gray
+                    };
+
+                    houses.Add(house);
+                }
+            }
+
+            return houses;
+        }
+
+        public List<HouseType> GetPlayerCountries()
+        {
+            List<HouseType> countries = new List<HouseType>();
+            if (Constants.UseCountries)
+            {
+                string letters = "ABCDEFGH";
+                for (int i = 0; i < 8; i++)
+                {
+                    HouseType country = new HouseType($"<Player @ {letters[i]}>")
+                    {
+                        Index = 4475 + i,
+                        IsPlayerHouse = true,
+                        Color = "Grey",
+                        XNAColor = Color.Gray
+                    };
+
+                    countries.Add(country);
+                }
+            }
+            else
+            {
+                for (int i = 0; i < 8; i++)
+                {
+                    HouseType country = new HouseType($"Spawn{i + 1}")
+                    {
+                        Index = 50 + i,
+                        IsPlayerHouse = true,
+                        Color = "Grey",
+                        XNAColor = Color.Gray
+                    };
+
+                    countries.Add(country);
+                }
+            }
+
+            return countries;
+        }
+
+        private void InitHouseType(HouseType houseType, bool isMapIni = false)
+        {
+            var color = Colors.Find(c => c.Name == houseType.Color);
+            if (color == null)
+                houseType.XNAColor = Color.Black;
+            else
+                houseType.XNAColor = color.XNAColor;
+        }
+
+        private void InitColors(IniFile iniFile)
+        {
+            var colorsSection = iniFile.GetSection("Colors");
+            if (colorsSection != null)
+            {
+                foreach (var kvp in colorsSection.Keys)
+                {
+                    Colors.Add(new RulesColor(kvp.Key, kvp.Value));
+                }
+            }
+        }
+
+        private void InitTiberiums(IniFile iniFile, bool isMapIni)
+        {
+            var tiberiumsSection = iniFile.GetSection("Tiberiums");
+            if (tiberiumsSection != null && !isMapIni)
+            {
+                for (int i = 0; i < tiberiumsSection.Keys.Count; i++)
+                {
+                    var kvp = tiberiumsSection.Keys[i];
+                    var tiberiumType = new TiberiumType(kvp.Value, i);
+
+                    var tiberiumTypeSection = iniFile.GetSection(kvp.Value);
+                    if (tiberiumTypeSection != null)
+                    {
+                        tiberiumType.ReadPropertiesFromIniSection(tiberiumTypeSection);
+
+                        TiberiumTypes.Add(tiberiumType);
+                        var rulesColor = Colors.Find(c => c.Name == tiberiumType.Color);
+                        if (rulesColor != null)
+                            tiberiumType.XNAColor = rulesColor.XNAColor;
+                    }
+                }
+            }
+        }
+
+        private void InitSides(IniFile iniFile, bool isMapIni)
+        {
+            var sidesSection = iniFile.GetSection("Sides");
+            if (sidesSection != null)
+            {
+                foreach (var kvp in sidesSection.Keys)
+                {
+                    Sides.Add(kvp.Key);
+                }
+            }
+        }
+
+        private void InitGlobalVariables(IniFile iniFile)
+        {
+            IniSection variableNamesSection = iniFile.GetSection("VariableNames");
+            if (variableNamesSection != null)
+            {
+                for (int i = 0; i < variableNamesSection.Keys.Count; i++)
+                {
+                    var kvp = variableNamesSection.Keys[i];
+                    GlobalVariables.Add(new GlobalVariable(i, kvp.Value));
+                }
+            }
         }
 
         private void InitFromTypeSection<T>(IniFile iniFile, string sectionName, List<T> targetList)
@@ -275,7 +384,7 @@ namespace TSMapEditor.Models
             }
             type.ArtConfig.Anims = anims.ToArray();
 
-            if (type.Turret && !type.TurretAnimIsVoxel)
+            if (type.TurretAnim!= null && type.Turret && !type.TurretAnimIsVoxel)
             {
                 AnimType turretAnim = AnimTypes.Find(at => at.ININame == type.TurretAnim);
                 turretAnim.ArtConfig.IsBuildingAnim = true;

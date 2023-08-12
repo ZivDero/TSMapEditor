@@ -20,7 +20,7 @@ namespace TSMapEditor.Models
         public bool Full { get; set; }
         public string Name { get; set; }
         public int Group { get; set; } = -1;
-        public House House { get; set; }
+        public HouseType Country { get; set; }
         public Script Script { get; set; }
         public TaskForce TaskForce { get; set; }
         public Tag Tag { get; set; }
@@ -67,8 +67,8 @@ namespace TSMapEditor.Models
             // This cuts it for all properties of standard types
             WritePropertiesToIniSection(iniSection);
 
-            if (House != null)
-                iniSection.SetStringValue("House", House.ININame);
+            if (Country != null)
+                iniSection.SetStringValue("House", Country.ININame);
             if (Script != null)
                 iniSection.SetStringValue("Script", Script.ININame);
             if (TaskForce != null)
@@ -84,10 +84,10 @@ namespace TSMapEditor.Models
 
         public Color GetXNAColor()
         {
-            if (House == null || House.HasDarkHouseColor())
+            if (Country == null || Country.HasDarkHouseColor())
                 return UISettings.ActiveSettings.AltColor;
 
-            return House.XNAColor;
+            return Country.XNAColor;
         }
     }
 }
