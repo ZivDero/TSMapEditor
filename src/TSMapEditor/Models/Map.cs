@@ -905,8 +905,11 @@ namespace TSMapEditor.Models
             if (Countries.Remove(country))
             {
                 for (int i = index; i < Countries.Count; i++)
-                    Countries[i].Index--;
-
+                {
+                    if (Countries[i].Index >= StandardCountries.Count)
+                        Countries[i].Index--;
+                }
+                
                 CountriesChanged?.Invoke(this, EventArgs.Empty);
                 return true;
             }
@@ -1484,7 +1487,7 @@ namespace TSMapEditor.Models
 
             Rules.InitFromINI(editorRulesIni, initializer, false);
 
-            StandardCountries = new(Rules.Countries);
+            StandardCountries = Rules.GetStandardCountries();
             StandardHouses = Rules.GetStandardHouses();
             PlayerHouses = Rules.GetPlayerHouses();
             PlayerCountries = Rules.GetPlayerCountries();
