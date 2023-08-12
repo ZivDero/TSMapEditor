@@ -321,7 +321,6 @@ namespace TSMapEditor.Initialization
                     continue;
                 }
 
-                House owner = map.FindOrMakeHouse(ownerName);
                 var building = new Structure(buildingType)
                 {
                     HP = health,
@@ -332,8 +331,8 @@ namespace TSMapEditor.Initialization
                     Spotlight = (SpotlightType)spotlight,
                     AIRepairable = aiRepairable,
                     Nominal = nominal,
-                    Owner = map.FindOrMakeHouse(ownerName)
-                };
+                    Owner = map.FindHouse(ownerName)
+            };
 
                 if (upgradeCount > 0)
                 {
@@ -449,7 +448,7 @@ namespace TSMapEditor.Initialization
                     Group = group,
                     AutocreateNoRecruitable = autocreateNoRecruitable,
                     AutocreateYesRecruitable = autocreateYesRecruitable,
-                    Owner = map.FindOrMakeHouse(ownerName)
+                    Owner = map.FindHouse(ownerName)
                 };
 
                 FindAttachedTag(map, aircraft, attachedTag);
@@ -514,7 +513,7 @@ namespace TSMapEditor.Initialization
                     FollowerID = followsIndex,
                     AutocreateNoRecruitable = autocreateNoRecruitable,
                     AutocreateYesRecruitable = autocreateYesRecruitable,
-                    Owner = map.FindOrMakeHouse(ownerName)
+                    Owner = map.FindHouse(ownerName)
                 };
 
                 FindAttachedTag(map, unit, attachedTag);
@@ -588,7 +587,7 @@ namespace TSMapEditor.Initialization
                     AutocreateYesRecruitable = autocreateYesRecruitable,
                     SubCell = subCell,
                     Mission = mission,
-                    Owner = map.FindOrMakeHouse(ownerName)
+                    Owner = map.FindHouse(ownerName)
                 };
 
                 FindAttachedTag(map, infantry, attachedTag);
@@ -880,7 +879,7 @@ namespace TSMapEditor.Initialization
                 string taskForceId = teamTypeSection.GetStringValue("TaskForce", string.Empty);
                 string tagId = teamTypeSection.GetStringValue("Tag", string.Empty);
 
-                teamType.House = map.FindHouse(houseIniName);
+                teamType.Country = map.FindCountry(houseIniName);
                 teamType.Script = map.Scripts.Find(s => s.ININame == scriptId);
                 teamType.TaskForce = map.TaskForces.Find(t => t.ININame == taskForceId);
                 teamType.Tag = map.Tags.Find(t => t.ID == tagId);
@@ -891,9 +890,9 @@ namespace TSMapEditor.Initialization
                         teamType.EnableFlag(ttflag.Name);
                 });
 
-                if (teamType.House == null)
+                if (teamType.Country == null)
                 {
-                    AddMapLoadError($"TeamType {teamType.ININame} has an invalid house ({houseIniName}) specified!");
+                    AddMapLoadError($"TeamType {teamType.ININame} has an invalid HouseType ({houseIniName}) specified!");
                 }
 
                 if (teamType.Script == null)
@@ -937,7 +936,7 @@ namespace TSMapEditor.Initialization
                 aiTriggerType.Name = parts[0];
                 aiTriggerType.PrimaryTeam = map.TeamTypes.Find(tt => tt.ININame == parts[1]);
                 aiTriggerType.OwnerName = parts[2];
-                aiTriggerType.Owner = map.FindHouse(aiTriggerType.OwnerName);
+                aiTriggerType.Owner = map.FindCountry(aiTriggerType.OwnerName);
 
                 if (!int.TryParse(parts[3], CultureInfo.InvariantCulture, out int techLevel))
                 {
@@ -1011,13 +1010,42 @@ namespace TSMapEditor.Initialization
             if (section == null)
                 return;
 
+            // First get all the houses no matter how they're ordered
+            var loadedHouses = new List<House>();
             foreach (var kvp in section.Keys)
             {
                 string houseName = kvp.Value;
-                var house = new House(houseName);
-                house.ID = Conversions.IntFromString(kvp.Key, -1);
 
-                map.Houses.Add(house);
+                if (houseName.StartsWith("Spawn") || houseName.StartsWith("<Player @")) // No one ever saves player houses in YR but it doesn't hurt to try
+                {
+                    var playerHouse = map.PlayerHouses.Find(h => h.ININame == houseName);
+                    if (playerHouse != null)
+                    {
+                        var sec = mapIni.GetSection(houseName);
+                        if (sec == null)
+                            continue;
+                        
+                        string color = section.GetStringValue("Color", "Grey");
+                        playerHouse.Color = color;
+
+                        if (map.Rules.Colors.Find(c => c.Name == color) is var xnaColor && xnaColor != null)
+                            playerHouse.XNAColor = xnaColor.XNAColor;
+                        else
+                            playerHouse.XNAColor = Color.Gray;
+
+                        continue;
+                    }
+                }
+
+                if (houseName.StartsWith("Fake") && houseName.Length <= 6)
+                {
+                    map.TsCoop = true;
+                    continue;
+                }
+
+                var house = new House(houseName);
+
+                loadedHouses.Add(house);
 
                 var houseSection = mapIni.GetSection(houseName);
                 if (houseSection != null)
@@ -1032,6 +1060,104 @@ namespace TSMapEditor.Initialization
                 }
             }
 
+            // Now first add the Houses that match the standard ones, and replace the generated ones with them
+            var housesToAdd = new List<House>();
+            for (int i = 0; i < map.StandardHouses.Count; i++)
+            {
+                if (loadedHouses.FindIndex(h => h.ININame == map.StandardHouses[i].ININame) is var index && index != -1)
+                {
+                    map.StandardHouses[i] = loadedHouses[index];
+                    housesToAdd.Add(loadedHouses[index]);
+                }
+            }
+
+            // Now add the rest to the end
+            foreach (var house in loadedHouses)
+            {
+                if (!housesToAdd.Exists(h => h.ININame == house.ININame))
+                {
+                    housesToAdd.Add(house);
+                }
+            }
+
+            map.Houses.AddRange(housesToAdd);
+        }
+
+        public static void ReadCountries(IMap map, IniFile mapIni)
+        {
+            var loadedCountries = new List<HouseType>();
+            if (Constants.UseCountries)
+            {
+                // YR Countries get loaded from [Countries]
+                var section = mapIni.GetSection("Countries");
+                if (section == null)
+                    return;
+
+                foreach (var kvp in section.Keys)
+                {
+                    string countryName = kvp.Value;
+                    var country = new HouseType(countryName);
+
+                    loadedCountries.Add(country);
+
+                    var countrySection = mapIni.GetSection(countryName);
+                    if (countrySection != null)
+                    {
+                        country.ReadFromIniSection(countrySection);
+
+                        var color = map.Rules.Colors.Find(c => c.Name == country.Color);
+                        if (color == null)
+                            country.XNAColor = Color.Black;
+                        else
+                            country.XNAColor = color.XNAColor;
+                    }
+                }
+            }
+            else
+            {
+                // TS Needs the Countries to be generated from the in-map houses. The actual properties of the Countries don't really matter
+                foreach (var house in map.Houses)
+                {
+                    if (map.StandardCountries.Exists(c => c.ININame == house.ININame))
+                        continue;
+
+                    var country = new HouseType(house.ININame)
+                    {
+                        Color = house.Color,
+                        XNAColor = house.XNAColor,
+                        Side = house.Side
+                    };
+                    
+                    loadedCountries.Add(country);
+                }
+            }
+
+            // Now first put in the Countries that match the standard ones
+            var countriesToAdd = new List<HouseType>();
+            for (int i = 0; i < map.StandardCountries.Count; i++)
+            {
+                if (loadedCountries.FindIndex(c => c.ININame == map.StandardCountries[i].ININame) is var index && index != -1)
+                {
+                    loadedCountries[index].Index = map.StandardCountries[i].Index;
+                    map.StandardCountries[i] = loadedCountries[index];
+                    countriesToAdd.Add(loadedCountries[index]);
+                }
+            }
+
+            // Now add the rest to the end
+            int countryCount = 0;
+            foreach (var country in loadedCountries)
+            {
+                if (!countriesToAdd.Contains(country))
+                {
+                    countriesToAdd.Add(country);
+                    country.Index = map.Rules.Countries.Count + countryCount;
+                    countryCount++;
+                }
+
+            }
+
+            map.Countries.AddRange(countriesToAdd);
             Logger.Log("Houses read successfully.");
         }
 

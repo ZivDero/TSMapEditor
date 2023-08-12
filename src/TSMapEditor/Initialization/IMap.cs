@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Rampastring.Tools;
+using System;
+using System.Collections.Generic;
 using TSMapEditor.GameMath;
 using TSMapEditor.Models;
 using TSMapEditor.Rendering;
@@ -12,11 +12,17 @@ namespace TSMapEditor.Initialization
     {
         BasicSection Basic { get; }
 
+        bool TsCoop { get; set; }
+
         MapTile[][] Tiles { get; }
         MapTile GetTile(int x, int y);
         MapTile GetTile(Point2D cellCoords);
+        List<HouseType> StandardCountries { get; }
         List<House> StandardHouses { get; }
+        public List<HouseType> PlayerCountries { get; set; }
+        public List<House> PlayerHouses { get; set; }
         List<Aircraft> Aircraft { get; }
+        List<HouseType> Countries { get; }
         List<House> Houses { get; }
         List<Infantry> Infantry { get; }
         IniFile LoadedINI { get; }
@@ -43,8 +49,9 @@ namespace TSMapEditor.Initialization
 
         void SetTileData(List<MapTile> tiles);
         void PlaceTerrainTileAt(ITileImage tile, Point2D cellCoords);
-        House FindOrMakeHouse(string houseName);
         House FindHouse(string houseName);
+        House TryFindHouse(string houseName);
+        HouseType FindCountry(string countryName);
         bool IsCoordWithinMap(int x, int y);
         bool IsCoordWithinMap(Point2D coord);
         void AddWaypoint(Waypoint waypoint);

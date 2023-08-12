@@ -109,7 +109,7 @@ namespace TSMapEditor.UI.Controls
         {
             base.Update(gameTime);
 
-            RemapColor = Color.White * Alpha;
+            RemapColor = Color.Gray * Alpha;
 
             if (Alpha <= 0.0f)
             {

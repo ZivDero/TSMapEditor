@@ -42,36 +42,7 @@ namespace TSMapEditor.UI.Windows
 
         private void AddHousesFromEditorRulesSectionAndHide(string sectionName)
         {
-            var houses = map.Rules.GetHousesFrom(map.EditorConfig.EditorRulesIni, sectionName);
-
-            // Set some meaningful default values
-            for (int i = 0; i < houses.Count; i++)
-            {
-                var house = houses[i];
-                house.ID = i;
-                house.Edge = "North";
-                house.Allies = house.ININame;
-                house.TechLevel = 7;
-
-                for (int sideIndex = 0; sideIndex < map.Rules.Sides.Count; sideIndex++)
-                {
-                    string side = map.Rules.Sides[sideIndex];
-
-                    if (house.ININame.StartsWith(side))
-                    {
-                        house.Side = side;
-                        house.ActsLike = houses.FindIndex(h => house.ININame.StartsWith(h.ININame));
-                        break;
-                    }
-                }
-
-                if (string.IsNullOrWhiteSpace(house.Side))
-                {
-                    house.Side = map.Rules.Sides[0];
-                    house.ActsLike = 0;
-                }
-            }
-
+            var houses = map.Rules.GetStandardHouses();
             map.AddHouses(houses);
 
             ReassignObjectHouses();
