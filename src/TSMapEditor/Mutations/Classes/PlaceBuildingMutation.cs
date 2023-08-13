@@ -26,9 +26,6 @@ namespace TSMapEditor.Mutations.Classes
         {
             var cell = MutationTarget.Map.GetTileOrFail(cellCoords);
 
-            //if (cell.Structure != null)
-            //    throw new InvalidOperationException(nameof(PlaceBuildingMutation) + ": the cell already has a building!");
-
             var structure = new Structure(buildingType);
             structure.Owner = MutationTarget.ObjectOwner;
             structure.Position = cellCoords;
