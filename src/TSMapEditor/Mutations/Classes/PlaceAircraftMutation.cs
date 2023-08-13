@@ -1,5 +1,4 @@
-﻿using System;
-using TSMapEditor.GameMath;
+﻿using TSMapEditor.GameMath;
 using TSMapEditor.Models;
 using TSMapEditor.Rendering;
 
@@ -25,9 +24,6 @@ namespace TSMapEditor.Mutations.Classes
             var cell = MutationTarget.Map.GetTile(cellCoords);
             if (cell == null)
                 return;
-
-            //if (cell.Aircraft != null)
-            //    throw new InvalidOperationException(nameof(PlaceAircraftMutation) + ": the cell already has an aircraft!");
 
             aircraft = new Aircraft(aircraftType);
             aircraft.Owner = MutationTarget.ObjectOwner;

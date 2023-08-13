@@ -1,5 +1,4 @@
-﻿using System;
-using TSMapEditor.GameMath;
+﻿using TSMapEditor.GameMath;
 using TSMapEditor.Models;
 using TSMapEditor.Rendering;
 
@@ -23,9 +22,6 @@ namespace TSMapEditor.Mutations.Classes
         public override void Perform()
         {
             var cell = MutationTarget.Map.GetTileOrFail(cellCoords);
-
-            //if (cell.Vehicle != null)
-            //    throw new InvalidOperationException(nameof(PlaceVehicleMutation) + ": the cell already has a vehicle!");
 
             unit = new Unit(unitType);
             unit.Owner = MutationTarget.ObjectOwner;
