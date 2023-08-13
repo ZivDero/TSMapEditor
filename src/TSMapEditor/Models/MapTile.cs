@@ -214,7 +214,7 @@ namespace TSMapEditor.Models
                     bool anotherExists = Structures.Count == 1 && !Structures.Contains((Structure)gameObject);
                     bool clone = Structures.Count == 1 && Structures.Contains((Structure)gameObject) && blocksSelf;
 
-                        if ((multipleStructuresExist || anotherExists || clone) && !overlapObjects)
+                    if ((multipleStructuresExist || anotherExists || clone) && !overlapObjects)
                         return false;
                     return true;
                 }
