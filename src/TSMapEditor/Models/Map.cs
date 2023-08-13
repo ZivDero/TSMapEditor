@@ -599,7 +599,6 @@ namespace TSMapEditor.Models
             var cell = GetTile(waypoint.Position.X, waypoint.Position.Y);
             if (cell.Waypoints.Count > 0)
             {
-                //throw new InvalidOperationException($"Cell at {cell.CoordsToPoint()} already has a waypoint, skipping adding waypoint {waypoint.Identifier}");
                 Logger.Log($"NOTE: Waypoint {waypoint.Identifier} exists in the cell {cell.CoordsToPoint()} that already has other waypoints.");
             }
 
