@@ -50,8 +50,7 @@ namespace TSMapEditor.UI.CursorActions
 
             bool overlapObjects = KeyboardCommands.Instance.OverlapObjects.AreKeysOrModifiersDown(keyboard);
 
-            bool canPlace = Map.CanPlaceObjectAt(aircraft, cellCoords, false,
-                overlapObjects);
+            bool canPlace = Map.CanPlaceObjectAt(aircraft, cellCoords, false, overlapObjects);
 
             if (!canPlace)
                 return;
