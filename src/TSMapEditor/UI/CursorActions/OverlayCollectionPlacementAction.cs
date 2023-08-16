@@ -15,10 +15,10 @@ namespace TSMapEditor.UI.CursorActions
 
         public override string GetName() => "Place Overlay Collection";
 
-        private OverlayCollection overlayCollection;
+        private OverlayCollection _overlayCollection;
         public OverlayCollection OverlayCollection
         {
-            get => overlayCollection;
+            get => _overlayCollection;
             set
             {
                 if (value.Entries.Length == 0)
@@ -26,7 +26,7 @@ namespace TSMapEditor.UI.CursorActions
                     throw new InvalidOperationException($"Overlay collection {value.Name} has no overlay entries!");
                 }
 
-                overlayCollection = value;
+                _overlayCollection = value;
             }
         }
 

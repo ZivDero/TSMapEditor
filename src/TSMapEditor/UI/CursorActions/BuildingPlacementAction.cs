@@ -22,26 +22,26 @@ namespace TSMapEditor.UI.CursorActions
 
         private Structure structure;
 
-        private BuildingType buildingType;
+        private BuildingType _buildingType;
 
         private readonly RKeyboard keyboard;
 
         public BuildingType BuildingType
         {
-            get => buildingType;
+            get => _buildingType;
             set
             {
-                if (buildingType != value)
+                if (_buildingType != value)
                 {
-                    buildingType = value;
+                    _buildingType = value;
 
-                    if (buildingType == null)
+                    if (_buildingType == null)
                     {
                         structure = null;
                     }
                     else
                     {
-                        structure = new Structure(buildingType) { Owner = CursorActionTarget.MutationTarget.ObjectOwner };
+                        structure = new Structure(_buildingType) { Owner = CursorActionTarget.MutationTarget.ObjectOwner };
                     }
                 }
             }

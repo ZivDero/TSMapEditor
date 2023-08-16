@@ -19,25 +19,25 @@ namespace TSMapEditor.UI.CursorActions
 
         private Infantry infantry;
 
-        private InfantryType infantryType;
+        private InfantryType _infantryType;
         
 
         public InfantryType InfantryType
         {
-            get => infantryType;
+            get => _infantryType;
             set
             {
-                if (infantryType != value)
+                if (_infantryType != value)
                 {
-                    infantryType = value;
+                    _infantryType = value;
 
-                    if (infantryType == null)
+                    if (_infantryType == null)
                     {
                         infantry = null;
                     }
                     else
                     {
-                        infantry = new Infantry(infantryType) { Owner = CursorActionTarget.MutationTarget.ObjectOwner };
+                        infantry = new Infantry(_infantryType) { Owner = CursorActionTarget.MutationTarget.ObjectOwner };
                     }
                 }
             }
