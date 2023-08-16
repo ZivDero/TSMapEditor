@@ -353,7 +353,7 @@ namespace TSMapEditor.Initialization
 
                     if (tile.Structures.Count > 0)
                     {
-                        Logger.Log($"NOTE: Building {buildingType.ININame} exists in the cell at {cellCoords} that already has other buildings: {string.Join(", ", tile.Structures.Select(s => s.ObjectType.ININame))}");
+                        Logger.Log($"NOTE: Building {buildingType.ININame} exists in the cell at {cellCoords} that already contains other buildings: {string.Join(", ", tile.Structures.Select(s => s.ObjectType.ININame))}");
                     }
                 }
 
