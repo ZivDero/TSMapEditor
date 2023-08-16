@@ -596,13 +596,13 @@ namespace TSMapEditor.Models
         public void AddWaypoint(Waypoint waypoint)
         {
             Waypoints.Add(waypoint);
-            var cell = GetTile(waypoint.Position.X, waypoint.Position.Y);
-            if (cell.Waypoints.Count > 0)
+            var tile = GetTile(waypoint.Position.X, waypoint.Position.Y);
+            if (tile.Waypoints.Count > 0)
             {
-                Logger.Log($"NOTE: Waypoint {waypoint.Identifier} exists in the cell {cell.CoordsToPoint()} that already has other waypoints.");
+                Logger.Log($"NOTE: Waypoint {waypoint.Identifier} exists in the cell at {waypoint.Position} that already contains other waypoints: {string.Join(", ", tile.Waypoints.Select(s => s.Identifier))}");
             }
 
-            cell.Waypoints.Add(waypoint);
+            tile.Waypoints.Add(waypoint);
         }
 
         public void RemoveWaypoint(Waypoint waypoint)

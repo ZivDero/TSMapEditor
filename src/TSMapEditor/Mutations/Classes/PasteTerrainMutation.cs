@@ -624,11 +624,13 @@ namespace TSMapEditor.Mutations.Classes
                 {
                     bool foreignUnitExists = false;
                     foreach (var vehicle in cell.Vehicles)
+                    {
                         if (!placedObjects.Contains(vehicle))
                         {
                             foreignUnitExists = true;
                             break;
                         }
+                    }
 
                     if (foreignUnitExists)
                         continue;
@@ -688,11 +690,13 @@ namespace TSMapEditor.Mutations.Classes
                         MapTile foundationCell = MutationTarget.Map.GetTile(foundationCellCoords);
 
                         foreach (var building in foundationCell.Structures)
+                        {
                             if (!placedObjects.Contains(building))
                             {
                                 isFoundationClear = false;
                                 break;
                             }
+                        }
                     });
 
                     if (!isFoundationClear)

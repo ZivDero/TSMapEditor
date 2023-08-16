@@ -21,26 +21,26 @@ namespace TSMapEditor.UI.CursorActions
 
         private Unit unit;
 
-        private UnitType unitType;
+        private UnitType _unitType;
 
         private readonly RKeyboard keyboard;
 
         public UnitType UnitType
         {
-            get => unitType;
+            get => _unitType;
             set
             {
-                if (unitType != value)
+                if (_unitType != value)
                 {
-                    unitType = value;
+                    _unitType = value;
 
-                    if (unitType == null)
+                    if (_unitType == null)
                     {
                         unit = null;
                     }
                     else
                     {
-                        unit = new Unit(unitType) { Owner = CursorActionTarget.MutationTarget.ObjectOwner };
+                        unit = new Unit(_unitType) { Owner = CursorActionTarget.MutationTarget.ObjectOwner };
                     }
                 }
             }

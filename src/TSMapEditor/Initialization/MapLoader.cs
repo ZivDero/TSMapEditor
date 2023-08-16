@@ -4,6 +4,7 @@ using Rampastring.Tools;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 using TSMapEditor.GameMath;
 using TSMapEditor.Models;
@@ -352,7 +353,7 @@ namespace TSMapEditor.Initialization
 
                     if (tile.Structures.Count > 0)
                     {
-                        Logger.Log($"NOTE: Building {buildingType.ININame} exists in the cell {cellCoords} that already has other buildings.");
+                        Logger.Log($"NOTE: Building {buildingType.ININame} exists in the cell at {cellCoords} that already has other buildings: {string.Join(", ", tile.Structures.Select(s => s.ObjectType.ININame))}");
                     }
                 }
 
@@ -666,16 +667,16 @@ namespace TSMapEditor.Initialization
                     continue;
                 }
 
-                var mapCell = map.GetTile(waypoint.Position.X, waypoint.Position.Y);
-                if (mapCell == null)
+                var tile = map.GetTile(waypoint.Position.X, waypoint.Position.Y);
+                if (tile == null)
                 {
                     AddMapLoadError($"Waypoint {waypoint.Identifier} at {waypoint.Position} is not within the valid map area.");
                     continue;
                 }
 
-                if (mapCell.Waypoints.Count > 0)
+                if (tile.Waypoints.Count > 0)
                 {
-                    Logger.Log($"NOTE: Waypoint {waypoint.Identifier} exists in the cell {waypoint.Position} that already has other waypoints.");
+                    Logger.Log($"NOTE: Waypoint {waypoint.Identifier} exists in the cell at {waypoint.Position} that already contains other waypoints: {string.Join(", ", tile.Waypoints.Select(s => s.Identifier))}");
                     continue;
                 }
 

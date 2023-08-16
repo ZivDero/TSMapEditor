@@ -18,26 +18,26 @@ namespace TSMapEditor.UI.CursorActions
 
         private Aircraft aircraft;
 
-        private AircraftType aircraftType;
+        private AircraftType _aircraftType;
 
         private readonly RKeyboard keyboard;
 
         public AircraftType AircraftType
         {
-            get => aircraftType;
+            get => _aircraftType;
             set
             {
-                if (aircraftType != value)
+                if (_aircraftType != value)
                 {
-                    aircraftType = value;
+                    _aircraftType = value;
 
-                    if (aircraftType == null)
+                    if (_aircraftType == null)
                     {
                         aircraft = null;
                     }
                     else
                     {
-                        aircraft = new Aircraft(aircraftType) { Owner = CursorActionTarget.MutationTarget.ObjectOwner };
+                        aircraft = new Aircraft(_aircraftType) { Owner = CursorActionTarget.MutationTarget.ObjectOwner };
                     }
                 }
             }
@@ -60,7 +60,6 @@ namespace TSMapEditor.UI.CursorActions
             tile.Aircraft.Add(aircraft);
             CursorActionTarget.TechnoUnderCursor = aircraft;
             CursorActionTarget.AddRefreshPoint(cellCoords);
-
         }
 
         public override void PostMapDraw(Point2D cellCoords)

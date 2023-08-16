@@ -70,7 +70,7 @@ namespace TSMapEditor.Models
             if (Structures.Count > 0)
                 objects.AddRange(Structures);
 
-            if (Structures.Count > 0)
+            if (Vehicles.Count > 0)
                 objects.AddRange(Vehicles);
         }
 

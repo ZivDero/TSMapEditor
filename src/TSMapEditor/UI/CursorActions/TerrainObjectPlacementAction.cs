@@ -19,24 +19,24 @@ namespace TSMapEditor.UI.CursorActions
 
         private TerrainObject terrainObject;
 
-        private TerrainType terrainType;
+        private TerrainType _terrainType;
 
         public TerrainType TerrainType
         {
-            get => terrainType;
+            get => _terrainType;
             set
             {
-                if (terrainType != value)
+                if (_terrainType != value)
                 {
-                    terrainType = value;
+                    _terrainType = value;
 
-                    if (terrainType == null)
+                    if (_terrainType == null)
                     {
                         terrainObject = null;
                     }
                     else
                     {
-                        terrainObject = new TerrainObject(terrainType);
+                        terrainObject = new TerrainObject(_terrainType);
                     }
                 }
             }
@@ -67,7 +67,7 @@ namespace TSMapEditor.UI.CursorActions
 
         public override void LeftDown(Point2D cellCoords)
         {
-            if (terrainType == null)
+            if (_terrainType == null)
                 throw new InvalidOperationException(nameof(TerrainType) + " cannot be null");
 
             var cell = CursorActionTarget.Map.GetTile(cellCoords);
