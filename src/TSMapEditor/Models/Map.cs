@@ -1113,6 +1113,9 @@ namespace TSMapEditor.Models
         /// <returns>True if the object can be moved, otherwise false.</returns>
         public bool CanMoveObject(IMovable movable, Point2D newCoords)
         {
+            if (movable.WhatAmI() == RTTIType.Waypoint)
+                return true;
+
             if (movable.WhatAmI() == RTTIType.Building)
             {
                 bool canPlace = true;
