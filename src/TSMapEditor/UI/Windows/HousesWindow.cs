@@ -232,7 +232,10 @@ namespace TSMapEditor.UI.Windows
             foreach (var house in map.StandardHouses)
                 map.AddStandardHouse(house);
 
-            var selectedItem = lbHouseList.SelectedItem.Tag;
+            object selectedItem = null;
+            if (lbHouseList.SelectedItem != null)
+                selectedItem = lbHouseList.SelectedItem.Tag;
+
             ListHouses();
             lbHouseList.SelectedIndex = lbHouseList.Items.FindIndex(i => i.Tag == selectedItem);
 
