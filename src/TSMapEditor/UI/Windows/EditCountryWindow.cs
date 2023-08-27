@@ -65,7 +65,7 @@ namespace TSMapEditor.UI.Windows
                 ddSide.AddItem(new XNADropDownItem() { Text = sideString, Tag = sideName });
             }
 
-            foreach (var country in map.StandardCountries)
+            foreach (var country in map.StandardHouseTypes)
                 ddParentCountry.AddItem(new XNADropDownItem() { Text = country.ININame, Tag = country.ININame, TextColor = country.XNAColor});
 
             foreach (RulesColor rulesColor in map.Rules.Colors.OrderBy(c => c.Name))
@@ -146,7 +146,7 @@ namespace TSMapEditor.UI.Windows
         {
             editedCountry.Color = ddColor.SelectedItem.Text;
             editedCountry.XNAColor = ddColor.SelectedItem.TextColor.Value;
-            map.CountryColorUpdated(editedCountry);
+            map.HouseTypeColorUpdated(editedCountry);
             CheckAddStandardCountry(editedCountry);
         }
 
@@ -182,7 +182,7 @@ namespace TSMapEditor.UI.Windows
             chkMultiplayPassive.CheckedChanged -= ChkMultiplayPassive_CheckedChanged;
             chkWallOwner.CheckedChanged -= ChkWallOwner_CheckedChanged;
 
-            int parentCountryIndex = map.StandardCountries.FindIndex(c => c.ININame == editedCountry.ParentCountry);
+            int parentCountryIndex = map.StandardHouseTypes.FindIndex(c => c.ININame == editedCountry.ParentCountry);
             ddParentCountry.SelectedIndex = parentCountryIndex;
             ddParentCountry.AllowDropDown = parentCountryIndex != -1;
 
@@ -213,8 +213,8 @@ namespace TSMapEditor.UI.Windows
 
         private void CheckAddStandardCountry(HouseType country)
         {
-            if (map.StandardCountries.Contains(editedCountry))
-                map.AddStandardCountry(country);
+            if (map.StandardHouseTypes.Contains(editedCountry))
+                map.AddStandardHouseType(country);
         }
 
         public void Open(HouseType editedCountry)

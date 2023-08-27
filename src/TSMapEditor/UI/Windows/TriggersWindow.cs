@@ -80,7 +80,7 @@ namespace TSMapEditor.UI.Windows
         private SelectTriggerWindow selectTriggerWindow;
         private SelectGlobalVariableWindow selectGlobalVariableWindow;
         private SelectLocalVariableWindow selectLocalVariableWindow;
-        private SelectCountryWindow selectCountryWindow;
+        private SelectHouseTypeWindow selectHouseTypeWindow;
         private SelectTutorialLineWindow selectTutorialLineWindow;
         private SelectThemeWindow selectThemeWindow;
 
@@ -209,8 +209,8 @@ namespace TSMapEditor.UI.Windows
             var localVariableDarkeningPanel = DarkeningPanel.InitializeAndAddToParentControlWithChild(WindowManager, Parent, selectLocalVariableWindow);
             localVariableDarkeningPanel.Hidden += LocalVariableDarkeningPanel_Hidden;
 
-            selectCountryWindow = new SelectCountryWindow(WindowManager, map);
-            var houseDarkeningPanel = DarkeningPanel.InitializeAndAddToParentControlWithChild(WindowManager, Parent, selectCountryWindow);
+            selectHouseTypeWindow = new SelectHouseTypeWindow(WindowManager, map);
+            var houseDarkeningPanel = DarkeningPanel.InitializeAndAddToParentControlWithChild(WindowManager, Parent, selectHouseTypeWindow);
             houseDarkeningPanel.Hidden += HouseDarkeningPanel_Hidden;
 
             selectTutorialLineWindow = new SelectTutorialLineWindow(WindowManager, map);
@@ -677,11 +677,11 @@ namespace TSMapEditor.UI.Windows
                     selectLocalVariableWindow.Open(existingLocalVariable);
                     break;
                 case TriggerParamType.House:
-                    selectCountryWindow.IsForEvent = true;
-                    if (paramValue > -1 && paramValue < map.GetCountries().Count)
-                        selectCountryWindow.Open(map.GetCountries()[paramValue]);
+                    selectHouseTypeWindow.IsForEvent = true;
+                    if (paramValue > -1 && paramValue < map.GetHouseTypes().Count)
+                        selectHouseTypeWindow.Open(map.GetHouseTypes()[paramValue]);
                     else
-                        selectCountryWindow.Open(null);
+                        selectHouseTypeWindow.Open(null);
                     break;
                 case TriggerParamType.Building:
                     BuildingType existingBuilding = paramValue < 0 || paramValue >= map.Rules.BuildingTypes.Count ? null : map.Rules.BuildingTypes[paramValue];
@@ -733,12 +733,12 @@ namespace TSMapEditor.UI.Windows
                     selectLocalVariableWindow.Open(existingLocalVariable);
                     break;
                 case TriggerParamType.House:
-                    int countryIndex = Conversions.IntFromString(triggerAction.Parameters[paramIndex], -1);
-                    selectCountryWindow.IsForEvent = false;
-                    if (countryIndex > -1 && countryIndex < map.GetCountries().Count)
-                        selectCountryWindow.Open(map.GetCountries()[countryIndex]);
+                    int houseTypeIndex = Conversions.IntFromString(triggerAction.Parameters[paramIndex], -1);
+                    selectHouseTypeWindow.IsForEvent = false;
+                    if (houseTypeIndex > -1 && houseTypeIndex < map.GetHouseTypes().Count)
+                        selectHouseTypeWindow.Open(map.GetHouseTypes()[houseTypeIndex]);
                     else
-                        selectCountryWindow.Open(null);
+                        selectHouseTypeWindow.Open(null);
                     break;
                 case TriggerParamType.Text:
                     selectTutorialLineWindow.Open(new TutorialLine(Conversions.IntFromString(triggerAction.Parameters[paramIndex], -1), string.Empty));
@@ -785,10 +785,10 @@ namespace TSMapEditor.UI.Windows
 
         private void HouseDarkeningPanel_Hidden(object sender, EventArgs e)
         {
-            if (selectCountryWindow.SelectedObject == null)
+            if (selectHouseTypeWindow.SelectedObject == null)
                 return;
 
-            AssignParamValue(selectCountryWindow.IsForEvent, selectCountryWindow.SelectedObject.Index);
+            AssignParamValue(selectHouseTypeWindow.IsForEvent, selectHouseTypeWindow.SelectedObject.Index);
         }
 
         private void LocalVariableDarkeningPanel_Hidden(object sender, EventArgs e)
@@ -869,7 +869,7 @@ namespace TSMapEditor.UI.Windows
 
         private void BtnNewTrigger_LeftClick(object sender, EventArgs e)
         {
-            var newTrigger = new Trigger(map.GetNewUniqueInternalId()) { Name = "New trigger", Country = "Neutral" };
+            var newTrigger = new Trigger(map.GetNewUniqueInternalId()) { Name = "New trigger", HouseType = "Neutral" };
             map.Triggers.Add(newTrigger);
             map.Tags.Add(new Tag() { ID = map.GetNewUniqueInternalId(), Name = "New tag", Trigger = newTrigger });
             ListTriggers();
@@ -1022,7 +1022,7 @@ namespace TSMapEditor.UI.Windows
         private void RefreshHouses()
         {
             ddHouse.Items.Clear();
-            map.GetCountries().ForEach(h => ddHouse.AddItem(h.ININame, h.XNAColor));
+            map.GetHouseTypes().ForEach(h => ddHouse.AddItem(h.ININame, h.XNAColor));
         }
 
         private void ListTriggers()
@@ -1109,7 +1109,7 @@ namespace TSMapEditor.UI.Windows
             }
 
             tbName.Text = editedTrigger.Name;
-            ddHouse.SelectedIndex = map.GetCountries().FindIndex(h => h.ININame == trigger.Country);
+            ddHouse.SelectedIndex = map.GetHouseTypes().FindIndex(h => h.ININame == trigger.HouseType);
             ddType.SelectedIndex = tag == null ? 3 : tag.Repeating;
             selAttachedTrigger.Text = editedTrigger.LinkedTrigger == null ? Constants.NoneValue1 : editedTrigger.LinkedTrigger.Name;
             selAttachedTrigger.Tag = editedTrigger.LinkedTrigger;
@@ -1171,7 +1171,7 @@ namespace TSMapEditor.UI.Windows
 
         private void DdHouse_SelectedIndexChanged(object sender, EventArgs e)
         {
-            editedTrigger.Country = ddHouse.SelectedItem.Text;
+            editedTrigger.HouseType = ddHouse.SelectedItem.Text;
         }
 
         private void ChkDisabled_CheckedChanged(object sender, EventArgs e)
@@ -1448,11 +1448,11 @@ namespace TSMapEditor.UI.Windows
                 case TriggerParamType.House:
                     if (intParseSuccess)
                     {
-                        var country = map.GetCountries().Find(c => c.Index == intValue);
-                        if (country == null)
+                        var houseType = map.GetHouseTypes().Find(c => c.Index == intValue);
+                        if (houseType == null)
                             goto case TriggerParamType.Unused;
 
-                        return country.XNAColor;
+                        return houseType.XNAColor;
                     }
                     goto case TriggerParamType.Unused;
 
@@ -1481,11 +1481,11 @@ namespace TSMapEditor.UI.Windows
                 case TriggerParamType.House:
                     if (intParseSuccess)
                     {
-                        var country = map.GetCountries().Find(c => c.Index == intValue);
-                        if (country == null)
-                            return $"{intValue} - unknown country";
+                        var houseType = map.GetHouseTypes().Find(c => c.Index == intValue);
+                        if (houseType == null)
+                            return $"{intValue} - unknown house";
 
-                        return $"{country.Index} {country.ININame}";
+                        return $"{houseType.Index} {houseType.ININame}";
                     }
 
                     return paramValue;

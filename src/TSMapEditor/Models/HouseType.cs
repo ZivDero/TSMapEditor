@@ -58,12 +58,12 @@ namespace TSMapEditor.Models
         [INI(false)] public Color XNAColor { get; set; } = Microsoft.Xna.Framework.Color.Gray;
         [INI(false)] public bool IsPlayerHouse { get; set; } = false;
 
-        public void CopyFromOtherCountry(HouseType baseCountry)
+        public void CopyFromOther(HouseType baseHouseType)
         {
             foreach (var property in typeof(HouseType).GetProperties())
             {
                 if (property.Name != "ININame")
-                    property.SetValue(this, property.GetValue(baseCountry));
+                    property.SetValue(this, property.GetValue(baseHouseType));
             }
         }
 

@@ -17,7 +17,7 @@ namespace TSMapEditor.Models
         public List<TerrainType> TerrainTypes = new List<TerrainType>();
         public List<OverlayType> OverlayTypes = new List<OverlayType>();
         public List<SmudgeType> SmudgeTypes = new List<SmudgeType>();
-        public List<HouseType> Countries = new List<HouseType>();
+        public List<HouseType> HouseTypes = new List<HouseType>();
 
         public List<string> Sides = new List<string>();
         public List<InfantrySequence> InfantrySequences = new List<InfantrySequence>();
@@ -60,9 +60,9 @@ namespace TSMapEditor.Models
 
             if (!isMapIni)
             {
-                InitFromTypeSection(iniFile, Constants.UseCountries ? "Countries" : "Houses", Countries);
-                Countries.ForEach(ot => initializer.ReadObjectTypePropertiesFromINI(ot, iniFile));
-                Countries.ForEach(ot => InitHouseType(ot, isMapIni));
+                InitFromTypeSection(iniFile, Constants.UseCountries ? "Countries" : "Houses", HouseTypes);
+                HouseTypes.ForEach(ot => initializer.ReadObjectTypePropertiesFromINI(ot, iniFile));
+                HouseTypes.ForEach(ot => InitHouseType(ot, isMapIni));
             }
 
             InitTiberiums(iniFile, isMapIni);
@@ -93,47 +93,47 @@ namespace TSMapEditor.Models
             AnimTypes.ForEach(a => initializer.ReadObjectTypeArtPropertiesFromINI(a, iniFile, a.ININame));
         }
 
-        public List<HouseType> GetStandardCountries()
+        public List<HouseType> GetStandardHouseTypes()
         {
-            var countries = new List<HouseType>();
+            var houseTypes = new List<HouseType>();
 
-            foreach (HouseType country in Countries)
+            foreach (HouseType houseType in HouseTypes)
             {
-                HouseType newCountry = new HouseType(country, country.ININame);
-                countries.Add(newCountry);
+                HouseType newHouseType = new HouseType(houseType, houseType.ININame);
+                houseTypes.Add(newHouseType);
             }
 
-            return countries;
+            return houseTypes;
         }
 
-        public HouseType GetStandardCountry(string iniName)
+        public HouseType GetStandardHouseType(string iniName)
         {
-            var country = Countries.Find(c => c.ININame == iniName);
-            if (country == null)
+            var houseType = HouseTypes.Find(c => c.ININame == iniName);
+            if (houseType == null)
                 return null;
 
-            return new HouseType( country, country.ININame);
+            return new HouseType(houseType, houseType.ININame);
         }
 
         public List<House> GetStandardHouses()
         {
             var houses = new List<House>();
 
-            foreach (HouseType country in Countries)
+            foreach (HouseType houseType in HouseTypes)
             {
-                houses.Add(GetStandardHouse(country));
+                houses.Add(GetStandardHouse(houseType));
             }
 
             return houses;
         }
 
-        public House GetStandardHouse(HouseType country)
+        public House GetStandardHouse(HouseType houseType)
         {
-            House house = new House(country.ININame)
+            House house = new House(houseType.ININame)
             {
-                Allies = country.ININame,
-                Color = country.Color,
-                XNAColor = country.XNAColor,
+                Allies = houseType.ININame,
+                Color = houseType.Color,
+                XNAColor = houseType.XNAColor,
                 Credits = 0,
                 Edge = "North",
                 IQ = 0,
@@ -145,17 +145,17 @@ namespace TSMapEditor.Models
             if (Constants.UseCountries)
             {
                 // RA2/YR Houses only have a country field
-                house.Country = country.ININame;
+                house.Country = houseType.ININame;
             }
             else
             {
                 // TS Houses contain ActsLike and Side
-                int sideIndex = Sides.FindIndex(side => side == country.Side);
+                int sideIndex = Sides.FindIndex(side => side == houseType.Side);
                 if (sideIndex == -1)
                     sideIndex = 0;
 
                 house.ActsLike = sideIndex;
-                house.Side = country.Side;
+                house.Side = houseType.Side;
             }
 
             return house;
@@ -199,7 +199,7 @@ namespace TSMapEditor.Models
             return houses;
         }
 
-        public List<HouseType> GetPlayerCountries()
+        public List<HouseType> GetPlayerHouseTypes()
         {
             List<HouseType> countries = new List<HouseType>();
             if (Constants.UseCountries)

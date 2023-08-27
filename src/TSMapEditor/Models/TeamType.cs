@@ -21,7 +21,7 @@ namespace TSMapEditor.Models
 
         public string Name { get; set; }
         public int Group { get; set; } = -1;
-        public HouseType Country { get; set; }
+        public HouseType HouseType { get; set; }
         public Script Script { get; set; }
         public TaskForce TaskForce { get; set; }
         public Tag Tag { get; set; }
@@ -56,7 +56,7 @@ namespace TSMapEditor.Models
         public string GetHintText()
         {
             var stringBuilder = new StringBuilder();
-            stringBuilder.Append("Owner: " + (Country == null ? Constants.NoneValue2 : Country.ININame));
+            stringBuilder.Append("Owner: " + (HouseType == null ? Constants.NoneValue2 : HouseType.ININame));
             stringBuilder.Append(Environment.NewLine + Environment.NewLine);
             stringBuilder.Append("Script: " + (Script == null ? Constants.NoneValue2 : Script.Name));
             stringBuilder.Append(Environment.NewLine + Environment.NewLine);
@@ -149,8 +149,8 @@ namespace TSMapEditor.Models
             // This cuts it for all properties of standard types
             WritePropertiesToIniSection(iniSection);
 
-            if (Country != null)
-                iniSection.SetStringValue("House", Country.ININame);
+            if (HouseType != null)
+                iniSection.SetStringValue("House", HouseType.ININame);
             if (Script != null)
                 iniSection.SetStringValue("Script", Script.ININame);
             if (TaskForce != null)

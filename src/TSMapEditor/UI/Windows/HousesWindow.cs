@@ -135,8 +135,8 @@ namespace TSMapEditor.UI.Windows
 
         private void BtnEditCountry_LeftClick(object sender, EventArgs e)
         {
-            if (editedHouse != null && editedHouse.CountryClass != null && !editedHouse.IsPlayerHouse)
-                editCountryWindow.Open(editedHouse.CountryClass);
+            if (editedHouse != null && editedHouse.HouseType != null && !editedHouse.IsPlayerHouse)
+                editCountryWindow.Open(editedHouse.HouseType);
         }
 
         private void GenerateStandardHousesDarkeningPanel_Hidden(object sender, EventArgs e)
@@ -204,20 +204,20 @@ namespace TSMapEditor.UI.Windows
             if (map.PlayerHouses.Contains(editedHouse))
                 return;
 
-            if (map.StandardCountries.Contains(editedHouse.CountryClass))
+            if (map.StandardHouseTypes.Contains(editedHouse.HouseType))
             {
-                editedHouse.CountryClass.CopyFromOtherCountry(map.Rules.GetStandardCountry(editedHouse.CountryClass.ININame));
+                editedHouse.HouseType.CopyFromOther(map.Rules.GetStandardHouseType(editedHouse.HouseType.ININame));
             }
 
             if (map.StandardHouses.Contains(editedHouse))
             {
                 editedHouse.BaseNodes.Clear();
-                editedHouse.CopyFromOtherHouse(map.Rules.GetStandardHouse(editedHouse.CountryClass));
+                editedHouse.CopyFromOtherHouse(map.Rules.GetStandardHouse(editedHouse.HouseType));
                 if (!map.Houses.Contains(editedHouse))
                     return;
             }
 
-            if (map.DeleteCountry(editedHouse.CountryClass))
+            if (map.DeleteHouseType(editedHouse.HouseType))
                 RefreshHouseInfo();
 
             if (map.DeleteHouse(editedHouse))
@@ -246,7 +246,7 @@ namespace TSMapEditor.UI.Windows
         {
             if (editedHouse == null)
             {
-                EditorMessageBox.Show(WindowManager, "No Country Selected", "Select a house first.", MessageBoxButtons.OK);
+                EditorMessageBox.Show(WindowManager, "No HouseType Selected", "Select a house first.", MessageBoxButtons.OK);
                 return;
             }
 
@@ -261,7 +261,7 @@ namespace TSMapEditor.UI.Windows
         {
             if (editedHouse == null)
             {
-                EditorMessageBox.Show(WindowManager, "No Country Selected", "Select a house first.", MessageBoxButtons.OK);
+                EditorMessageBox.Show(WindowManager, "No HouseType Selected", "Select a house first.", MessageBoxButtons.OK);
                 return;
             }
 
@@ -327,7 +327,7 @@ namespace TSMapEditor.UI.Windows
             if (Constants.UseCountries)
             {
                 tbCountry.Text = editedHouse.Country;
-                tbCountry.TextColor = editedHouse.CountryClass.XNAColor;
+                tbCountry.TextColor = editedHouse.HouseType.XNAColor;
             }
             else
             {
@@ -396,9 +396,9 @@ namespace TSMapEditor.UI.Windows
 
             if (!Constants.UseCountries || editedHouse.IsPlayerHouse)
             {
-                editedHouse.CountryClass.Color = ddColor.SelectedItem.Text;
-                editedHouse.CountryClass.XNAColor = ddColor.SelectedItem.TextColor.Value;
-                map.CountryColorUpdated(editedHouse.CountryClass);
+                editedHouse.HouseType.Color = ddColor.SelectedItem.Text;
+                editedHouse.HouseType.XNAColor = ddColor.SelectedItem.TextColor.Value;
+                map.HouseTypeColorUpdated(editedHouse.HouseType);
             }
 
             if (Constants.UseCountries)
@@ -451,14 +451,10 @@ namespace TSMapEditor.UI.Windows
                 selectedItem = lbHouseList.SelectedItem.Tag;
 
             lbHouseList.Clear();
-            ddHouseOfHumanPlayer.Items.Clear();
-
-            ddHouseOfHumanPlayer.AddItem("None");
-
-            foreach (House house in map.GetHouses())
+            foreach (House house in map.GetHouses(false, true))
             {
                 lbHouseList.AddItem(
-                    new XNAListBoxItem()
+                    new XNAListBoxItem
                     {
                         Text = house.ININame,
                         TextColor = house.XNAColor,
@@ -467,12 +463,15 @@ namespace TSMapEditor.UI.Windows
                 );
             }
 
-            foreach (House house in map.GetHouses(true))
+            lbHouseList.SelectedIndex = lbHouseList.Items.FindIndex(i => i.Tag == selectedItem);
+
+            ddHouseOfHumanPlayer.Items.Clear();
+            ddHouseOfHumanPlayer.AddItem("None");
+
+            foreach (House house in map.GetHouses(true, true))
                 ddHouseOfHumanPlayer.AddItem(house.ININame, house.XNAColor);
 
             ddHouseOfHumanPlayer.SelectedIndex = map.Houses.FindIndex(h => h.ININame == map.Basic.Player) + 1;
-
-            lbHouseList.SelectedIndex = lbHouseList.Items.FindIndex(i => i.Tag == selectedItem);
         }
 
         private void CheckAddStandardHouse(House house)
@@ -480,7 +479,6 @@ namespace TSMapEditor.UI.Windows
             if (house != null && map.StandardHouses.Contains(house))
             {
                 map.AddStandardHouse(house);
-
                 ListHouses();
             }
         }
@@ -493,7 +491,7 @@ namespace TSMapEditor.UI.Windows
                 return;
             }
 
-            string stats = "Power: " + map.Structures.Aggregate<Structure, int>(0, (value, structure) => 
+            string stats = "Power: " + map.Structures.Aggregate(0, (value, structure) => 
             {
                 if (structure.Owner == editedHouse)
                     return value + structure.ObjectType.Power;

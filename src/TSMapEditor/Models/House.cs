@@ -73,7 +73,7 @@ namespace TSMapEditor.Models
         public bool PlayerControl { get; set; }
         public string Side { get; set; } // Only in TS
 
-        [INI(false)] public HouseType CountryClass { get; set; }
+        [INI(false)] public HouseType HouseType { get; set; }
         [INI(false)] public bool IsPlayerHouse { get; set; } = false;
         [INI(false)] public Color XNAColor { get; set; } = Microsoft.Xna.Framework.Color.Gray;
 
@@ -82,7 +82,7 @@ namespace TSMapEditor.Models
         {
             foreach (var property in typeof(House).GetProperties())
             {
-                if (property.Name != "BaseNodes" && property.Name != "CountryClass")
+                if (property.Name != "BaseNodes" && property.Name != "HouseType")
                     property.SetValue(this, property.GetValue(baseHouse));
             }
         }
