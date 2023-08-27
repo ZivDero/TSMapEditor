@@ -39,7 +39,10 @@ namespace TSMapEditor.UI.Windows
             FindChild<EditorButton>("btnAdd").LeftClick += BtnAdd_LeftClick;
 
             if (!Constants.UseCountries)
+            {
                 ddParentCountry.Visible = false;
+                FindChild<XNALabel>("lblParentCountry").Visible = false;
+            }
         }
 
         private void DdParentCountry_SelectedIndexChanged(object sender, EventArgs e)
@@ -72,12 +75,12 @@ namespace TSMapEditor.UI.Windows
 
             if (Constants.UseCountries)
             {
-                newCountry = new HouseType(map.StandardCountries.Find(c => c.ININame == ParentCountry), countryName)
+                newCountry = new HouseType(map.StandardHouseTypes.Find(c => c.ININame == ParentCountry), countryName)
                 {
                     ParentCountry = ParentCountry,
                     Multiplay = false,
                     MultiplayPassive = true,
-                    Index = map.GetCountries(true).Last().Index + 1
+                    Index = map.GetHouseTypes(true).Last().Index + 1
                 };
 
                 newHouse.Country = countryName;
@@ -100,14 +103,14 @@ namespace TSMapEditor.UI.Windows
                     Color = newHouse.Color,
                     XNAColor = newHouse.XNAColor,
                     Side = newHouse.Side,
-                    Index = map.GetCountries(true).Last().Index + 1
+                    Index = map.GetHouseTypes(true).Last().Index + 1
                 };
             }
 
-            newHouse.CountryClass = newCountry;
+            newHouse.HouseType = newCountry;
 
             map.AddHouse(newHouse);
-            map.AddCountry(newCountry);
+            map.AddHouseType(newCountry);
 
             Success = true;
 
@@ -117,7 +120,7 @@ namespace TSMapEditor.UI.Windows
         private void ListParentCountries()
         {
             ddParentCountry.Items.Clear();
-            map.StandardCountries.ForEach(h => ddParentCountry.AddItem(h.ININame, h.XNAColor));
+            map.StandardHouseTypes.ForEach(h => ddParentCountry.AddItem(h.ININame, h.XNAColor));
         }
 
         public void Open()

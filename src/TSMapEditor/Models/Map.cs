@@ -24,14 +24,14 @@ namespace TSMapEditor.Models
         public House House { get; }
     }
 
-    public class CountryEventArgs : EventArgs
+    public class HouseTypeEventArgs : EventArgs
     {
-        public CountryEventArgs(HouseType country)
+        public HouseTypeEventArgs(HouseType houseType)
         {
-            Country = country;
+            HouseType = houseType;
         }
 
-        public HouseType Country { get; }
+        public HouseType HouseType { get; }
     }
 
     public class Map : IMap
@@ -41,8 +41,8 @@ namespace TSMapEditor.Models
 
         public event EventHandler HousesChanged;
         public event EventHandler<HouseEventArgs> HouseColorChanged;
-        public event EventHandler CountriesChanged;
-        public event EventHandler<CountryEventArgs> CountryColorChanged;
+        public event EventHandler HouseTypesChanged;
+        public event EventHandler<HouseTypeEventArgs> HouseTypeColorChanged;
         public event EventHandler LocalSizeChanged;
         public event EventHandler MapResized;
         public event EventHandler MapHeightChanged;
@@ -115,11 +115,11 @@ namespace TSMapEditor.Models
         /// objects whose owner does not exist in the map's list of houses
         /// or in the Rules.ini standard house list.
         /// </summary>
-        public List<HouseType> StandardCountries { get; protected set; } = new List<HouseType>();
+        public List<HouseType> StandardHouseTypes { get; protected set; } = new List<HouseType>();
         public List<House> StandardHouses { get; set; } = new List<House>();
-        public List<HouseType> PlayerCountries { get; set; } = new List<HouseType>();
+        public List<HouseType> PlayerHouseTypes { get; set; } = new List<HouseType>();
         public List<House> PlayerHouses { get; set; } = new List<House>();
-        public List<HouseType> Countries { get; protected set; } = new List<HouseType>();
+        public List<HouseType> HouseTypes { get; protected set; } = new List<HouseType>();
         public List<House> Houses { get; protected set; } = new List<House>();
         public List<TerrainObject> TerrainObjects { get; private set; } = new List<TerrainObject>();
         public List<Waypoint> Waypoints { get; private set; } = new List<Waypoint>();
@@ -179,44 +179,30 @@ namespace TSMapEditor.Models
             this.ccFileManager = ccFileManager;
         }
 
-        public List<House> GetHouses(bool noPlayers = false)
+        public List<House> GetHouses(bool noPlayers = false, bool noStandards = false)
         {
+            List<House> houses = Houses.Count == 0 && !noStandards ? new(StandardHouses) : new(Houses);
+
             if (Basic.MultiplayerOnly)
             {
-                // Multiplayer maps can have no houses and just use standard houses
-                List<House> houses = Houses.Count == 0 ? new(StandardHouses) : new(Houses);
-                
                 if (!noPlayers)
                     houses.AddRange(PlayerHouses);
-                return houses;
             }
-            // Singleplayer maps cannot
-            return Houses;
+
+            return houses;
         }
 
-        public List<HouseType> GetCountries(bool noPlayers = false)
+        public List<HouseType> GetHouseTypes(bool noPlayers = false, bool noStandards = false)
         {
-            List<HouseType> allCountries = new List<HouseType>();
+            List<HouseType> houseTypes = HouseTypes.Count == 0 && !noStandards ? new(StandardHouseTypes) : new(HouseTypes);
 
-            foreach (var country in StandardCountries)
+            if (Basic.MultiplayerOnly)
             {
-                var mapCountry = Countries.Find(c => c.ININame == country.ININame);
-                if (mapCountry != null)
-                    allCountries.Add(mapCountry);
-                else
-                    allCountries.Add(country);
+                if (!noPlayers)
+                    houseTypes.AddRange(PlayerHouseTypes);
             }
 
-            foreach (var country in Countries)
-            {
-                if (!allCountries.Contains(country))
-                    allCountries.Add(country);
-            }
-
-            if (Basic.MultiplayerOnly && !noPlayers)
-                allCountries.AddRange(PlayerCountries);
-            
-            return allCountries;
+            return houseTypes;
         }
 
         private void InitEditorConfig()
@@ -259,8 +245,8 @@ namespace TSMapEditor.Models
             MapLoader.ReadIsoMapPack(this, mapIni);
 
             MapLoader.ReadHouses(this, mapIni);
-            MapLoader.ReadCountries(this, mapIni);
-            LinkHousesToCountries();
+            MapLoader.ReadOrMakeHouseTypes(this, mapIni);
+            LinkHousesToHouseTypes();
             
             MapLoader.ReadSmudges(this, mapIni);
             MapLoader.ReadOverlays(this, mapIni);
@@ -287,28 +273,28 @@ namespace TSMapEditor.Models
             Lighting.ReadFromIniFile(mapIni);
         }
 
-        private void LinkHousesToCountries()
+        private void LinkHousesToHouseTypes()
         {
             var allHouses = new List<House>(Houses);
             allHouses.AddRange(StandardHouses);
 
             foreach (var house in allHouses)
             {
-                if (house.CountryClass != null)
+                if (house.HouseType != null)
                     continue;
 
                 if (Constants.UseCountries)
                 {
-                    HouseType country = FindCountry(house.Country);
-                    if (country == null)
+                    HouseType houseType = FindHouseType(house.Country);
+                    if (houseType == null)
                         throw new InvalidOperationException(
-                            $"House {house.ININame} has an invalid Country {house.Country} set!");
-                    house.CountryClass = country;
+                            $"House {house.ININame} has an invalid HouseType {house.Country} set!");
+                    house.HouseType = houseType;
                 }
                 else
                 {
-                    HouseType country = FindCountry(house.ININame);
-                    house.CountryClass = country;
+                    HouseType houseType = FindHouseType(house.ININame);
+                    house.HouseType = houseType;
                 }
             }
         }
@@ -415,7 +401,7 @@ namespace TSMapEditor.Models
         }
 
         /// <summary>
-        /// Finds a house with the given name from the map's or the game's house lists.
+        /// Finds a House with the given name from the map's or the game's house lists.
         /// Throws an exception if no house is found
         /// </summary>
         /// <param name="houseName">The name of the house to find.</param>
@@ -437,22 +423,25 @@ namespace TSMapEditor.Models
         }
 
         /// <summary>
-        /// Finds a house with the given name from the map's or the game's house lists.
-        /// Returns null if no house is found.
+        /// Finds a HouseType with the given name from the map's or the game's HouseType lists.
+        /// Throws an exception if no HouseType is found
         /// </summary>
-        /// <param name="houseName">The name of the house to find.</param>
-        public House TryFindHouse(string houseName)
+        /// <param name="houseTypeName">The name of the HouseType to find.</param>
+        public HouseType FindHouseType(string houseTypeName)
         {
-            var house = GetHouses().Find(h => h.ININame == houseName);
-            if (house != null)
-                return house;
+            var houseType = HouseTypes.Find(h => h.ININame == houseTypeName);
+            if (houseType != null)
+                return houseType;
 
-            return StandardHouses.Find(h => h.ININame == houseName);
-        }
+            houseType = StandardHouseTypes.Find(h => h.ININame == houseTypeName);
+            if (houseType != null)
+                return houseType;
 
-        public HouseType FindCountry(string countryName)
-        {
-            return GetCountries().Find(h => h.ININame == countryName);
+            houseType = PlayerHouseTypes.Find(h => h.ININame == houseTypeName);
+            if (houseType != null)
+                return houseType;
+
+            throw new InvalidOperationException($"Tried to find invalid HouseType {houseTypeName}");
         }
 
         public bool IsCoordWithinMap(int x, int y) => IsCoordWithinMap(new Point2D(x, y));
@@ -845,9 +834,9 @@ namespace TSMapEditor.Models
             if (Houses.FindIndex(h => h.ININame == house.ININame) == -1)
             {
                 string houseName = Constants.UseCountries ? house.Country : house.ININame;
-                var country = StandardCountries.Find(c => c.ININame == houseName);
+                var houseType = StandardHouseTypes.Find(c => c.ININame == houseName);
                 for (int i = 0; i < Houses.Count; i++)
-                    if (Houses[i].CountryClass.Index > country.Index)
+                    if (Houses[i].HouseType.Index > houseType.Index)
                     {
                         Houses.Insert(i, house);
                         HousesChanged?.Invoke(this, EventArgs.Empty);
@@ -873,44 +862,44 @@ namespace TSMapEditor.Models
             return false;
         }
 
-        public void AddCountry(HouseType country)
+        public void AddHouseType(HouseType houseType)
         {
-            Countries.Add(country);
-            CountriesChanged?.Invoke(this, EventArgs.Empty);
+            HouseTypes.Add(houseType);
+            HouseTypesChanged?.Invoke(this, EventArgs.Empty);
         }
 
-        public void AddStandardCountry(HouseType country)
+        public void AddStandardHouseType(HouseType houseType)
         {
-            if (Countries.FindIndex(c => c.ININame == country.ININame) == -1)
+            if (HouseTypes.FindIndex(c => c.ININame == houseType.ININame) == -1)
             {
-                for (int i = 0; i < Countries.Count; i++)
-                    if (Countries[i].Index > country.Index)
+                for (int i = 0; i < HouseTypes.Count; i++)
+                    if (HouseTypes[i].Index > houseType.Index)
                     {
-                        Countries.Insert(i, country);
-                        CountriesChanged?.Invoke(this, EventArgs.Empty);
+                        HouseTypes.Insert(i, houseType);
+                        HouseTypesChanged?.Invoke(this, EventArgs.Empty);
                         break;
                     }
 
-                if (!Countries.Contains(country))
+                if (!HouseTypes.Contains(houseType))
                 {
-                    Countries.Add(country);
-                    CountriesChanged?.Invoke(this, EventArgs.Empty);
+                    HouseTypes.Add(houseType);
+                    HouseTypesChanged?.Invoke(this, EventArgs.Empty);
                 }
             }
         }
 
-        public bool DeleteCountry(HouseType country)
+        public bool DeleteHouseType(HouseType houseType)
         {
-            int index = Countries.IndexOf(country);
-            if (Countries.Remove(country))
+            int index = HouseTypes.IndexOf(houseType);
+            if (HouseTypes.Remove(houseType))
             {
-                for (int i = index; i < Countries.Count; i++)
+                for (int i = index; i < HouseTypes.Count; i++)
                 {
-                    if (Countries[i].Index >= StandardCountries.Count)
-                        Countries[i].Index--;
+                    if (HouseTypes[i].Index >= StandardHouseTypes.Count)
+                        HouseTypes[i].Index--;
                 }
                 
-                CountriesChanged?.Invoke(this, EventArgs.Empty);
+                HouseTypesChanged?.Invoke(this, EventArgs.Empty);
                 return true;
             }
 
@@ -936,9 +925,9 @@ namespace TSMapEditor.Models
         {
             HouseColorChanged?.Invoke(this, new HouseEventArgs(house));
         }
-        public void CountryColorUpdated(HouseType country)
+        public void HouseTypeColorUpdated(HouseType country)
         {
-            CountryColorChanged?.Invoke(this, new CountryEventArgs(country));
+            HouseTypeColorChanged?.Invoke(this, new HouseTypeEventArgs(country));
         }
 
         public void PlaceBuilding(Structure structure)
@@ -1487,12 +1476,12 @@ namespace TSMapEditor.Models
 
             Rules.InitFromINI(editorRulesIni, initializer, false);
 
-            StandardCountries = Rules.GetStandardCountries();
+            StandardHouseTypes = Rules.GetStandardHouseTypes();
             StandardHouses = Rules.GetStandardHouses();
             PlayerHouses = Rules.GetPlayerHouses();
-            PlayerCountries = Rules.GetPlayerCountries();
+            PlayerHouseTypes = Rules.GetPlayerHouseTypes();
             for (int i = 0; i < PlayerHouses.Count; i++)
-                PlayerHouses[i].CountryClass = PlayerCountries[i];
+                PlayerHouses[i].HouseType = PlayerHouseTypes[i];
 
             // Load impassable cell information for terrain types
             var impassableTerrainObjectsIni = new IniFile(Environment.CurrentDirectory + "/Config/TerrainTypeImpassability.ini");
@@ -1898,11 +1887,11 @@ namespace TSMapEditor.Models
             Units.Clear();
             Structures.Clear();
             PlayerHouses.Clear();
-            PlayerCountries.Clear();
+            PlayerHouseTypes.Clear();
             StandardHouses.Clear();
-            StandardCountries.Clear();
+            StandardHouseTypes.Clear();
             Houses.Clear();
-            Countries.Clear();
+            HouseTypes.Clear();
             TerrainObjects.Clear();
             Waypoints.Clear();
             TaskForces.Clear();

@@ -374,20 +374,20 @@ namespace TSMapEditor.Initialization
             const string sectionName = "Countries";
             mapIni.RemoveSection(sectionName);
 
-            if (map.Countries.Count == 0)
+            if (map.HouseTypes.Count == 0)
                 return;
 
             var countriesSection = new IniSection(sectionName);
             mapIni.AddSection(countriesSection);
 
-            for (int i = 0; i < map.Countries.Count; i++)
+            for (int i = 0; i < map.HouseTypes.Count; i++)
             {
-                HouseType country = map.Countries[i];
+                HouseType country = map.HouseTypes[i];
                 countriesSection.SetStringValue(country.Index.ToString(), country.ININame);
 
                 mapIni.RemoveSection(country.ININame);
-                var houseSection = FindOrMakeSection(country.ININame, mapIni);
-                country.WriteToIniSection(houseSection);
+                var countrySection = FindOrMakeSection(country.ININame, mapIni);
+                country.WriteToIniSection(countrySection);
             }
         }
 
@@ -429,7 +429,7 @@ namespace TSMapEditor.Initialization
             // First prepare the list of houses to write
             List<House> houses = new List<House>(map.Houses);
 
-            // Fake and Spawn houses for TS Coop
+            // Fake houses for TS Coop
             if (!Constants.UseCountries && map.TsCoop)
             {
                 List<House> housesToCount = new List<House>(map.Houses);
@@ -439,20 +439,16 @@ namespace TSMapEditor.Initialization
                 for (int i = housesToCount.Count; i < 50; i++)
                 {
                     House house = new House($"Fake{i}");
-                    HouseType country = new HouseType($"Fake{i}");
-                    country.Index = i;
-                    house.CountryClass = country;
+                    HouseType houseType = new HouseType($"Fake{i}");
+                    houseType.Index = i;
+                    house.HouseType = houseType;
                     houses.Add(house);
                 }
+            }
 
-                for (int i = 1; i <= 8; i++)
-                {
-                    House house = new House($"Spawn{i}");
-                    HouseType country = new HouseType($"Spawn{i}");
-                    country.Index = i + 49;
-                    house.CountryClass = country;
-                    houses.Add(house);
-                }
+            if (map.Basic.MultiplayerOnly)
+            {
+                houses.AddRange(map.PlayerHouses);
             }
 
             const string sectionName = "Houses";
@@ -469,18 +465,16 @@ namespace TSMapEditor.Initialization
             {
                 House house = houses[i];
 
-                // In YR, there can be multiple houses per country, but the houses's index doesn't matter, so just write out as-id.
+                // In YR, there can be multiple houses per country, but the house's index doesn't matter, so just write out as-is.
                 // In TS, there can only be one house per country, so just give it the country's index.
                 if (Constants.UseCountries)
                     housesSection.SetStringValue(i.ToString(), house.ININame);
                 else
-                    housesSection.SetStringValue(house.CountryClass.Index.ToString(), house.ININame);
+                    housesSection.SetStringValue(house.HouseType.Index.ToString(), house.ININame);
 
                 if (house.ININame.StartsWith("Fake") && house.ININame.Length <= 6)
                     continue;
 
-                if (!map.Countries.Exists(c => c.ININame == house.ININame))
-                    mapIni.RemoveSection(house.ININame);
                 var houseSection = FindOrMakeSection(house.ININame, mapIni);
                 house.WriteToIniSection(houseSection);
             }

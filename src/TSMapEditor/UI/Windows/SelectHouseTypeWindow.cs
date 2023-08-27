@@ -5,9 +5,9 @@ using TSMapEditor.Models;
 
 namespace TSMapEditor.UI.Windows
 {
-    public class SelectCountryWindow : SelectObjectWindow<HouseType>
+    public class SelectHouseTypeWindow : SelectObjectWindow<HouseType>
     {
-        public SelectCountryWindow(WindowManager windowManager, Map map) : base(windowManager)
+        public SelectHouseTypeWindow(WindowManager windowManager, Map map) : base(windowManager)
         {
             this.map = map;
         }
@@ -16,7 +16,7 @@ namespace TSMapEditor.UI.Windows
 
         public override void Initialize()
         {
-            Name = nameof(SelectCountryWindow);
+            Name = nameof(SelectHouseTypeWindow);
             base.Initialize();
         }
 
@@ -34,10 +34,10 @@ namespace TSMapEditor.UI.Windows
         protected override void ListObjects()
         {
             lbObjectList.Clear();
-            foreach (var country in map.GetCountries())
+            foreach (var houseType in map.GetHouseTypes())
             {
-                lbObjectList.AddItem(new XNAListBoxItem() { Text = $"{country.Index} {country.ININame}", TextColor = country.XNAColor, Tag = country });
-                if (country == SelectedObject)
+                lbObjectList.AddItem(new XNAListBoxItem() { Text = $"{houseType.Index} {houseType.ININame}", TextColor = houseType.XNAColor, Tag = houseType });
+                if (houseType == SelectedObject)
                     lbObjectList.SelectedIndex = lbObjectList.Items.Count - 1;
             }
         }

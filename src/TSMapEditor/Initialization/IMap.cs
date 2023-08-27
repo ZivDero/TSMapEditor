@@ -17,12 +17,12 @@ namespace TSMapEditor.Initialization
         MapTile[][] Tiles { get; }
         MapTile GetTile(int x, int y);
         MapTile GetTile(Point2D cellCoords);
-        List<HouseType> StandardCountries { get; }
+        List<HouseType> StandardHouseTypes { get; }
         List<House> StandardHouses { get; }
-        public List<HouseType> PlayerCountries { get; set; }
+        public List<HouseType> PlayerHouseTypes { get; set; }
         public List<House> PlayerHouses { get; set; }
         List<Aircraft> Aircraft { get; }
-        List<HouseType> Countries { get; }
+        List<HouseType> HouseTypes { get; }
         List<House> Houses { get; }
         List<Infantry> Infantry { get; }
         IniFile LoadedINI { get; }
@@ -50,8 +50,7 @@ namespace TSMapEditor.Initialization
         void SetTileData(List<MapTile> tiles);
         void PlaceTerrainTileAt(ITileImage tile, Point2D cellCoords);
         House FindHouse(string houseName);
-        House TryFindHouse(string houseName);
-        HouseType FindCountry(string countryName);
+        HouseType FindHouseType(string houseTypeName);
         bool IsCoordWithinMap(int x, int y);
         bool IsCoordWithinMap(Point2D coord);
         void AddWaypoint(Waypoint waypoint);
