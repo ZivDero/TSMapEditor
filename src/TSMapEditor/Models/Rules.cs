@@ -155,7 +155,7 @@ namespace TSMapEditor.Models
             {
                 var obj = gameObjectTypes.Find(o => o.ININame == keyValuePair.Key);
                 if (obj != null)
-                    obj.EditorVisible = section.GetBooleanValue(keyValuePair.Key, obj.EditorVisible);
+                    obj.EditorVisible = !section.GetBooleanValue(keyValuePair.Key, !obj.EditorVisible);
             }
         }
 
