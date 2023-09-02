@@ -78,7 +78,7 @@ namespace TSMapEditor.Models
         [INI(false)] public Color XNAColor { get; set; } = Microsoft.Xna.Framework.Color.Gray;
 
         public List<BaseNode> BaseNodes { get; } = new List<BaseNode>();
-        public void CopyFromOtherHouse(House baseHouse)
+        public void CopyFromOther(House baseHouse)
         {
             foreach (var property in typeof(House).GetProperties())
             {

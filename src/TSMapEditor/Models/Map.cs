@@ -814,45 +814,36 @@ namespace TSMapEditor.Models
             LoadedINI.RemoveSection(teamType.ININame);
         }
 
-        public void AddHouses(List<House> houses)
-        {
-            if (houses.Count > 0)
-            {
-                Houses.AddRange(houses);
-                HousesChanged?.Invoke(this, EventArgs.Empty);
-            }
-        }
-
         public void AddHouse(House house)
         {
+            if (Houses.Contains(house))
+                return;
+
+            if (StandardHouses.Contains(house))
+            {
+                for (int i = 0; i < Houses.Count; i++)
+                {
+                    if (Houses[i].HouseType.Index > house.HouseType.Index)
+                    {
+                        Houses.Insert(i, house);
+                        HousesChanged?.Invoke(this, EventArgs.Empty);
+                        return;
+                    }
+                }
+            }
+
             Houses.Add(house);
             HousesChanged?.Invoke(this, EventArgs.Empty);
         }
 
-        public void AddStandardHouse(House house)
-        {
-            if (Houses.FindIndex(h => h.ININame == house.ININame) == -1)
-            {
-                string houseName = Constants.UseCountries ? house.Country : house.ININame;
-                var houseType = StandardHouseTypes.Find(c => c.ININame == houseName);
-                for (int i = 0; i < Houses.Count; i++)
-                    if (Houses[i].HouseType.Index > houseType.Index)
-                    {
-                        Houses.Insert(i, house);
-                        HousesChanged?.Invoke(this, EventArgs.Empty);
-                        break;
-                    }
-
-                if (!Houses.Contains(house))
-                {
-                    Houses.Add(house);
-                    HousesChanged?.Invoke(this, EventArgs.Empty);
-                }
-            }
-        }
-
         public bool DeleteHouse(House house)
         {
+            if (StandardHouses.Contains(house))
+            {
+                house.BaseNodes.Clear();
+                house.CopyFromOther(Rules.GetStandardHouse(house.HouseType));
+            }
+
             if (Houses.Remove(house))
             {
                 HousesChanged?.Invoke(this, EventArgs.Empty);
@@ -864,28 +855,24 @@ namespace TSMapEditor.Models
 
         public void AddHouseType(HouseType houseType)
         {
-            HouseTypes.Add(houseType);
-            HouseTypesChanged?.Invoke(this, EventArgs.Empty);
-        }
+            if (HouseTypes.Contains(houseType))
+                return;
 
-        public void AddStandardHouseType(HouseType houseType)
-        {
-            if (HouseTypes.FindIndex(c => c.ININame == houseType.ININame) == -1)
+            if (StandardHouseTypes.Contains(houseType))
             {
                 for (int i = 0; i < HouseTypes.Count; i++)
+                {
                     if (HouseTypes[i].Index > houseType.Index)
                     {
                         HouseTypes.Insert(i, houseType);
                         HouseTypesChanged?.Invoke(this, EventArgs.Empty);
-                        break;
+                        return;
                     }
-
-                if (!HouseTypes.Contains(houseType))
-                {
-                    HouseTypes.Add(houseType);
-                    HouseTypesChanged?.Invoke(this, EventArgs.Empty);
                 }
             }
+
+            HouseTypes.Add(houseType);
+            HouseTypesChanged?.Invoke(this, EventArgs.Empty);
         }
 
         public bool DeleteHouseType(HouseType houseType)
@@ -893,6 +880,11 @@ namespace TSMapEditor.Models
             int index = HouseTypes.IndexOf(houseType);
             if (HouseTypes.Remove(houseType))
             {
+                if (StandardHouseTypes.Contains(houseType))
+                {
+                    houseType.CopyFromOther(Rules.GetStandardHouseType(houseType.ININame));
+                }
+
                 for (int i = index; i < HouseTypes.Count; i++)
                 {
                     if (HouseTypes[i].Index >= StandardHouseTypes.Count)

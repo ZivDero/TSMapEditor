@@ -71,11 +71,11 @@ namespace TSMapEditor.UI.Windows
                 TechLevel = 10
             };
 
-            HouseType newCountry;
+            HouseType newHouseType;
 
             if (Constants.UseCountries)
             {
-                newCountry = new HouseType(map.StandardHouseTypes.Find(c => c.ININame == ParentCountry), countryName)
+                newHouseType = new HouseType(map.StandardHouseTypes.Find(c => c.ININame == ParentCountry), countryName)
                 {
                     ParentCountry = ParentCountry,
                     Multiplay = false,
@@ -84,8 +84,8 @@ namespace TSMapEditor.UI.Windows
                 };
 
                 newHouse.Country = countryName;
-                newHouse.Color = newCountry.Color;
-                newHouse.XNAColor = newCountry.XNAColor;
+                newHouse.Color = newHouseType.Color;
+                newHouse.XNAColor = newHouseType.XNAColor;
             }
             else
             {
@@ -98,7 +98,7 @@ namespace TSMapEditor.UI.Windows
                 newHouse.ActsLike = 0;
                 newHouse.Side = map.Rules.Sides[0];
 
-                newCountry = new HouseType(countryName)
+                newHouseType = new HouseType(countryName)
                 {
                     Color = newHouse.Color,
                     XNAColor = newHouse.XNAColor,
@@ -107,10 +107,10 @@ namespace TSMapEditor.UI.Windows
                 };
             }
 
-            newHouse.HouseType = newCountry;
+            newHouse.HouseType = newHouseType;
 
             map.AddHouse(newHouse);
-            map.AddHouseType(newCountry);
+            map.AddHouseType(newHouseType);
 
             Success = true;
 

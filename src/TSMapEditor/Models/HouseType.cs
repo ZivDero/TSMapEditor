@@ -31,6 +31,9 @@ namespace TSMapEditor.Models
         public bool? MultiplayPassive { get; set; }
         public bool? WallOwner { get; set; }
 
+        public float? ROF { get; set; }
+        public float? Firepower { get; set; }
+
         public float? ArmorInfantryMult { get; set; }
         public float? ArmorUnitsMult { get; set; }
         public float? ArmorAircraftMult { get; set; }
