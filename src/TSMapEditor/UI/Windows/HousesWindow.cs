@@ -41,7 +41,6 @@ namespace TSMapEditor.UI.Windows
 
         private House editedHouse;
 
-        private GenerateStandardHousesWindow generateStandardHousesWindow;
         private NewHouseWindow newHouseWindow;
         private EditCountryWindow editCountryWindow;
 
@@ -119,12 +118,8 @@ namespace TSMapEditor.UI.Windows
             ddMapMode.SelectedIndexChanged += DdMapMode_SelectedIndexChanged;
             lbHouseList.SelectedIndexChanged += LbHouseList_SelectedIndexChanged;
 
-            generateStandardHousesWindow = new GenerateStandardHousesWindow(WindowManager, map);
             newHouseWindow = new NewHouseWindow(WindowManager, map);
             editCountryWindow = new EditCountryWindow(WindowManager, map);
-
-            var generateStandardHousesDarkeningPanel = DarkeningPanel.InitializeAndAddToParentControlWithChild(WindowManager, Parent, generateStandardHousesWindow);
-            generateStandardHousesDarkeningPanel.Hidden += GenerateStandardHousesDarkeningPanel_Hidden;
 
             var newHouseWindowDarkeningPanel = DarkeningPanel.InitializeAndAddToParentControlWithChild(WindowManager, Parent, newHouseWindow);
             newHouseWindowDarkeningPanel.Hidden += NewHouseWindowDarkeningPanel_Hidden;
@@ -137,11 +132,6 @@ namespace TSMapEditor.UI.Windows
         {
             if (editedHouse != null && editedHouse.HouseType != null && !editedHouse.IsPlayerHouse)
                 editCountryWindow.Open(editedHouse.HouseType);
-        }
-
-        private void GenerateStandardHousesDarkeningPanel_Hidden(object sender, EventArgs e)
-        {
-            ListHouses();
         }
 
         private void NewHouseWindowDarkeningPanel_Hidden(object sender, EventArgs e)
@@ -165,7 +155,6 @@ namespace TSMapEditor.UI.Windows
             }
 
             map.Basic.Player = ddHouseOfHumanPlayer.SelectedItem.Text;
-            CheckAddStandardHouse(editedHouse);
         }
 
         private void DdMapMode_SelectedIndexChanged(object sender, EventArgs e)
@@ -188,7 +177,6 @@ namespace TSMapEditor.UI.Windows
             }
 
             ListHouses();
-            CheckAddStandardHouse(editedHouse);
         }
 
         private void BtnAddHouse_LeftClick(object sender, System.EventArgs e)
@@ -201,36 +189,21 @@ namespace TSMapEditor.UI.Windows
             if (editedHouse == null)
                 return;
 
+            // Fake player houses don't get deleted
             if (map.PlayerHouses.Contains(editedHouse))
                 return;
-
-            if (map.StandardHouseTypes.Contains(editedHouse.HouseType))
-            {
-                editedHouse.HouseType.CopyFromOther(map.Rules.GetStandardHouseType(editedHouse.HouseType.ININame));
-            }
-
-            if (map.StandardHouses.Contains(editedHouse))
-            {
-                editedHouse.BaseNodes.Clear();
-                editedHouse.CopyFromOtherHouse(map.Rules.GetStandardHouse(editedHouse.HouseType));
-                if (!map.Houses.Contains(editedHouse))
-                    return;
-            }
 
             if (map.DeleteHouseType(editedHouse.HouseType))
                 RefreshHouseInfo();
 
             if (map.DeleteHouse(editedHouse))
-            {
-                lbHouseList.SelectedIndex -= 1;
                 ListHouses();
-            }
         }
 
         private void BtnStandardHouses_LeftClick(object sender, System.EventArgs e)
         {
             foreach (var house in map.StandardHouses)
-                map.AddStandardHouse(house);
+                map.AddHouse(house);
 
             object selectedItem = null;
             if (lbHouseList.SelectedItem != null)
@@ -309,6 +282,7 @@ namespace TSMapEditor.UI.Windows
                 ddMapEdge.SelectedIndex = -1;
                 ddSide.SelectedIndex = -1;
                 ddActsLike.SelectedIndex = -1;
+                tbCountry.Text = string.Empty;
                 ddColor.SelectedIndex = -1;
                 ddTechnologyLevel.SelectedIndex = -1;
                 ddPercentBuilt.SelectedIndex = -1;
@@ -318,31 +292,33 @@ namespace TSMapEditor.UI.Windows
                 lblStatsValue.Text = string.Empty;
                 return;
             }
-
-            tbName.Text = editedHouse.ININame;
-            ddIQ.SelectedIndex = ddIQ.Items.FindIndex(item => Conversions.IntFromString(item.Text, -1) == editedHouse.IQ);
-            ddMapEdge.SelectedIndex = ddMapEdge.Items.FindIndex(item => item.Text == editedHouse.Edge);
-            ddSide.SelectedIndex = map.Rules.Sides.FindIndex(s => s == editedHouse.Side);
-
-            if (Constants.UseCountries)
-            {
-                tbCountry.Text = editedHouse.Country;
-                tbCountry.TextColor = editedHouse.HouseType.XNAColor;
-            }
             else
             {
-                if (editedHouse.ActsLike < map.Rules.Sides.Count)
-                    ddActsLike.SelectedIndex = editedHouse.ActsLike ?? -1;
-                else
-                    ddActsLike.SelectedIndex = -1;
-            }
+                tbName.Text = editedHouse.ININame;
+                ddIQ.SelectedIndex = ddIQ.Items.FindIndex(item => Conversions.IntFromString(item.Text, -1) == editedHouse.IQ);
+                ddMapEdge.SelectedIndex = ddMapEdge.Items.FindIndex(item => item.Text == editedHouse.Edge);
+                ddSide.SelectedIndex = map.Rules.Sides.FindIndex(s => s == editedHouse.Side);
 
-            ddColor.SelectedIndex = ddColor.Items.FindIndex(item => item.Text == editedHouse.Color);
-            ddTechnologyLevel.SelectedIndex = ddTechnologyLevel.Items.FindIndex(item => Conversions.IntFromString(item.Text, -1) == editedHouse.TechLevel);
-            ddPercentBuilt.SelectedIndex = ddPercentBuilt.Items.FindIndex(item => Conversions.IntFromString(item.Text, -1) == editedHouse.PercentBuilt);
-            tbAllies.Text = editedHouse.Allies ?? "";
-            tbMoney.Value = editedHouse.Credits;
-            chkPlayerControl.Checked = editedHouse.PlayerControl;
+                if (Constants.UseCountries)
+                {
+                    tbCountry.Text = editedHouse.Country;
+                    tbCountry.TextColor = editedHouse.HouseType.XNAColor;
+                }
+                else
+                {
+                    if (editedHouse.ActsLike < map.Rules.Sides.Count)
+                        ddActsLike.SelectedIndex = editedHouse.ActsLike ?? -1;
+                    else
+                        ddActsLike.SelectedIndex = -1;
+                }
+
+                ddColor.SelectedIndex = ddColor.Items.FindIndex(item => item.Text == editedHouse.Color);
+                ddTechnologyLevel.SelectedIndex = ddTechnologyLevel.Items.FindIndex(item => Conversions.IntFromString(item.Text, -1) == editedHouse.TechLevel);
+                ddPercentBuilt.SelectedIndex = ddPercentBuilt.Items.FindIndex(item => Conversions.IntFromString(item.Text, -1) == editedHouse.PercentBuilt);
+                tbAllies.Text = editedHouse.Allies ?? string.Empty;
+                tbMoney.Value = editedHouse.Credits;
+                chkPlayerControl.Checked = editedHouse.PlayerControl;
+            }
 
             tbName.TextChanged += TbName_TextChanged;
             ddIQ.SelectedIndexChanged += DdIQ_SelectedIndexChanged;
@@ -361,31 +337,26 @@ namespace TSMapEditor.UI.Windows
         {
             editedHouse.ININame = tbName.Text;
             ListHouses();
-            CheckAddStandardHouse(editedHouse);
         }
 
         private void DdIQ_SelectedIndexChanged(object sender, System.EventArgs e)
         {
             editedHouse.IQ = Conversions.IntFromString(ddIQ.SelectedItem.Text, -1);
-            CheckAddStandardHouse(editedHouse);
         }
 
         private void DdMapEdge_SelectedIndexChanged(object sender, System.EventArgs e)
         {
             editedHouse.Edge = ddMapEdge.SelectedItem?.Text;
-            CheckAddStandardHouse(editedHouse);
         }
 
         private void DdSide_SelectedIndexChanged(object sender, System.EventArgs e)
         {
             editedHouse.Side = (string)ddSide.SelectedItem.Tag;
-            CheckAddStandardHouse(editedHouse);
         }
 
         private void DdActsLike_SelectedIndexChanged(object sender, System.EventArgs e)
         {
             editedHouse.ActsLike = ddActsLike.SelectedIndex;
-            CheckAddStandardHouse(editedHouse);
         }
 
         private void DdColor_SelectedIndexChanged(object sender, System.EventArgs e)
@@ -394,48 +365,40 @@ namespace TSMapEditor.UI.Windows
             editedHouse.XNAColor = ddColor.SelectedItem.TextColor.Value;
             map.HouseColorUpdated(editedHouse);
 
-            if (!Constants.UseCountries || editedHouse.IsPlayerHouse)
+            // For TS Houses change the HouseType color as well, 
+            if (!Constants.UseCountries)
             {
                 editedHouse.HouseType.Color = ddColor.SelectedItem.Text;
                 editedHouse.HouseType.XNAColor = ddColor.SelectedItem.TextColor.Value;
                 map.HouseTypeColorUpdated(editedHouse.HouseType);
             }
 
-            if (Constants.UseCountries)
-                RefreshHouseInfo();
-
             ListHouses();
-            CheckAddStandardHouse(editedHouse);
         }
 
         private void DdTechnologyLevel_SelectedIndexChanged(object sender, System.EventArgs e)
         {
             editedHouse.TechLevel = Conversions.IntFromString(ddTechnologyLevel.SelectedItem.Text, -1);
-            CheckAddStandardHouse(editedHouse);
         }
 
         private void DdPercentBuilt_SelectedIndexChanged(object sender, System.EventArgs e)
         {
             editedHouse.PercentBuilt = Conversions.IntFromString(ddPercentBuilt.SelectedItem.Text, 100);
-            CheckAddStandardHouse(editedHouse);
         }
 
         private void TbAllies_TextChanged(object sender, System.EventArgs e)
         {
             editedHouse.Allies = tbAllies.Text;
-            CheckAddStandardHouse(editedHouse);
         }
 
         private void TbMoney_TextChanged(object sender, System.EventArgs e)
         {
             editedHouse.Credits = tbMoney.Value;
-            CheckAddStandardHouse(editedHouse);
         }
 
         private void ChkPlayerControl_CheckedChanged(object sender, System.EventArgs e)
         {
             editedHouse.PlayerControl = chkPlayerControl.Checked;
-            CheckAddStandardHouse(editedHouse);
         }
 
         public void Open()
@@ -472,15 +435,6 @@ namespace TSMapEditor.UI.Windows
                 ddHouseOfHumanPlayer.AddItem(house.ININame, house.XNAColor);
 
             ddHouseOfHumanPlayer.SelectedIndex = map.Houses.FindIndex(h => h.ININame == map.Basic.Player) + 1;
-        }
-
-        private void CheckAddStandardHouse(House house)
-        {
-            if (house != null && map.StandardHouses.Contains(house))
-            {
-                map.AddStandardHouse(house);
-                ListHouses();
-            }
         }
 
         private void RefreshHouseStats()

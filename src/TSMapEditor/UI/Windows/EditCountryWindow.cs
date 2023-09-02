@@ -73,7 +73,7 @@ namespace TSMapEditor.UI.Windows
 
             foreach (var property in typeof(HouseType).GetProperties())
             {
-                if (property.Name.EndsWith("Mult"))
+                if (property.Name.EndsWith("Mult") || property.Name == "ROF" || property.Name == "Firepower")
                     lbMultipliers.AddItem(new XNAListBoxItem() { Text = property.Name, Tag = property });
             }
 
@@ -131,7 +131,7 @@ namespace TSMapEditor.UI.Windows
 
             var property = (PropertyInfo)lbMultipliers.SelectedItem.Tag;
             var propertyValue = (float?)property.GetValue(editedCountry);
-            tbSelectedMultiplier.Text = propertyValue != null ? propertyValue.ToString() : "";
+            tbSelectedMultiplier.Text = propertyValue != null ? propertyValue.ToString() : string.Empty;
 
             tbSelectedMultiplier.TextChanged += TbSelectedMultiplier_TextChanged;
         }
@@ -192,7 +192,7 @@ namespace TSMapEditor.UI.Windows
             ddColor.SelectedIndex = ddColor.Items.FindIndex(item => item.Text == editedCountry.Color);
             ddSide.SelectedIndex = map.Rules.Sides.FindIndex(s => s == editedCountry.Side);
             lbMultipliers.SelectedIndex = -1;
-            tbSelectedMultiplier.Text = "";
+            tbSelectedMultiplier.Text = string.Empty;
             chkSmartAI.Checked = editedCountry.SmartAI ?? false;
             chkMultiplay.Checked = editedCountry.Multiplay ?? false;
             chkMultiplayPassive.Checked = editedCountry.MultiplayPassive ?? false;
@@ -214,7 +214,7 @@ namespace TSMapEditor.UI.Windows
         private void CheckAddStandardCountry(HouseType country)
         {
             if (map.StandardHouseTypes.Contains(editedCountry))
-                map.AddStandardHouseType(country);
+                map.AddHouseType(country);
         }
 
         public void Open(HouseType editedCountry)
