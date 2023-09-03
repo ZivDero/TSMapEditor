@@ -123,6 +123,7 @@ namespace TSMapEditor.Rendering
 
             Components.Add(windowManager);
 
+            CustomUISettings.InitializeEditorThemes();
             UISettings.ActiveSettings = new CustomUISettings();
             UISettings.ActiveSettings.CheckBoxCheckedTexture = AssetLoader.LoadTextureUncached("checkBoxChecked.png");
             UISettings.ActiveSettings.CheckBoxClearTexture = AssetLoader.LoadTextureUncached("checkBoxClear.png");
