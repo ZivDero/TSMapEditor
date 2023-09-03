@@ -5,11 +5,13 @@ using Rampastring.XNAUI;
 using Rampastring.XNAUI.XNAControls;
 using System;
 using System.IO;
+using System.Windows.Forms;
 using TSMapEditor.GameMath;
 using TSMapEditor.Settings;
 using TSMapEditor.UI.Controls;
 using TSMapEditor.UI.Windows;
 using TSMapEditor.UI.Windows.MainMenuWindows;
+using MessageBoxButtons = TSMapEditor.UI.Windows.MessageBoxButtons;
 
 namespace TSMapEditor.UI
 {
@@ -24,7 +26,9 @@ namespace TSMapEditor.UI
         private string gameDirectory;
 
         private EditorTextBox tbGameDirectory;
+        private EditorButton btnBrowseGameDirectory;
         private EditorTextBox tbMapPath;
+        private EditorButton btnBrowseMapPath;
         private EditorButton btnLoad;
         private FileBrowserListBox lbFileList;
 
@@ -48,7 +52,7 @@ namespace TSMapEditor.UI
             tbGameDirectory.Name = nameof(tbGameDirectory);
             tbGameDirectory.X = Constants.UIEmptySideSpace;
             tbGameDirectory.Y = lblGameDirectory.Bottom + Constants.UIVerticalSpacing;
-            tbGameDirectory.Width = Width - Constants.UIEmptySideSpace * 2;
+            tbGameDirectory.Width = Width - Constants.UIEmptySideSpace * 3 - 70;
             tbGameDirectory.Text = UserSettings.Instance.GameDirectory;
             if (string.IsNullOrWhiteSpace(tbGameDirectory.Text))
             {
@@ -56,6 +60,16 @@ namespace TSMapEditor.UI
             }
             tbGameDirectory.TextChanged += TbGameDirectory_TextChanged;
             AddChild(tbGameDirectory);
+
+            btnBrowseGameDirectory = new EditorButton(WindowManager);
+            btnBrowseGameDirectory.Name = nameof(btnBrowseGameDirectory);
+            btnBrowseGameDirectory.Width = 70;
+            btnBrowseGameDirectory.Text = "Browse...";
+            btnBrowseGameDirectory.Y = tbGameDirectory.Y;
+            btnBrowseGameDirectory.X = tbGameDirectory.Right + Constants.UIEmptySideSpace;
+            btnBrowseGameDirectory.Height = tbGameDirectory.Height;
+            AddChild(btnBrowseGameDirectory);
+            btnBrowseGameDirectory.LeftClick += BtnBrowseGameDirectory_LeftClick;
 
             var lblMapPath = new XNALabel(WindowManager);
             lblMapPath.Name = nameof(lblMapPath);
@@ -68,9 +82,19 @@ namespace TSMapEditor.UI
             tbMapPath.Name = nameof(tbMapPath);
             tbMapPath.X = Constants.UIEmptySideSpace;
             tbMapPath.Y = lblMapPath.Bottom + Constants.UIVerticalSpacing;
-            tbMapPath.Width = Width - Constants.UIEmptySideSpace * 2;
+            tbMapPath.Width = Width - Constants.UIEmptySideSpace * 3 - 70;
             tbMapPath.Text = UserSettings.Instance.LastScenarioPath;
             AddChild(tbMapPath);
+
+            btnBrowseMapPath = new EditorButton(WindowManager);
+            btnBrowseMapPath.Name = nameof(btnBrowseMapPath);
+            btnBrowseMapPath.Width = 70;
+            btnBrowseMapPath.Text = "Browse...";
+            btnBrowseMapPath.Y = tbMapPath.Y;
+            btnBrowseMapPath.X = tbMapPath.Right + Constants.UIEmptySideSpace;
+            btnBrowseMapPath.Height = tbMapPath.Height;
+            AddChild(btnBrowseMapPath);
+            btnBrowseMapPath.LeftClick += BtnBrowseMapPath_LeftClick;
 
             var lblDirectoryListing = new XNALabel(WindowManager);
             lblDirectoryListing.Name = nameof(lblDirectoryListing);
@@ -252,6 +276,37 @@ namespace TSMapEditor.UI
             WindowManager.CenterControlOnScreen(this);
 
             _ = UserSettings.Instance.SaveSettingsAsync();
+        }
+
+        private void BtnBrowseGameDirectory_LeftClick(object sender, EventArgs e)
+        {
+            using (OpenFileDialog openFileDialog = new OpenFileDialog())
+            {
+                openFileDialog.InitialDirectory = tbGameDirectory.Text;
+                openFileDialog.Filter =
+                    $"Game executable|{Constants.ExpectedClientExecutableName}";
+                openFileDialog.RestoreDirectory = true;
+
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    tbGameDirectory.Text = Path.GetDirectoryName(openFileDialog.FileName);
+                }
+            }
+        }
+
+        private void BtnBrowseMapPath_LeftClick(object sender, EventArgs e)
+        {
+            using (OpenFileDialog openFileDialog = new OpenFileDialog())
+            {
+                openFileDialog.InitialDirectory = tbMapPath.Text;
+                openFileDialog.Filter = Constants.OpenFileDialogFilter.Replace(':', ';');
+                openFileDialog.RestoreDirectory = true;
+
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    tbMapPath.Text = openFileDialog.FileName;
+                }
+            }
         }
 
         private void BtnLoad_LeftClick(object sender, EventArgs e)

@@ -1,9 +1,12 @@
 ﻿using System;
+using System.IO;
+using System.Windows.Forms;
 using Rampastring.XNAUI;
 using TSMapEditor.Models;
 using TSMapEditor.Mutations;
 using TSMapEditor.Rendering;
 using TSMapEditor.Scripts;
+using TSMapEditor.Settings;
 using TSMapEditor.UI.Controls;
 using TSMapEditor.UI.CursorActions;
 using TSMapEditor.UI.Windows;
@@ -20,6 +23,7 @@ namespace TSMapEditor.UI.TopBar
             this.windowController = windowController;
         }
 
+        public event EventHandler<FileSelectedEventArgs> OnFileSelected;
         public event EventHandler InputFileReloadRequested;
 
         private readonly MutationManager mutationManager;
@@ -53,7 +57,7 @@ namespace TSMapEditor.UI.TopBar
             var fileContextMenu = new EditorContextMenu(WindowManager);
             fileContextMenu.Name = nameof(fileContextMenu);
             fileContextMenu.AddItem("New", () => windowController.CreateNewMapWindow.Open(), null, null, null);
-            fileContextMenu.AddItem("Open", () => windowController.OpenMapWindow.Open(), null, null, null);
+            fileContextMenu.AddItem("Open", () => Open(), null, null, null);
 
             fileContextMenu.AddItem("Save", () => SaveMap());
             fileContextMenu.AddItem("Save As", () => SaveAs(), null, null, null);
@@ -179,7 +183,7 @@ namespace TSMapEditor.UI.TopBar
             {
                 EditorMessageBox.Show(WindowManager, "Houses Required",
                     "The map has no houses set up. Houses need to be configured before base nodes can be added." + Environment.NewLine + Environment.NewLine +
-                    "You can configure Houses from Edit -> Houses.", MessageBoxButtons.OK);
+                    "You can configure Houses from Edit -> Houses.", TSMapEditor.UI.Windows.MessageBoxButtons.OK);
                 return;
             }
 
@@ -205,9 +209,50 @@ namespace TSMapEditor.UI.TopBar
             mapView.CursorAction = generateForestCursorAction;
         }
 
+        private void Open()
+        {
+            string initialPath = string.IsNullOrWhiteSpace(UserSettings.Instance.LastScenarioPath.GetValue()) ? UserSettings.Instance.GameDirectory : Path.GetDirectoryName(UserSettings.Instance.LastScenarioPath.GetValue());
+
+            using (OpenFileDialog openFileDialog = new OpenFileDialog())
+            {
+                openFileDialog.InitialDirectory = initialPath;
+                openFileDialog.Filter = Constants.OpenFileDialogFilter.Replace(':', ';');
+                openFileDialog.RestoreDirectory = true;
+
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    OnFileSelected?.Invoke(this, new FileSelectedEventArgs(openFileDialog.FileName));
+                }
+            }
+
+            //windowController.OpenMapWindow.Open();
+        }
+
         private void SaveAs()
         {
-            windowController.SaveMapAsWindow.Open();
+            string initialPath = string.IsNullOrWhiteSpace(UserSettings.Instance.LastScenarioPath.GetValue()) ? UserSettings.Instance.GameDirectory : UserSettings.Instance.LastScenarioPath.GetValue();
+
+            using (SaveFileDialog saveFileDialog = new SaveFileDialog())
+            {
+                saveFileDialog.InitialDirectory = Path.GetDirectoryName(initialPath);
+                saveFileDialog.FileName = Path.GetFileName(initialPath);
+                saveFileDialog.Filter = Constants.OpenFileDialogFilter.Replace(':', ';');
+                saveFileDialog.RestoreDirectory = true;
+
+                if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    map.LoadedINI.FileName = saveFileDialog.FileName;
+                    map.Save();
+
+                    if (UserSettings.Instance.LastScenarioPath.GetValue() != saveFileDialog.FileName)
+                    {
+                        UserSettings.Instance.LastScenarioPath.UserDefinedValue = saveFileDialog.FileName;
+                        _ = UserSettings.Instance.SaveSettingsAsync();
+                    }
+                }
+            }
+
+            //windowController.SaveMapAsWindow.Open();
         }
 
         private void MenuButton_MouseEnter(object sender, EventArgs e)

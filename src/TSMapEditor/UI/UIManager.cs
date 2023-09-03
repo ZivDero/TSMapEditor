@@ -134,6 +134,7 @@ namespace TSMapEditor.UI
 
             topBarMenu = new TopBarMenu(WindowManager, mutationManager, mapView, map, windowController);
             topBarMenu.Width = editorSidebar.Width;
+            topBarMenu.OnFileSelected += OpenMapWindow_OnFileSelected;
             AddChild(topBarMenu);
 
             var editorControlsPanel = new EditorControlsPanel(WindowManager, map, theaterGraphics,
