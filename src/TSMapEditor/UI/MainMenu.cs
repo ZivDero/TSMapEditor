@@ -1,17 +1,20 @@
-﻿using Microsoft.Win32;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Rampastring.Tools;
 using Rampastring.XNAUI;
 using Rampastring.XNAUI.XNAControls;
 using System;
 using System.IO;
-using System.Windows.Forms;
 using TSMapEditor.GameMath;
 using TSMapEditor.Settings;
 using TSMapEditor.UI.Controls;
 using TSMapEditor.UI.Windows;
 using TSMapEditor.UI.Windows.MainMenuWindows;
 using MessageBoxButtons = TSMapEditor.UI.Windows.MessageBoxButtons;
+
+#if WINDOWS
+using System.Windows.Forms;
+using Microsoft.Win32;
+#endif
 
 namespace TSMapEditor.UI
 {
@@ -280,6 +283,7 @@ namespace TSMapEditor.UI
 
         private void BtnBrowseGameDirectory_LeftClick(object sender, EventArgs e)
         {
+#if WINDOWS
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
                 openFileDialog.InitialDirectory = tbGameDirectory.Text;
@@ -292,10 +296,12 @@ namespace TSMapEditor.UI
                     tbGameDirectory.Text = Path.GetDirectoryName(openFileDialog.FileName);
                 }
             }
+#endif
         }
 
         private void BtnBrowseMapPath_LeftClick(object sender, EventArgs e)
         {
+#if WINDOWS
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
                 openFileDialog.InitialDirectory = tbMapPath.Text;
@@ -307,6 +313,7 @@ namespace TSMapEditor.UI
                     tbMapPath.Text = openFileDialog.FileName;
                 }
             }
+#endif
         }
 
         private void BtnLoad_LeftClick(object sender, EventArgs e)

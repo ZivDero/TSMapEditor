@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Windows.Forms;
 using Rampastring.XNAUI;
 using TSMapEditor.Models;
 using TSMapEditor.Mutations;
@@ -10,6 +9,10 @@ using TSMapEditor.Settings;
 using TSMapEditor.UI.Controls;
 using TSMapEditor.UI.CursorActions;
 using TSMapEditor.UI.Windows;
+
+#if WINDOWS
+using System.Windows.Forms;
+#endif
 
 namespace TSMapEditor.UI.TopBar
 {
@@ -211,6 +214,7 @@ namespace TSMapEditor.UI.TopBar
 
         private void Open()
         {
+#if WINDOWS
             string initialPath = string.IsNullOrWhiteSpace(UserSettings.Instance.LastScenarioPath.GetValue()) ? UserSettings.Instance.GameDirectory : Path.GetDirectoryName(UserSettings.Instance.LastScenarioPath.GetValue());
 
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
@@ -224,12 +228,14 @@ namespace TSMapEditor.UI.TopBar
                     OnFileSelected?.Invoke(this, new FileSelectedEventArgs(openFileDialog.FileName));
                 }
             }
-
-            //windowController.OpenMapWindow.Open();
+#else
+            windowController.OpenMapWindow.Open();
+#endif
         }
 
         private void SaveAs()
         {
+#if WINDOWS
             string initialPath = string.IsNullOrWhiteSpace(UserSettings.Instance.LastScenarioPath.GetValue()) ? UserSettings.Instance.GameDirectory : UserSettings.Instance.LastScenarioPath.GetValue();
 
             using (SaveFileDialog saveFileDialog = new SaveFileDialog())
@@ -251,8 +257,9 @@ namespace TSMapEditor.UI.TopBar
                     }
                 }
             }
-
-            //windowController.SaveMapAsWindow.Open();
+#else
+            windowController.SaveMapAsWindow.Open();
+#endif
         }
 
         private void MenuButton_MouseEnter(object sender, EventArgs e)
