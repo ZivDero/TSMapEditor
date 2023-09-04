@@ -817,6 +817,7 @@ namespace TSMapEditor.Models
 
             if (Houses.Remove(house))
             {
+                LoadedINI.RemoveSection(house.ININame);
                 HousesChanged?.Invoke(this, EventArgs.Empty);
                 return true;
             }
@@ -861,7 +862,8 @@ namespace TSMapEditor.Models
                     if (HouseTypes[i].Index >= StandardHouseTypes.Count)
                         HouseTypes[i].Index--;
                 }
-                
+
+                LoadedINI.RemoveSection(houseType.ININame);
                 HouseTypesChanged?.Invoke(this, EventArgs.Empty);
                 return true;
             }

@@ -960,7 +960,6 @@ namespace TSMapEditor.Initialization
 
                 // Actual houses get saved for now
                 var house = new House(houseName);
-
                 loadedHouses.Add(house);
 
                 var houseSection = mapIni.GetSection(houseName);
@@ -995,6 +994,26 @@ namespace TSMapEditor.Initialization
             }
 
             map.Houses.AddRange(housesToAdd);
+
+            // Make sure to load in properties of standard houses even if they aren't listed
+            foreach (var house in map.StandardHouses)
+            {
+                if (map.Houses.Contains(house))
+                    continue;
+
+                var houseSection = mapIni.GetSection(house.ININame);
+                if (houseSection != null)
+                {
+                    house.ReadFromIniSection(houseSection);
+
+                    var color = map.Rules.Colors.Find(c => c.Name == house.Color);
+                    if (color == null)
+                        house.XNAColor = Color.Black;
+                    else
+                        house.XNAColor = color.XNAColor;
+                }
+            }
+
         }
 
         public static void ReadOrMakeHouseTypes(IMap map, IniFile mapIni)
@@ -1025,6 +1044,25 @@ namespace TSMapEditor.Initialization
                     }
 
                     loadedHouseTypes.Add(houseType);
+                }
+
+                // Make sure to load in properties of standard countries even if they aren't listed
+                foreach (var houseType in map.StandardHouseTypes)
+                {
+                    if (map.HouseTypes.Contains(houseType))
+                        continue;
+
+                    var houseTypeSection = mapIni.GetSection(houseType.ININame);
+                    if (houseTypeSection != null)
+                    {
+                        houseType.ReadFromIniSection(houseTypeSection);
+
+                        var color = map.Rules.Colors.Find(c => c.Name == houseType.Color);
+                        if (color == null)
+                            houseType.XNAColor = Color.Black;
+                        else
+                            houseType.XNAColor = color.XNAColor;
+                    }
                 }
             }
             else
