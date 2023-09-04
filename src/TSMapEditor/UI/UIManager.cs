@@ -26,10 +26,10 @@ namespace TSMapEditor.UI
     {
         public CustomUISettings()
         {
-            CheckBoxCheckedTexture = AssetLoader.LoadTextureUncached("checkBoxChecked.png");
-            CheckBoxClearTexture = AssetLoader.LoadTextureUncached("checkBoxClear.png");
-            CheckBoxDisabledCheckedTexture = AssetLoader.LoadTextureUncached("checkBoxCheckedD.png");
-            CheckBoxDisabledClearTexture = AssetLoader.LoadTextureUncached("checkBoxClearD.png");
+            CheckBoxCheckedTexture = AssetLoader.LoadTexture("checkBoxChecked.png");
+            CheckBoxClearTexture = AssetLoader.LoadTexture("checkBoxClear.png");
+            CheckBoxDisabledCheckedTexture = AssetLoader.LoadTexture("checkBoxCheckedD.png");
+            CheckBoxDisabledClearTexture = AssetLoader.LoadTexture("checkBoxClearD.png");
             PanelBackgroundColor = new Color(0, 0, 0, 128);
             PanelBorderColor = new Color(128, 128, 128, 255);
         }
@@ -81,7 +81,7 @@ namespace TSMapEditor.UI
                         string propertyString =
                             themeSection.GetPathStringValue(property.Name, "ToolIcons/deletionmode.png");
 
-                        property.SetValue(theme, AssetLoader.LoadTextureUncached(propertyString));
+                        property.SetValue(theme, AssetLoader.LoadTexture(propertyString));
                     }
                 }
 
