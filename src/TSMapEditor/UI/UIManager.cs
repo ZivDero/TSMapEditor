@@ -24,6 +24,16 @@ namespace TSMapEditor.UI
 {
     public class CustomUISettings : UISettings
     {
+        public CustomUISettings()
+        {
+            CheckBoxCheckedTexture = AssetLoader.LoadTextureUncached("checkBoxChecked.png");
+            CheckBoxClearTexture = AssetLoader.LoadTextureUncached("checkBoxClear.png");
+            CheckBoxDisabledCheckedTexture = AssetLoader.LoadTextureUncached("checkBoxCheckedD.png");
+            CheckBoxDisabledClearTexture = AssetLoader.LoadTextureUncached("checkBoxClearD.png");
+            PanelBackgroundColor = new Color(0, 0, 0, 128);
+            PanelBorderColor = new Color(128, 128, 128, 255);
+        }
+
         public static Dictionary<string, UISettings> EditorThemes { get; set; } = new Dictionary<string, UISettings>();
         public Color ListBoxBackgroundColor { get; set; } = Color.Black;
         public Color ButtonMainBackgroundColor { get; set; } = new Color(0, 0, 0, 196);
@@ -38,12 +48,6 @@ namespace TSMapEditor.UI
             if (themesSection == null || themesSection.Keys.Count == 0)
             {
                 EditorThemes.Add("Default", new CustomUISettings());
-                EditorThemes["Default"].CheckBoxCheckedTexture = AssetLoader.LoadTextureUncached("checkBoxChecked.png");
-                EditorThemes["Default"].CheckBoxClearTexture = AssetLoader.LoadTextureUncached("checkBoxClear.png");
-                EditorThemes["Default"].CheckBoxDisabledCheckedTexture = AssetLoader.LoadTextureUncached("checkBoxCheckedD.png");
-                EditorThemes["Default"].CheckBoxDisabledClearTexture = AssetLoader.LoadTextureUncached("checkBoxClearD.png");
-                EditorThemes["Default"].PanelBackgroundColor = new Color(0, 0, 0, 128);
-                EditorThemes["Default"].PanelBorderColor = new Color(128, 128, 128, 255);
                 return;
             }
 
@@ -87,12 +91,6 @@ namespace TSMapEditor.UI
             if (!EditorThemes.ContainsKey("Default"))
             {
                 EditorThemes.Add("Default", new CustomUISettings());
-                EditorThemes["Default"].CheckBoxCheckedTexture = AssetLoader.LoadTextureUncached("checkBoxChecked.png");
-                EditorThemes["Default"].CheckBoxClearTexture = AssetLoader.LoadTextureUncached("checkBoxClear.png");
-                EditorThemes["Default"].CheckBoxDisabledCheckedTexture = AssetLoader.LoadTextureUncached("checkBoxCheckedD.png");
-                EditorThemes["Default"].CheckBoxDisabledClearTexture = AssetLoader.LoadTextureUncached("checkBoxClearD.png");
-                EditorThemes["Default"].PanelBackgroundColor = new Color(0, 0, 0, 128);
-                EditorThemes["Default"].PanelBorderColor = new Color(128, 128, 128, 255);
             }
         }
     }
