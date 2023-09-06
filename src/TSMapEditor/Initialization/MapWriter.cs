@@ -366,28 +366,6 @@ namespace TSMapEditor.Initialization
             }
         }
 
-        public static void WriteCountries(IMap map, IniFile mapIni)
-        {
-            const string sectionName = "Countries";
-            mapIni.RemoveSection(sectionName);
-
-            if (map.HouseTypes.Count == 0)
-                return;
-
-            var countriesSection = new IniSection(sectionName);
-            mapIni.AddSection(countriesSection);
-
-            for (int i = 0; i < map.HouseTypes.Count; i++)
-            {
-                HouseType country = map.HouseTypes[i];
-                countriesSection.SetStringValue(country.Index.ToString(), country.ININame);
-
-                mapIni.RemoveSection(country.ININame);
-                var countrySection = FindOrMakeSection(country.ININame, mapIni);
-                country.WriteToIniSection(countrySection);
-            }
-        }
-
         public static void WriteAITriggerTypes(IMap map, IniFile mapIni)
         {
             const string sectionName = "AITriggerTypes";
@@ -418,6 +396,35 @@ namespace TSMapEditor.Initialization
             {
                 if (!enablesSection.KeyExists(map.AITriggerTypes[i].ININame))
                     enablesSection.SetStringValue(map.AITriggerTypes[i].ININame, "yes");
+            }
+        }
+
+        public static void WriteCountries(IMap map, IniFile mapIni)
+        {
+            const string sectionName = "Countries";
+            mapIni.RemoveSection(sectionName);
+
+            if (map.HouseTypes.Count == 0)
+                return;
+
+            var countriesSection = new IniSection(sectionName);
+            mapIni.AddSection(countriesSection);
+
+            for (int i = 0; i < map.HouseTypes.Count; i++)
+            {
+                HouseType country = map.HouseTypes[i];
+                countriesSection.SetStringValue(country.Index.ToString(), country.ININame);
+
+                if (country.ININame.StartsWith("Fake") && country.ININame.Length <= 6)
+                    continue;
+
+                mapIni.RemoveSection(country.ININame);
+                var countrySection = FindOrMakeSection(country.ININame, mapIni);
+
+                if (map.PlayerHouseTypes.Contains(country))
+                    countrySection.SetStringValue("Color", country.Color);
+                else
+                    country.WriteToIniSection(countrySection);
             }
         }
 
@@ -473,7 +480,11 @@ namespace TSMapEditor.Initialization
                     continue;
 
                 var houseSection = FindOrMakeSection(house.ININame, mapIni);
-                house.WriteToIniSection(houseSection);
+
+                if (map.PlayerHouses.Contains(house))
+                    houseSection.SetStringValue("Color", house.Color);
+                else
+                    house.WriteToIniSection(houseSection);
             }
         }
 
