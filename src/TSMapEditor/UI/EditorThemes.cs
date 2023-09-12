@@ -49,8 +49,11 @@ namespace TSMapEditor.UI
                     }
                     else if (property.PropertyType == typeof(Texture2D))
                     {
-                        string propertyString = themeSection.GetPathStringValue(property.Name, "ToolIcons/deletionmode.png");
-                        property.SetValue(theme, AssetLoader.LoadTexture(propertyString));
+                        string textureString = themeSection.GetPathStringValue(property.Name, null);
+                        if (textureString == null)
+                            continue;
+
+                        property.SetValue(theme, AssetLoader.LoadTexture(textureString));
                     }
                 }
 
