@@ -21,6 +21,7 @@ namespace TSMapEditor.UI
     public class MainMenu : EditorPanel
     {
         private const string DirectoryPrefix = "<DIR> ";
+        private const int BrowseButtonWidth = 70;
 
         public MainMenu(WindowManager windowManager) : base(windowManager)
         {
@@ -55,7 +56,7 @@ namespace TSMapEditor.UI
             tbGameDirectory.Name = nameof(tbGameDirectory);
             tbGameDirectory.X = Constants.UIEmptySideSpace;
             tbGameDirectory.Y = lblGameDirectory.Bottom + Constants.UIVerticalSpacing;
-            tbGameDirectory.Width = Width - Constants.UIEmptySideSpace * 3 - 70;
+            tbGameDirectory.Width = Width - Constants.UIEmptySideSpace * 3 - BrowseButtonWidth;
             tbGameDirectory.Text = UserSettings.Instance.GameDirectory;
             if (string.IsNullOrWhiteSpace(tbGameDirectory.Text))
             {
@@ -66,7 +67,7 @@ namespace TSMapEditor.UI
 
             btnBrowseGameDirectory = new EditorButton(WindowManager);
             btnBrowseGameDirectory.Name = nameof(btnBrowseGameDirectory);
-            btnBrowseGameDirectory.Width = 70;
+            btnBrowseGameDirectory.Width = BrowseButtonWidth;
             btnBrowseGameDirectory.Text = "Browse...";
             btnBrowseGameDirectory.Y = tbGameDirectory.Y;
             btnBrowseGameDirectory.X = tbGameDirectory.Right + Constants.UIEmptySideSpace;
@@ -85,13 +86,13 @@ namespace TSMapEditor.UI
             tbMapPath.Name = nameof(tbMapPath);
             tbMapPath.X = Constants.UIEmptySideSpace;
             tbMapPath.Y = lblMapPath.Bottom + Constants.UIVerticalSpacing;
-            tbMapPath.Width = Width - Constants.UIEmptySideSpace * 3 - 70;
+            tbMapPath.Width = Width - Constants.UIEmptySideSpace * 3 - BrowseButtonWidth;
             tbMapPath.Text = UserSettings.Instance.LastScenarioPath;
             AddChild(tbMapPath);
 
             btnBrowseMapPath = new EditorButton(WindowManager);
             btnBrowseMapPath.Name = nameof(btnBrowseMapPath);
-            btnBrowseMapPath.Width = 70;
+            btnBrowseMapPath.Width = BrowseButtonWidth;
             btnBrowseMapPath.Text = "Browse...";
             btnBrowseMapPath.Y = tbMapPath.Y;
             btnBrowseMapPath.X = tbMapPath.Right + Constants.UIEmptySideSpace;

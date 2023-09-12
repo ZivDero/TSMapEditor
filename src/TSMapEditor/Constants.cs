@@ -19,7 +19,7 @@ namespace TSMapEditor
 
         public static string ExpectedClientExecutableName = "DTA.exe";
         public static string GameRegistryInstallPath = "SOFTWARE\\DawnOfTheTiberiumAge";
-        public static string OpenFileDialogFilter = "TS maps (*.map)|*.map|All files (*.*)|*.*";
+        public static string OpenFileDialogFilter = "TS maps|*.map|All files|*.*";
 
         public static bool EnableIniInclude = false;
         public static bool EnableIniInheritance = false;
