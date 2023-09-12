@@ -34,65 +34,10 @@ namespace TSMapEditor.UI
             PanelBorderColor = new Color(128, 128, 128, 255);
         }
 
-        public static Dictionary<string, UISettings> EditorThemes { get; set; } = new Dictionary<string, UISettings>();
         public Color ListBoxBackgroundColor { get; set; } = Color.Black;
         public Color ButtonMainBackgroundColor { get; set; } = new Color(0, 0, 0, 196);
         public Color ButtonSecondaryBackgroundColor { get; set; } = new Color(0, 0, 0, 255);
         public Color ButtonTertiaryBackgroundColor { get; set; } = Color.White;
-
-        public static void InitializeEditorThemes()
-        {
-            var iniFile = new IniFile(Environment.CurrentDirectory + "/Config/EditorThemes.ini");
-            var themesSection = iniFile.GetSection("EditorThemes");
-
-            if (themesSection == null || themesSection.Keys.Count == 0)
-            {
-                EditorThemes.Add("Default", new CustomUISettings());
-                return;
-            }
-
-            foreach (var themeName in themesSection.Keys)
-            {
-                var themeSection = iniFile.GetSection(themeName.Value);
-                if (themeSection == null)
-                    continue;
-
-                var theme = new CustomUISettings();
-                foreach (var property in theme.GetType().GetProperties())
-                {
-                    if (!themeSection.KeyExists(property.Name))
-                        continue;
-
-                    if (property.PropertyType == typeof(Color))
-                    {
-                        string propertyString = themeSection.GetStringValue(property.Name, "0,0,0,255");
-                        var parts = propertyString.Split(',');
-                        if (parts.Length != 4)
-                            continue;
-
-                        property.SetValue(theme, new Color(int.Parse(parts[0]), int.Parse(parts[1]), int.Parse(parts[2]), int.Parse(parts[3])), null);
-                    }
-                    else if (property.PropertyType == typeof(float))
-                    {
-                        property.SetValue(theme, themeSection.GetSingleValue(property.Name, (float)property.GetValue(theme)));
-                    }
-                    else if (property.PropertyType == typeof(Texture2D))
-                    {
-                        string propertyString =
-                            themeSection.GetPathStringValue(property.Name, "ToolIcons/deletionmode.png");
-
-                        property.SetValue(theme, AssetLoader.LoadTexture(propertyString));
-                    }
-                }
-
-                EditorThemes.Add(themeName.Value, theme);
-            }
-
-            if (!EditorThemes.ContainsKey("Default"))
-            {
-                EditorThemes.Add("Default", new CustomUISettings());
-            }
-        }
     }
 
     class UIManager : XNAControl, IWindowParentControl
@@ -253,7 +198,7 @@ namespace TSMapEditor.UI
                 Renderer.GetFontList()[0] = Renderer.GetFontList()[1];
             }
 
-            UISettings.ActiveSettings = CustomUISettings.EditorThemes[UserSettings.Instance.Theme];
+            UISettings.ActiveSettings = EditorThemes.Themes[UserSettings.Instance.Theme];
 
             Width = WindowManager.RenderResolutionX;
             Height = WindowManager.RenderResolutionY;

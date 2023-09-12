@@ -123,7 +123,7 @@ namespace TSMapEditor.Rendering
 
             Components.Add(windowManager);
 
-            CustomUISettings.InitializeEditorThemes();
+            EditorThemes.Initialize();
             UISettings.ActiveSettings = new CustomUISettings()
             {
                 PanelBackgroundColor = new Color(32, 32, 32),

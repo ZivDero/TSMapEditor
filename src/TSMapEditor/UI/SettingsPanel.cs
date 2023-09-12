@@ -133,7 +133,7 @@ namespace TSMapEditor.UI
             ddTheme.Y = lblTheme.Y - 1;
             ddTheme.Width = ddDisplayResolution.Width;
             AddChild(ddTheme);
-            foreach (var theme in CustomUISettings.EditorThemes)
+            foreach (var theme in EditorThemes.Themes)
                 ddTheme.AddItem(theme.Key);
 
             var lblScrollRate = new XNALabel(WindowManager);
