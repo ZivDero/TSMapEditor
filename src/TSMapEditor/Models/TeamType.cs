@@ -2,7 +2,6 @@
 using Rampastring.Tools;
 using Rampastring.XNAUI;
 using System;
-using System.Globalization;
 using System.Text;
 
 namespace TSMapEditor.Models

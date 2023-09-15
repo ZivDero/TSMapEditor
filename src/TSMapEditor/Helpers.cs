@@ -123,10 +123,18 @@ namespace TSMapEditor
             return landType == 0x9;
         }
 
-        public static int GetWaypointNumberFromAlphabeticalString(string str)
+        public static bool IsValidAlphabeticalWaypoint(string str)
         {
             if (str.Length < 1 || str.Length > 2 ||
                 str[0] < 'A' || str[0] > 'Z' || (str.Length == 2 && (str[1] < 'A' || str[1] > 'Z')))
+                return false;
+
+            return true;
+        }
+
+        public static int GetWaypointNumberFromAlphabeticalString(string str)
+        {
+            if (!IsValidAlphabeticalWaypoint(str))
                 throw new InvalidOperationException("Waypoint values are only valid between A and ZZ. Invalid value: " + str);
 
             if (str.Length == 1)

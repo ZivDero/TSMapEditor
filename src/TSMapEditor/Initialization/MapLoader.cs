@@ -827,6 +827,12 @@ namespace TSMapEditor.Initialization
                     AddMapLoadError($"TeamType {teamType.ININame} has an invalid TaskForce ({taskForceId}) specified!");
                 }
 
+                if (!Helpers.IsValidAlphabeticalWaypoint(teamType.Waypoint))
+                {
+                    AddMapLoadError($"TeamType {teamType.ININame} has an invalid waypoint ({teamType.Waypoint}) specified! Replacing with waypoint A (0).");
+                    teamType.Waypoint = "A";
+                }
+
                 map.AddTeamType(teamType);
             }
         }
