@@ -978,6 +978,18 @@ namespace TSMapEditor.Initialization
 
             foreach (var kvp in section.Keys)
             {
+                if (!int.TryParse(kvp.Key, out int variableIndex))
+                {
+                    AddMapLoadError($"Invalid local variable index in entry {kvp.Key}: {kvp.Value}, skipping reading local variables.");
+                    return;
+                }
+
+                if (map.LocalVariables.Exists(c => c.Index == variableIndex))
+                {
+                    AddMapLoadError($"Duplicate local variable index in entry {kvp.Key}: {kvp.Value}, skipping reading local variables.");
+                    return;
+                }
+
                 string[] parts = kvp.Value.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
 
                 if (parts.Length != 2)
@@ -986,7 +998,7 @@ namespace TSMapEditor.Initialization
                     return;
                 }
 
-                var localVariable = new LocalVariable(map.LocalVariables.Count);
+                var localVariable = new LocalVariable(variableIndex);
                 localVariable.Name = parts[0];
                 localVariable.InitialState = int.Parse(parts[1]);
 
