@@ -181,35 +181,55 @@ namespace TSMapEditor.CCEngine
             }
             else
             {
-                int dataOffset = 0;
-                for (int lineIndex = 0; lineIndex < frameInfo.Height; lineIndex++)
+                // Decompression of RLE-Zero data by Nyerguds
+                // Taken from Engie File Converter
+                // http://nyerguds.arsaneus-design.com/project_stuff/2018/EngieFileConverter/
+
+                int offset = (int)frameInfo.DataOffset;
+                int dataLength = fileData.Length;
+                int outLineOffset = 0;
+                for (int y = 0; y < frameInfo.Height; ++y)
                 {
-                    int baseOffset = (int)frameInfo.DataOffset + dataOffset;
-                    int lineDataLength = fileData[baseOffset];
-                    int currentByteIndex = 2;
-                    int positionOnLine = 0;
-                    while (currentByteIndex < lineDataLength && positionOnLine < frameInfo.Width)
+                    int outOffset = outLineOffset;
+                    int nextLineOffset = outLineOffset + frameInfo.Width;
+                    if (offset + 2 >= dataLength)
+                        throw new ShpLoadException("Not enough lines in RLE-Zero data!");
+                    // Compose little-endian UInt16 from 2 bytes
+                    int lineLen = fileData[offset] | (fileData[offset + 1] << 8);
+                    int end = offset + lineLen;
+                    if (lineLen < 2 || end > dataLength)
+                        throw new ShpLoadException("Bad value in RLE-Zero line header!");
+                    // Skip header
+                    offset += 2;
+                    bool readZero = false;
+                    for (; offset < end; ++offset)
                     {
-                        byte value = fileData[baseOffset + currentByteIndex];
-                        if (value == 0)
+                        if (outOffset >= nextLineOffset)
+                            throw new ShpLoadException("Bad line alignment in RLE-Zero data!");
+                        if (readZero)
                         {
-                            byte transparentPixelCount = fileData[baseOffset + currentByteIndex + 1];
-                            for (int j = 0; j < transparentPixelCount; j++)
-                            {
-                                frameData[lineIndex * frameInfo.Width + positionOnLine + j] = 0;
-                            }
-                            positionOnLine += transparentPixelCount;
-                            currentByteIndex += 2;
+                            // Zero has been read. Process 0-repeat.
+                            readZero = false;
+                            int zeroes = fileData[offset];
+                            for (; zeroes > 0 && outOffset < nextLineOffset; zeroes--)
+                                frameData[outOffset++] = 0;
+                        }
+                        else if (fileData[offset] == 0)
+                        {
+                            // Rather than manually increasing the offset, just flag that
+                            // "a 0 value has been read" so the next loop can read the repeat value.
+                            readZero = true;
                         }
                         else
                         {
-                            frameData[lineIndex * frameInfo.Width + positionOnLine] = value;
-                            positionOnLine++;
-                            currentByteIndex++;
+                            // Simply copy a value.
+                            frameData[outOffset++] = fileData[offset];
                         }
                     }
-
-                    dataOffset += lineDataLength;
+                    // If a data line ended on a 0, there's something wrong.
+                    if (readZero)
+                        throw new ShpLoadException("Incomplete zero-repeat command!");
+                    outLineOffset = nextLineOffset;
                 }
             }
 
