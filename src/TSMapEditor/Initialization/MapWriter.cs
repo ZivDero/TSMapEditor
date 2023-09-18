@@ -578,7 +578,7 @@ namespace TSMapEditor.Initialization
 
             foreach (var localVariable in map.LocalVariables)
             {
-                section.SetStringValue(localVariable.Index.ToString(), $"{localVariable.Name},{localVariable.InitialState.ToString(CultureInfo.InvariantCulture)}");
+                section.SetStringValue(localVariable.Index.ToString(CultureInfo.InvariantCulture), $"{localVariable.Name},{localVariable.InitialState.ToString(CultureInfo.InvariantCulture)}");
             }
         }
 
