@@ -20,9 +20,11 @@ namespace TSMapEditor
 
         public static string ExpectedClientExecutableName = "DTA.exe";
         public static string GameRegistryInstallPath = "SOFTWARE\\DawnOfTheTiberiumAge";
-        public static string OpenFileDialogFilter = "TS maps|*.map|All files|*.*";
 
         public static bool EnableIniInclude = false;
+        public static string OpenFileMapDialogFilter = "TS maps|*.map|All files|*.*";
+        public static string OpenImageFileDialogFilter = "Images|*.bmp;*.png;*.jpg;*.jpeg|All files|*.*";
+
         public static bool EnableIniInheritance = false;
 
         public static bool IntegerVariables = false;
@@ -107,7 +109,7 @@ namespace TSMapEditor
 
             ExpectedClientExecutableName = constantsIni.GetStringValue(ConstantsSectionName, nameof(ExpectedClientExecutableName), ExpectedClientExecutableName);
             GameRegistryInstallPath = constantsIni.GetStringValue(ConstantsSectionName, nameof(GameRegistryInstallPath), GameRegistryInstallPath);
-            OpenFileDialogFilter = constantsIni.GetStringValue(ConstantsSectionName, nameof(OpenFileDialogFilter), OpenFileDialogFilter);
+            OpenFileMapDialogFilter = constantsIni.GetStringValue(ConstantsSectionName, nameof(OpenFileMapDialogFilter), OpenFileMapDialogFilter);
 
             EnableIniInclude = constantsIni.GetBooleanValue(ConstantsSectionName, nameof(EnableIniInclude), EnableIniInclude);
             EnableIniInheritance = constantsIni.GetBooleanValue(ConstantsSectionName, nameof(EnableIniInheritance), EnableIniInheritance);

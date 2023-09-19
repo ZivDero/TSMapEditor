@@ -303,7 +303,7 @@ namespace TSMapEditor.UI
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
                 openFileDialog.InitialDirectory = tbMapPath.Text;
-                openFileDialog.Filter = Constants.OpenFileDialogFilter.Replace(':', ';');
+                openFileDialog.Filter = Constants.OpenFileMapDialogFilter.Replace(':', ';');
                 openFileDialog.RestoreDirectory = true;
 
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
