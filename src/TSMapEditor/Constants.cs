@@ -8,6 +8,7 @@ namespace TSMapEditor
         public static int CellSizeX = 48;
         public static int CellSizeY = 24;
         public static int CellHeight => CellSizeY / 2;
+		public static double CellWHRatio = CellSizeX / CellSizeY;
         public static int TileColorBufferSize = 576;
 
         public static int RenderPixelPadding = 50;
@@ -26,6 +27,7 @@ namespace TSMapEditor
         public static string OpenImageFileDialogFilter = "Images|*.bmp;*.png;*.jpg;*.jpeg|All files|*.*";
 
         public static bool EnableIniInheritance = false;
+		public static string OpenIniFileDialogFilter = "INI|*.ini|All files|*.*";
 
         public static bool IntegerVariables = false;
 
