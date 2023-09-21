@@ -299,7 +299,7 @@ namespace TSMapEditor.Models
             IniSection variableNamesSection = iniFile.GetSection("VariableNames");
             if (variableNamesSection != null)
             {
-                foreach (var kvp in variableNamesSection)
+                foreach (var kvp in variableNamesSection.Keys)
                 {
                     GlobalVariables.Add(new GlobalVariable(int.Parse(kvp.Key, CultureInfo.InvariantCulture), kvp.Value));
                 }
