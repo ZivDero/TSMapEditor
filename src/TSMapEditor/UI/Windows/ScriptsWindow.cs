@@ -349,7 +349,7 @@ namespace TSMapEditor.UI.Windows
             {
                 foreach (var house in map.GetHouses())
                 {
-                    btnEditorPresetValues.ContextMenu.AddItem(new XNAContextMenuItem() { Text = house.ID + " " + house.ININame, TextColor = Helpers.GetHouseUITextColor(house) });
+                    btnEditorPresetValues.ContextMenu.AddItem(new XNAContextMenuItem() { Text = house.ININame, TextColor = Helpers.GetHouseUITextColor(house) });
                 }
             }
 

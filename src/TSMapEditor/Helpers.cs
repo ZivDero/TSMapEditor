@@ -279,5 +279,13 @@ namespace TSMapEditor
 
             return house.XNAColor;
         }
+
+        public static Color GetHouseTypeUITextColor(HouseType houseType)
+        {
+            if (houseType == null || houseType.HasDarkHouseColor())
+                return UISettings.ActiveSettings.AltColor;
+
+            return houseType.XNAColor;
+        }
     }
 }

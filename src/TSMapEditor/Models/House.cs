@@ -106,17 +106,18 @@ namespace TSMapEditor.Models
 
         public void WriteToIniSection(IniSection iniSection)
         {
-            if (ININame.StartsWith("Spawn") && ININame.Length <= 6)
-            {
+            if (IsPlayerHouse)
                 iniSection.SetStringValue("Color", Color);
-                return;
-            }
-
-            WritePropertiesToIniSection(iniSection);
+            else
+                WritePropertiesToIniSection(iniSection);
 
             // Write base nodes
             // Format: Index=BuildingTypeName,X,Y
             // Index is from 000 to 999
+
+            // Player houses only get BaseNodes in TS
+            if (IsPlayerHouse && Constants.UseCountries)
+                return;
 
             iniSection.SetIntValue("NodeCount", BaseNodes.Count);
             for (int i = 0; i < BaseNodes.Count; i++)
