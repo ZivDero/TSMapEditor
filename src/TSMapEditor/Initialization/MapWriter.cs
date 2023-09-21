@@ -418,9 +418,6 @@ namespace TSMapEditor.Initialization
                 HouseType country = map.HouseTypes[i];
                 countriesSection.SetStringValue(country.Index.ToString(), country.ININame);
 
-                if (country.ININame.StartsWith("Fake") && country.ININame.Length <= 6)
-                    continue;
-
                 mapIni.RemoveSection(country.ININame);
                 var countrySection = FindOrMakeSection(country.ININame, mapIni);
 
@@ -453,6 +450,7 @@ namespace TSMapEditor.Initialization
                 }
             }
 
+            // Player houses for Skirmish
             if (map.Basic.MultiplayerOnly)
             {
                 houses.AddRange(map.PlayerHouses);

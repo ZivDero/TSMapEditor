@@ -1016,6 +1016,8 @@ namespace TSMapEditor.Initialization
                 string houseName = kvp.Value;
 
                 // For player houses, just read the color
+                // Actually, we might not care and just load everything, just write back only the things we need
+                /*
                 if (houseName.StartsWith("Spawn") || houseName.StartsWith("<Player @"))
                 {
                     var playerHouse = map.PlayerHouses.Find(h => h.ININame == houseName);
@@ -1036,6 +1038,7 @@ namespace TSMapEditor.Initialization
                         continue;
                     }
                 }
+                */
 
                 // If we find fake houses, discard them but remember TS Coop mode
                 if (houseName.StartsWith("Fake") && houseName.Length <= 6)
