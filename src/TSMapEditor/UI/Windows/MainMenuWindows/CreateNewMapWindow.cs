@@ -88,8 +88,6 @@ namespace TSMapEditor.UI.Windows.MainMenuWindows
 
             ddTheater.SelectedIndex = 0;
 
-            tbTerrainImage.Text = "W:\\Games\\C&C\\Maps\\Oresund.png";
-
             CenterOnParent();
         }
 
