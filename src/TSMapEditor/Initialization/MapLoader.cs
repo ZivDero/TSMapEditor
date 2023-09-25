@@ -984,7 +984,6 @@ namespace TSMapEditor.Initialization
                     house.XNAColor = map.Rules.FindColor(house.Color);
                 }
             }
-
         }
 
         public static void ReadOrMakeHouseTypes(IMap map, IniFile mapIni)
@@ -1043,7 +1042,7 @@ namespace TSMapEditor.Initialization
                 loadedHouseTypes.Add(houseType);
             }
 
-            // Now first put in the HouseTypes that match the standard ones, copying their index
+            // Now first put in the HouseTypes that match the standard ones
             var houseTypesInOrder = new List<HouseType>();
             for (int i = 0; i < map.StandardHouseTypes.Count; i++)
             {
@@ -1056,12 +1055,11 @@ namespace TSMapEditor.Initialization
             }
 
             // Now add the rest to the end, assigning indices after the standard ones
-            int newHouseTypeCount = 0;
-            foreach (var houseType in loadedHouseTypes)
+            for (int i = 0; i < loadedHouseTypes.Count; i++)
             {
+                var houseType = loadedHouseTypes[i];
                 houseTypesInOrder.Add(houseType);
-                houseType.Index = map.Rules.HouseTypes.Count + newHouseTypeCount;
-                newHouseTypeCount++;
+                houseType.Index = map.Rules.HouseTypes.Count + i;
             }
 
             map.HouseTypes.AddRange(houseTypesInOrder);
