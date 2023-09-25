@@ -376,14 +376,18 @@ namespace TSMapEditor.Models
                         " has no public constructor that takes a single string as an argument!");
                 }
 
-                T objectInstance = (T)constructor.Invoke(new object[] { typeName });
+                T objectInstance = targetList.Find(o => o.GetType().GetProperty("ININame").GetValue(o).ToString() == typeName) ?? (T)constructor.Invoke(new object[] { typeName });
 
-                // Set the index property if one exists
-                var indexProperty = objectType.GetProperty("Index");
-                if (indexProperty != null)
-                    indexProperty.SetValue(objectInstance, i);
+                if (!targetList.Contains(objectInstance))
+                {
+                    // Set the index property if one exists
+                    var indexProperty = objectType.GetProperty("Index");
+                    if (indexProperty != null)
+                        indexProperty.SetValue(objectInstance, i);
 
-                targetList.Add(objectInstance);
+                    targetList.Add(objectInstance);
+                }
+
                 i++;
             }
         }
