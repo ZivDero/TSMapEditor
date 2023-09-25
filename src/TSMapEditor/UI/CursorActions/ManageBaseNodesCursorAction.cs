@@ -142,7 +142,7 @@ namespace TSMapEditor.UI.CursorActions
 
         private void DeleteBaseNode(Point2D cellCoords)
         {
-            foreach (House house in CursorActionTarget.Map.GetHouses(true))
+            foreach (House house in CursorActionTarget.Map.GetHouses())
             {
                 int index = house.BaseNodes.FindIndex(baseNode =>
                 {
