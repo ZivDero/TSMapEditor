@@ -73,27 +73,6 @@ namespace TSMapEditor.Models
                 InitGlobalVariables(iniFile);
         }
 
-        public void InitArt(IniFile iniFile, IInitializer initializer)
-        {
-            TerrainTypes.ForEach(tt => initializer.ReadObjectTypeArtPropertiesFromINI(tt, iniFile));
-
-            SmudgeTypes.ForEach(st => initializer.ReadObjectTypeArtPropertiesFromINI(st, iniFile));
-
-            BuildingTypes.ForEach(bt => initializer.ReadObjectTypeArtPropertiesFromINI(bt, iniFile,
-                string.IsNullOrWhiteSpace(bt.Image) ? bt.ININame : bt.Image));
-
-            UnitTypes.ForEach(ut => initializer.ReadObjectTypeArtPropertiesFromINI(ut, iniFile,
-                string.IsNullOrWhiteSpace(ut.Image) ? ut.ININame : ut.Image));
-
-            InfantryTypes.ForEach(it => initializer.ReadObjectTypeArtPropertiesFromINI(it, iniFile,
-                string.IsNullOrWhiteSpace(it.Image) ? it.ININame : it.Image));
-
-            OverlayTypes.ForEach(ot => initializer.ReadObjectTypeArtPropertiesFromINI(ot, iniFile,
-                string.IsNullOrWhiteSpace(ot.Image) ? ot.ININame : ot.Image));
-
-            AnimTypes.ForEach(a => initializer.ReadObjectTypeArtPropertiesFromINI(a, iniFile, a.ININame));
-        }
-
         /// <summary>
         /// Makes a deep copy of the HouseTypes list.
         /// The original list of HouseTypes is not modified.
@@ -276,6 +255,27 @@ namespace TSMapEditor.Models
                     GlobalVariables.Add(new GlobalVariable(int.Parse(kvp.Key, CultureInfo.InvariantCulture), kvp.Value));
                 }
             }
+        }
+
+        public void InitArt(IniFile iniFile, IInitializer initializer)
+        {
+            TerrainTypes.ForEach(tt => initializer.ReadObjectTypeArtPropertiesFromINI(tt, iniFile));
+
+            SmudgeTypes.ForEach(st => initializer.ReadObjectTypeArtPropertiesFromINI(st, iniFile));
+
+            BuildingTypes.ForEach(bt => initializer.ReadObjectTypeArtPropertiesFromINI(bt, iniFile,
+                string.IsNullOrWhiteSpace(bt.Image) ? bt.ININame : bt.Image));
+
+            UnitTypes.ForEach(ut => initializer.ReadObjectTypeArtPropertiesFromINI(ut, iniFile,
+                string.IsNullOrWhiteSpace(ut.Image) ? ut.ININame : ut.Image));
+
+            InfantryTypes.ForEach(it => initializer.ReadObjectTypeArtPropertiesFromINI(it, iniFile,
+                string.IsNullOrWhiteSpace(it.Image) ? it.ININame : it.Image));
+
+            OverlayTypes.ForEach(ot => initializer.ReadObjectTypeArtPropertiesFromINI(ot, iniFile,
+                string.IsNullOrWhiteSpace(ot.Image) ? ot.ININame : ot.Image));
+
+            AnimTypes.ForEach(a => initializer.ReadObjectTypeArtPropertiesFromINI(a, iniFile, a.ININame));
         }
 
         public void InitEditorOverrides(IniFile iniFile)
