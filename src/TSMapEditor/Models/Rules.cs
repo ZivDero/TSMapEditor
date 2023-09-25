@@ -68,7 +68,8 @@ namespace TSMapEditor.Models
             InitTiberiums(iniFile, isMapIni);
             InitSides(iniFile, isMapIni);
 
-            if (!isMapIni) // Don't load local variables defined in the map as globals
+            // Don't load local variables defined in the map as globals
+            if (!isMapIni)
                 InitGlobalVariables(iniFile);
         }
 
@@ -93,6 +94,11 @@ namespace TSMapEditor.Models
             AnimTypes.ForEach(a => initializer.ReadObjectTypeArtPropertiesFromINI(a, iniFile, a.ININame));
         }
 
+        /// <summary>
+        /// Makes a deep copy of the HouseTypes list.
+        /// The original list of HouseTypes is not modified.
+        /// </summary>
+        /// <returns>List of standard HouseTypes</returns>
         public List<HouseType> GetStandardHouseTypes()
         {
             var houseTypes = new List<HouseType>();
@@ -106,6 +112,12 @@ namespace TSMapEditor.Models
             return houseTypes;
         }
 
+        /// <summary>
+        /// Returns a copy of the HouseType with the specified INI name.
+        /// If no HouseType with such a name is found, null is returned.
+        /// </summary>
+        /// <param name="iniName"></param>
+        /// <returns>Standard HouseType</returns>
         public HouseType GetStandardHouseType(string iniName)
         {
             var houseType = HouseTypes.Find(c => c.ININame == iniName);
@@ -115,6 +127,10 @@ namespace TSMapEditor.Models
             return new HouseType(houseType, houseType.ININame);
         }
 
+        /// <summary>
+        /// Returns a deep copy of the list of houses based on HouseTypes from the rules.
+        /// </summary>
+        /// <returns>List of standard Houses</returns>
         public List<House> GetStandardHouses()
         {
             var houses = new List<House>();
@@ -127,10 +143,16 @@ namespace TSMapEditor.Models
             return houses;
         }
 
+        /// <summary>
+        /// Creates a new House object based on the specified HouseType.
+        /// </summary>
+        /// <param name="houseType"></param>
+        /// <returns>Standard House</returns>
         public House GetStandardHouse(HouseType houseType)
         {
             House house = new House(houseType.ININame)
             {
+                HouseType = houseType,
                 Allies = houseType.ININame,
                 Color = houseType.Color,
                 XNAColor = houseType.XNAColor,
@@ -144,18 +166,13 @@ namespace TSMapEditor.Models
 
             if (Constants.UseCountries)
             {
-                // RA2/YR Houses only have a country field
+                // RA2/YR Houses have a country field
                 house.Country = houseType.ININame;
             }
             else
             {
-                // TS Houses contain ActsLike and Side
-                int sideIndex = Sides.FindIndex(side => side == houseType.Side);
-                if (sideIndex == -1)
-                    sideIndex = 0;
-
-                house.ActsLike = sideIndex;
-                house.Side = houseType.Side;
+                // TS Houses contain ActsLike
+                house.ActsLike = houseType.Index;
             }
 
             return house;
@@ -186,7 +203,6 @@ namespace TSMapEditor.Models
                 {
                     House house = new House($"Spawn{i + 1}")
                     {
-                        Country = $"Spawn{i + 1}",
                         IsPlayerHouse = true,
                         Color = "Grey",
                         XNAColor = Color.Gray
@@ -239,11 +255,7 @@ namespace TSMapEditor.Models
 
         private void InitHouseType(HouseType houseType, bool isMapIni = false)
         {
-            var color = Colors.Find(c => c.Name == houseType.Color);
-            if (color == null)
-                houseType.XNAColor = Color.Black;
-            else
-                houseType.XNAColor = color.XNAColor;
+            houseType.XNAColor = FindColor(houseType.Color);
         }
 
         private void InitColors(IniFile iniFile)
@@ -454,6 +466,14 @@ namespace TSMapEditor.Models
                     type.ArtConfig.TurretAnim = turretAnim;
                 }
             }
+        }
+
+        public Color FindColor(string name)
+        {
+            var color = Colors.Find(c => c.Name == name);
+            if (color == null)
+                return Color.Black;
+            return color.XNAColor;
         }
     }
 }

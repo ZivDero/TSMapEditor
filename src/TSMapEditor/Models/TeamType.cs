@@ -149,6 +149,6 @@ namespace TSMapEditor.Models
             return RTTIType.TeamType;
         }
 
-        public Color GetXNAColor() => Helpers.GetHouseUITextColor(House);
+        public Color GetXNAColor() => Helpers.GetHouseTypeUITextColor(HouseType);
     }
 }

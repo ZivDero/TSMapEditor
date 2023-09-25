@@ -402,20 +402,27 @@ namespace TSMapEditor.Initialization
             }
         }
 
-        public static void WriteCountries(IMap map, IniFile mapIni)
+        public static void WriteHouseTypes(IMap map, IniFile mapIni)
         {
-            const string sectionName = "Countries";
-            mapIni.RemoveSection(sectionName);
+            string sectionName = Constants.UseCountries ? "Countries" : "Houses";
+
+            // If we are in YR, we need to remove the old section, for TS it's already been overwritten when writing houses
+            if (Constants.UseCountries)
+                mapIni.RemoveSection(sectionName);
 
             if (map.HouseTypes.Count == 0)
                 return;
 
-            var countriesSection = new IniSection(sectionName);
-            mapIni.AddSection(countriesSection);
-
-            for (int i = 0; i < map.HouseTypes.Count; i++)
+            // Now find the section if it exists, else make one
+            var countriesSection = mapIni.GetSection(sectionName);
+            if (countriesSection == null)
             {
-                HouseType country = map.HouseTypes[i];
+                countriesSection = new IniSection(sectionName);
+                mapIni.AddSection(countriesSection);
+            }
+
+            foreach (var country in map.HouseTypes)
+            {
                 countriesSection.SetStringValue(country.Index.ToString(), country.ININame);
 
                 mapIni.RemoveSection(country.ININame);
@@ -481,11 +488,7 @@ namespace TSMapEditor.Initialization
                     continue;
 
                 var houseSection = FindOrMakeSection(house.ININame, mapIni);
-
-                if (map.PlayerHouses.Contains(house))
-                    houseSection.SetStringValue("Color", house.Color);
-                else
-                    house.WriteToIniSection(houseSection);
+                house.WriteToIniSection(houseSection);
             }
         }
 

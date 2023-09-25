@@ -96,13 +96,12 @@ namespace TSMapEditor.UI.Windows
                 newHouse.Color = newColor.Name;
                 newHouse.XNAColor = newColor.XNAColor;
                 newHouse.ActsLike = 0;
-                newHouse.Side = map.Rules.Sides[0];
 
                 newHouseType = new HouseType(countryName)
                 {
                     Color = newHouse.Color,
                     XNAColor = newHouse.XNAColor,
-                    Side = newHouse.Side,
+                    Side = map.Rules.Sides[0],
                     Index = map.GetHouseTypes(true).Last().Index + 1
                 };
             }
