@@ -1432,10 +1432,8 @@ namespace TSMapEditor.Models
 
             StandardHouseTypes = Rules.GetStandardHouseTypes();
             StandardHouses = Rules.GetStandardHouses();
-            PlayerHouses = Rules.GetPlayerHouses();
             PlayerHouseTypes = Rules.GetPlayerHouseTypes();
-            for (int i = 0; i < PlayerHouses.Count; i++)
-                PlayerHouses[i].HouseType = PlayerHouseTypes[i];
+            PlayerHouses = Rules.GetPlayerHouses();
 
             // Load impassable cell information for terrain types
             var impassableTerrainObjectsIni = new IniFile(Environment.CurrentDirectory + "/Config/TerrainTypeImpassability.ini");
