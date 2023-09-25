@@ -181,35 +181,11 @@ namespace TSMapEditor.Models
         public List<House> GetPlayerHouses()
         {
             List<House> houses = new List<House>();
-            if (Constants.UseCountries)
+            foreach (var houseType in GetPlayerHouseTypes())
             {
-                string letters = "ABCDEFGH";
-                for (int i = 0; i < 8; i++)
-                {
-                    House house = new House($"<Player @ {letters[i]}>")
-                    {
-                        Country = $"<Player @ {letters[i]}>",
-                        IsPlayerHouse = true,
-                        Color = "Grey",
-                        XNAColor = Color.Gray
-                    };
-
-                    houses.Add(house);
-                }
-            }
-            else
-            {
-                for (int i = 0; i < 8; i++)
-                {
-                    House house = new House($"Spawn{i + 1}")
-                    {
-                        IsPlayerHouse = true,
-                        Color = "Grey",
-                        XNAColor = Color.Gray
-                    };
-
-                    houses.Add(house);
-                }
+                var house = GetStandardHouse(houseType);
+                house.IsPlayerHouse = true;
+                houses.Add(house);
             }
 
             return houses;
@@ -217,40 +193,24 @@ namespace TSMapEditor.Models
 
         public List<HouseType> GetPlayerHouseTypes()
         {
-            List<HouseType> countries = new List<HouseType>();
-            if (Constants.UseCountries)
-            {
-                string letters = "ABCDEFGH";
-                for (int i = 0; i < 8; i++)
-                {
-                    HouseType country = new HouseType($"<Player @ {letters[i]}>")
-                    {
-                        Index = 4475 + i,
-                        IsPlayerHouse = true,
-                        Color = "Grey",
-                        XNAColor = Color.Gray
-                    };
+            List<HouseType> houseTypes = new List<HouseType>();
+            int baseIndex = Constants.UseCountries ? 4475 : 50;
+            const string letters = "ABCDEFGH";
 
-                    countries.Add(country);
-                }
-            }
-            else
+            for (int i = 0; i < 8; i++)
             {
-                for (int i = 0; i < 8; i++)
+                HouseType houseType = new HouseType(Constants.UseCountries ? $"<Player @ {letters[i]}>" : $"Spawn{i + 1}")
                 {
-                    HouseType country = new HouseType($"Spawn{i + 1}")
-                    {
-                        Index = 50 + i,
-                        IsPlayerHouse = true,
-                        Color = "Grey",
-                        XNAColor = Color.Gray
-                    };
+                    Index = baseIndex + i,
+                    IsPlayerHouse = true,
+                    Color = "Grey",
+                    XNAColor = Color.Gray
+                };
 
-                    countries.Add(country);
-                }
+                houseTypes.Add(houseType);
             }
 
-            return countries;
+            return houseTypes;
         }
 
         private void InitHouseType(HouseType houseType, bool isMapIni = false)
