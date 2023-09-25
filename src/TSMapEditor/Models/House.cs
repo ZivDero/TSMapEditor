@@ -71,7 +71,7 @@ namespace TSMapEditor.Models
         public int TechLevel { get; set; }
         public int PercentBuilt { get; set; }
         public bool PlayerControl { get; set; }
-        public string Side { get; set; } // Only in TS
+        //public string Side { get; set; } // Only in TS
 
         [INI(false)] public HouseType HouseType { get; set; }
         [INI(false)] public bool IsPlayerHouse { get; set; } = false;

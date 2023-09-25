@@ -368,7 +368,7 @@ namespace TSMapEditor.Models
             Lighting.WriteToIniFile(LoadedINI);
 
             if (Constants.UseCountries)
-                MapWriter.WriteCountries(this, LoadedINI);
+                MapWriter.WriteHouseTypes(this, LoadedINI);
             MapWriter.WriteHouses(this, LoadedINI);
 
             MapWriter.WriteSmudges(this, LoadedINI);

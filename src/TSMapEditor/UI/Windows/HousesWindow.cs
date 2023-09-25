@@ -68,12 +68,16 @@ namespace TSMapEditor.UI.Windows
             lblStatsValue = FindChild<XNALabel>(nameof(lblStatsValue));
             lblStatsValue.Text = "";
 
-            for (int i = 0; i < map.Rules.Sides.Count; i++)
+            foreach (var side in map.Rules.Sides)
             {
-                string sideName = map.Rules.Sides[i];
-                string sideString = $"{i} {sideName}";
-                ddSide.AddItem(new XNADropDownItem() { Text = sideString, Tag = sideName });
-                ddActsLike.AddItem(new XNADropDownItem() { Text = sideString, Tag = i });
+                ddSide.AddItem(new XNADropDownItem() { Text = side, Tag = side });
+            }
+
+            for (int i = 0; i < map.GetHouses(true).Count; i++)
+            {
+                House house = map.GetHouses(true)[i];
+                string houseString = $"{i} {house.ININame}";
+                ddActsLike.AddItem(new XNADropDownItem() { Text = houseString, Tag = house.HouseType.Index });
             }
 
             foreach (RulesColor rulesColor in map.Rules.Colors.OrderBy(c => c.Name))
@@ -189,7 +193,7 @@ namespace TSMapEditor.UI.Windows
             if (editedHouse == null)
                 return;
 
-            // Fake player houses don't get deleted
+            // Player houses don't get deleted
             if (map.PlayerHouses.Contains(editedHouse))
                 return;
 
@@ -297,7 +301,7 @@ namespace TSMapEditor.UI.Windows
                 tbName.Text = editedHouse.ININame;
                 ddIQ.SelectedIndex = ddIQ.Items.FindIndex(item => Conversions.IntFromString(item.Text, -1) == editedHouse.IQ);
                 ddMapEdge.SelectedIndex = ddMapEdge.Items.FindIndex(item => item.Text == editedHouse.Edge);
-                ddSide.SelectedIndex = map.Rules.Sides.FindIndex(s => s == editedHouse.Side);
+                ddSide.SelectedIndex = map.Rules.Sides.FindIndex(s => s == editedHouse.HouseType.Side);
 
                 if (Constants.UseCountries)
                 {
@@ -306,7 +310,7 @@ namespace TSMapEditor.UI.Windows
                 }
                 else
                 {
-                    if (editedHouse.ActsLike < map.Rules.Sides.Count)
+                    if (editedHouse.ActsLike < map.GetHouses(true).Count)
                         ddActsLike.SelectedIndex = editedHouse.ActsLike ?? -1;
                     else
                         ddActsLike.SelectedIndex = -1;
@@ -351,7 +355,7 @@ namespace TSMapEditor.UI.Windows
 
         private void DdSide_SelectedIndexChanged(object sender, System.EventArgs e)
         {
-            editedHouse.Side = (string)ddSide.SelectedItem.Tag;
+            editedHouse.HouseType.Side = (string)ddSide.SelectedItem.Tag;
         }
 
         private void DdActsLike_SelectedIndexChanged(object sender, System.EventArgs e)
