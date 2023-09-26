@@ -46,7 +46,7 @@ namespace TSMapEditor.UI.Windows
 
         // General trigger settings
         private EditorTextBox tbName;
-        private XNADropDown ddHouse;
+        private XNADropDown ddHouseType;
         private XNADropDown ddType;
         private EditorPopUpSelector selAttachedTrigger;
         private XNADropDown ddTriggerColor;
@@ -120,7 +120,7 @@ namespace TSMapEditor.UI.Windows
             tbName = FindChild<EditorTextBox>(nameof(tbName));
             tbName.AllowComma = false;
 
-            ddHouse = FindChild<XNADropDown>(nameof(ddHouse));
+            ddHouseType = FindChild<XNADropDown>(nameof(ddHouseType));
             ddType = FindChild<XNADropDown>(nameof(ddType));
             selAttachedTrigger = FindChild<EditorPopUpSelector>(nameof(selAttachedTrigger));
             chkDisabled = FindChild<XNACheckBox>(nameof(chkDisabled));
@@ -1161,8 +1161,8 @@ namespace TSMapEditor.UI.Windows
 
         private void RefreshHouses()
         {
-            ddHouse.Items.Clear();
-            map.GetHouseTypes().ForEach(h => ddHouse.AddItem(h.ININame, h.XNAColor));
+            ddHouseType.Items.Clear();
+            map.GetHouseTypes().ForEach(h => ddHouseType.AddItem(h.ININame, h.XNAColor));
         }
 
         private void ListTriggers()
@@ -1202,7 +1202,7 @@ namespace TSMapEditor.UI.Windows
             lbEvents.SelectedIndexChanged -= LbEvents_SelectedIndexChanged;
             lbActions.SelectedIndexChanged -= LbActions_SelectedIndexChanged;
             tbName.TextChanged -= TbName_TextChanged;
-            ddHouse.SelectedIndexChanged -= DdHouse_SelectedIndexChanged;
+            ddHouseType.SelectedIndexChanged -= DdHouse_SelectedIndexChanged;
             ddType.SelectedIndexChanged -= DdType_SelectedIndexChanged;
             chkDisabled.CheckedChanged -= ChkDisabled_CheckedChanged;
             selAttachedTrigger.LeftClick -= SelAttachedTrigger_LeftClick;
@@ -1216,7 +1216,7 @@ namespace TSMapEditor.UI.Windows
             if (editedTrigger == null)
             {
                 tbName.Text = string.Empty;
-                ddHouse.SelectedIndex = -1;
+                ddHouseType.SelectedIndex = -1;
                 ddType.SelectedIndex = -1;
                 selAttachedTrigger.Text = string.Empty;
 
@@ -1252,7 +1252,7 @@ namespace TSMapEditor.UI.Windows
             }
 
             tbName.Text = editedTrigger.Name;
-            ddHouse.SelectedIndex = map.GetHouseTypes().FindIndex(h => h.ININame == trigger.HouseType);
+            ddHouseType.SelectedIndex = map.GetHouseTypes().FindIndex(h => h.ININame == trigger.HouseType);
             ddType.SelectedIndex = tag == null ? 3 : tag.Repeating;
             selAttachedTrigger.Text = editedTrigger.LinkedTrigger == null ? Constants.NoneValue1 : editedTrigger.LinkedTrigger.Name;
             selAttachedTrigger.Tag = editedTrigger.LinkedTrigger;
@@ -1279,7 +1279,7 @@ namespace TSMapEditor.UI.Windows
             lbEvents.SelectedIndexChanged += LbEvents_SelectedIndexChanged;
             lbActions.SelectedIndexChanged += LbActions_SelectedIndexChanged;
             tbName.TextChanged += TbName_TextChanged;
-            ddHouse.SelectedIndexChanged += DdHouse_SelectedIndexChanged;
+            ddHouseType.SelectedIndexChanged += DdHouse_SelectedIndexChanged;
             ddType.SelectedIndexChanged += DdType_SelectedIndexChanged;
             chkDisabled.CheckedChanged += ChkDisabled_CheckedChanged;
             selAttachedTrigger.LeftClick += SelAttachedTrigger_LeftClick;
@@ -1332,7 +1332,7 @@ namespace TSMapEditor.UI.Windows
 
         private void DdHouse_SelectedIndexChanged(object sender, EventArgs e)
         {
-            editedTrigger.HouseType = ddHouse.SelectedItem.Text;
+            editedTrigger.HouseType = ddHouseType.SelectedItem.Text;
         }
 
         private void ChkDisabled_CheckedChanged(object sender, EventArgs e)

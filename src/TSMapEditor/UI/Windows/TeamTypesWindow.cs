@@ -43,7 +43,7 @@ namespace TSMapEditor.UI.Windows
         private EditorListBox lbTeamTypes;
         private EditorTextBox tbName;
         private XNADropDown ddVeteranLevel;
-        private XNADropDown ddHouse;
+        private XNADropDown ddHouseType;
         private EditorNumberTextBox tbPriority;
         private EditorNumberTextBox tbMax;
         private EditorNumberTextBox tbTechLevel;
@@ -68,7 +68,7 @@ namespace TSMapEditor.UI.Windows
             lbTeamTypes = FindChild<EditorListBox>(nameof(lbTeamTypes));
             tbName = FindChild<EditorTextBox>(nameof(tbName));
             ddVeteranLevel = FindChild<XNADropDown>(nameof(ddVeteranLevel));
-            ddHouse = FindChild<XNADropDown>(nameof(ddHouse));
+            ddHouseType = FindChild<XNADropDown>(nameof(ddHouseType));
             tbPriority = FindChild<EditorNumberTextBox>(nameof(tbPriority));
             tbMax = FindChild<EditorNumberTextBox>(nameof(tbMax));
             tbTechLevel = FindChild<EditorNumberTextBox>(nameof(tbTechLevel));
@@ -259,8 +259,8 @@ namespace TSMapEditor.UI.Windows
 
         private void ListHouses()
         {
-            ddHouse.Items.Clear();
-            map.GetHouseTypes().ForEach(h => ddHouse.AddItem(h.ININame, h.XNAColor));
+            ddHouseType.Items.Clear();
+            map.GetHouseTypes().ForEach(h => ddHouseType.AddItem(h.ININame, h.XNAColor));
         }
 
         private void ListTeamTypes()
@@ -285,7 +285,7 @@ namespace TSMapEditor.UI.Windows
         {
             tbName.TextChanged -= TbName_TextChanged;
             ddVeteranLevel.SelectedIndexChanged -= DdVeteranLevel_SelectedIndexChanged;
-            ddHouse.SelectedIndexChanged -= DdHouse_SelectedIndexChanged;
+            ddHouseType.SelectedIndexChanged -= DdHouse_SelectedIndexChanged;
             tbPriority.TextChanged -= TbPriority_TextChanged;
             tbMax.TextChanged -= TbMax_TextChanged;
             tbTechLevel.TextChanged -= TbTechLevel_TextChanged;
@@ -299,7 +299,7 @@ namespace TSMapEditor.UI.Windows
             {
                 tbName.Text = string.Empty;
                 ddVeteranLevel.SelectedIndex = -1;
-                ddHouse.SelectedIndex = -1;
+                ddHouseType.SelectedIndex = -1;
                 tbPriority.Text = string.Empty;
                 tbMax.Text = string.Empty;
                 tbTechLevel.Text = string.Empty;
@@ -322,7 +322,7 @@ namespace TSMapEditor.UI.Windows
 
             tbName.Text = editedTeamType.Name;
             ddVeteranLevel.SelectedIndex = editedTeamType.VeteranLevel - 1;
-            ddHouse.SelectedIndex = ddHouse.Items.FindIndex(i => i.Text == (editedTeamType.HouseType == null ? "" : editedTeamType.HouseType.ININame));
+            ddHouseType.SelectedIndex = ddHouseType.Items.FindIndex(i => i.Text == (editedTeamType.HouseType == null ? "" : editedTeamType.HouseType.ININame));
             tbPriority.Value = editedTeamType.Priority;
             tbMax.Value = editedTeamType.Max;
             tbTechLevel.Value = editedTeamType.TechLevel;
@@ -348,7 +348,7 @@ namespace TSMapEditor.UI.Windows
 
             tbName.TextChanged += TbName_TextChanged;
             ddVeteranLevel.SelectedIndexChanged += DdVeteranLevel_SelectedIndexChanged;
-            ddHouse.SelectedIndexChanged += DdHouse_SelectedIndexChanged;
+            ddHouseType.SelectedIndexChanged += DdHouse_SelectedIndexChanged;
             tbPriority.TextChanged += TbPriority_TextChanged;
             tbMax.TextChanged += TbMax_TextChanged;
             tbTechLevel.TextChanged += TbTechLevel_TextChanged;
@@ -393,7 +393,7 @@ namespace TSMapEditor.UI.Windows
 
         private void DdHouse_SelectedIndexChanged(object sender, EventArgs e)
         {
-            editedTeamType.HouseType = map.GetHouseTypes().Find(c => c.Index == ddHouse.SelectedIndex);
+            editedTeamType.HouseType = map.GetHouseTypes().Find(c => c.Index == ddHouseType.SelectedIndex);
             lbTeamTypes.SelectedItem.TextColor = editedTeamType.HouseType.XNAColor;
         }
 
