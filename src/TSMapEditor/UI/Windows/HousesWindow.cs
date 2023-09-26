@@ -433,7 +433,7 @@ namespace TSMapEditor.UI.Windows
             ddHouseOfHumanPlayer.Items.Clear();
             ddHouseOfHumanPlayer.AddItem("None");
 
-            foreach (House house in map.GetHouses(true, true))
+            foreach (House house in map.GetHouses(noPlayers: true, noStandards: true))
                 ddHouseOfHumanPlayer.AddItem(house.ININame, house.XNAColor);
 
             ddHouseOfHumanPlayer.SelectedIndex = map.Houses.FindIndex(h => h.ININame == map.Basic.Player) + 1;
