@@ -122,11 +122,11 @@ namespace TSMapEditor.UI.Windows
         {
             Show();
             ListParentCountries();
+
             ddParentCountry.SelectedIndex = 0;
-
             tbHouseName.Text = "NewHouse";
-
             HouseName = "NewHouse";
+
             Success = false;
         }
     }
