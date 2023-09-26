@@ -9,12 +9,12 @@ namespace TSMapEditor.Models
         {
         }
 
-        public HouseType(HouseType baseHouse, string iniName) : base(iniName)
+        public HouseType(HouseType baseHouseType, string iniName) : base(iniName)
         {
             foreach (var property in typeof(HouseType).GetProperties())
             {
                 if (property.Name != "ININame")
-                    property.SetValue(this, property.GetValue(baseHouse));
+                    property.SetValue(this, property.GetValue(baseHouseType));
             }
         }
 
