@@ -1030,11 +1030,20 @@ namespace TSMapEditor.Initialization
             {
                 string houseTypeName = Constants.UseCountries ? house.Country : house.ININame;
 
-                if (map.StandardHouseTypes.Exists(ht => ht.ININame == houseTypeName))
+                if (house.HouseType != null)
                     continue;
 
-                if (loadedHouseTypes.Exists(ht => ht.ININame == houseTypeName))
+                if (map.StandardHouseTypes.Find(ht => ht.ININame == houseTypeName) is { } ht1)
+                {
+                    house.HouseType = ht1;
                     continue;
+                }
+
+                if (loadedHouseTypes.Find(ht => ht.ININame == houseTypeName) is { } ht2)
+                {
+                    house.HouseType = ht2;
+                    continue;
+                }
 
                 var houseType = new HouseType(houseTypeName);
                 var houseTypeSection = mapIni.GetSection(houseTypeName);

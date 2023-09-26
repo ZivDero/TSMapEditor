@@ -244,7 +244,6 @@ namespace TSMapEditor.Models
 
             MapLoader.ReadHouses(this, mapIni);
             MapLoader.ReadOrMakeHouseTypes(this, mapIni);
-            LinkHousesToHouseTypes();
             
             MapLoader.ReadSmudges(this, mapIni);
             MapLoader.ReadOverlays(this, mapIni);
@@ -271,17 +270,6 @@ namespace TSMapEditor.Models
             Lighting.ReadFromIniFile(mapIni);
         }
 
-        private void LinkHousesToHouseTypes()
-        {
-            foreach (var house in GetHouses(noPlayers: true))
-            {
-                if (house.HouseType != null)
-                    continue;
-
-                string houseTypeName = Constants.UseCountries ? house.Country : house.ININame;
-                house.HouseType = FindHouseType(houseTypeName);
-            }
-        }
         private void CreateGraphicalNodesFromBaseNodes()
         {
             // Check base nodes and create graphical base node instances from them
