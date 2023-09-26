@@ -1023,10 +1023,14 @@ namespace TSMapEditor.Initialization
                     continue;
                 }
 
-                // Try to find a house in the standard list, else create a new one
-                House house = map.StandardHouses.Find(h => h.ININame == houseName) ?? new House(houseName);
+                // Try to find a house in the standard list, or the list of player houses, else create a new one
+                House house = map.StandardHouses.Find(h => h.ININame == houseName) ?? 
+                              map.PlayerHouses.Find(h => h.ININame == houseName) ??
+                              new House(houseName);
 
-                loadedHouses.Add(house);
+                // Add the house to the list unless it's a player house (they don't get included in the total list)
+                if (!map.PlayerHouses.Contains(house))
+                    loadedHouses.Add(house);
 
                 var houseSection = mapIni.GetSection(houseName);
                 if (houseSection != null)
@@ -1093,7 +1097,9 @@ namespace TSMapEditor.Initialization
                 }
 
                 // Try to find a house in the standard list, else create a new one
-                HouseType houseType = map.StandardHouseTypes.Find(h => h.ININame == houseTypeName) ?? new HouseType(houseTypeName);
+                HouseType houseType = map.StandardHouseTypes.Find(h => h.ININame == houseTypeName) ??
+                                      map.PlayerHouseTypes.Find(h => h.ININame == houseTypeName) ??
+                                      new HouseType(houseTypeName);
 
                 var houseTypeSection = mapIni.GetSection(houseTypeName);
                 if (houseTypeSection != null)
@@ -1125,7 +1131,9 @@ namespace TSMapEditor.Initialization
                     houseType.XNAColor = map.Rules.FindColor(houseType.Color);
                 }
 
-                loadedHouseTypes.Add(houseType);
+                // Add the HouseType to the list unless it's a player HouseType (they don't get included in the total list)
+                if (!map.PlayerHouseTypes.Contains(houseType))
+                    loadedHouseTypes.Add(houseType);
             }
 
             // Now first put in the HouseTypes that match the standard ones

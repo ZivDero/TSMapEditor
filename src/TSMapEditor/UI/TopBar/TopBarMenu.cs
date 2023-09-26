@@ -214,7 +214,7 @@ namespace TSMapEditor.UI.TopBar
 
         private void ManageBaseNodes_Selected()
         {
-            if (map.Houses.Count == 0)
+            if (map.GetHouses(noStandards: true).Count == 0)
             {
                 EditorMessageBox.Show(WindowManager, "Houses Required",
                     "The map has no houses set up. Houses need to be configured before base nodes can be added." + Environment.NewLine + Environment.NewLine +

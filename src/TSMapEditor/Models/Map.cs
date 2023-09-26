@@ -275,35 +275,21 @@ namespace TSMapEditor.Models
 
         private void LinkHousesToHouseTypes()
         {
-            var allHouses = new List<House>(Houses);
-            allHouses.AddRange(StandardHouses);
-
-            foreach (var house in allHouses)
+            foreach (var house in GetHouses(noPlayers: true))
             {
                 if (house.HouseType != null)
                     continue;
 
-                if (Constants.UseCountries)
-                {
-                    HouseType houseType = FindHouseType(house.Country);
-                    if (houseType == null)
-                        throw new InvalidOperationException(
-                            $"House {house.ININame} has an invalid HouseType {house.Country} set!");
-                    house.HouseType = houseType;
-                }
-                else
-                {
-                    HouseType houseType = FindHouseType(house.ININame);
-                    house.HouseType = houseType;
-                }
+                string houseTypeName = Constants.UseCountries ? house.Country : house.ININame;
+                house.HouseType = FindHouseType(houseTypeName);
             }
         }
         private void CreateGraphicalNodesFromBaseNodes()
         {
             // Check base nodes and create graphical base node instances from them
-            if (Houses.Count > 0)
+            if (GetHouses().Count > 0)
             {
-                foreach (var house in Houses)
+                foreach (var house in GetHouses())
                 {
                     for (int i = 0; i < house.BaseNodes.Count; i++)
                     {
@@ -582,7 +568,7 @@ namespace TSMapEditor.Models
             ShiftObjectsInList(CellTags, eastShift, southShift);
 
             // Iterate all houses to shift base nodes
-            foreach (House house in GetHouses(true))
+            foreach (House house in GetHouses(noPlayers: true))
             {
                 ShiftObjectsInList(house.BaseNodes, eastShift, southShift);
             }
@@ -618,7 +604,7 @@ namespace TSMapEditor.Models
             // Refresh base nodes
             GraphicalBaseNodes.Clear();
 
-            foreach (House house in GetHouses(true))
+            foreach (House house in GetHouses())
             {
                 var nodesWithinMap = house.BaseNodes.Where(bn => IsCoordWithinMap(bn.Position)).ToList();
                 house.BaseNodes.Clear();
@@ -1618,7 +1604,7 @@ namespace TSMapEditor.Models
             // (iow. this is a singleplayer mission)
             if (!string.IsNullOrWhiteSpace(Basic.Player) && !Helpers.IsStringNoneValue(Basic.Player))
             {
-                House matchingHouse = GetHouses(true).Find(h => h.ININame == Basic.Player);
+                House matchingHouse = GetHouses(noPlayers: true).Find(h => h.ININame == Basic.Player);
                 if (matchingHouse == null)
                     issueList.Add("A nonexistent house has been specified in [Basic] Player= .");
                 else if (!matchingHouse.PlayerControl)
