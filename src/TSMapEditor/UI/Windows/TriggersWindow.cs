@@ -1496,7 +1496,7 @@ namespace TSMapEditor.UI.Windows
                     if (!map.Rules.GlobalVariables.Exists(v => v.Index == intValue))
                         return $"{intValue} - nonexistent variable";
 
-                    return $"{intValue} {map.Rules.GlobalVariables[intValue].Name}";
+                    return $"{intValue} {map.Rules.GlobalVariables.Find(v => v.Index == intValue).Name}";
                 case TriggerParamType.LocalVariable:
                     if (!intParseSuccess)
                         return paramValue;
@@ -1504,7 +1504,7 @@ namespace TSMapEditor.UI.Windows
                     if (!map.LocalVariables.Exists(v => v.Index == intValue))
                         return $"{intValue} - nonexistent variable";
 
-                    return $"{intValue} {map.LocalVariables[intValue].Name}";
+                    return $"{intValue} {map.LocalVariables.Find(v => v.Index == intValue).Name}";
                 case TriggerParamType.WaypointZZ:
                     if (!intParseSuccess)
                         return Helpers.GetWaypointNumberFromAlphabeticalString(paramValue).ToString();
