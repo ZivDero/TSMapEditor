@@ -73,11 +73,9 @@ namespace TSMapEditor.UI.Windows
                 ddSide.AddItem(new XNADropDownItem() { Text = side, Tag = side });
             }
 
-            for (int i = 0; i < map.GetHouses(true).Count; i++)
+            foreach (var houseType in map.GetHouseTypes(true))
             {
-                House house = map.GetHouses(true)[i];
-                string houseString = $"{i} {house.ININame}";
-                ddActsLike.AddItem(new XNADropDownItem() { Text = houseString, Tag = house.HouseType.Index });
+                ddActsLike.AddItem(new XNADropDownItem() { Text = $"{houseType.Index} {houseType.ININame}", Tag = houseType.Index });
             }
 
             foreach (RulesColor rulesColor in map.Rules.Colors.OrderBy(c => c.Name))
@@ -310,7 +308,7 @@ namespace TSMapEditor.UI.Windows
                 }
                 else
                 {
-                    if (editedHouse.ActsLike < map.GetHouses(true).Count)
+                    if (editedHouse.ActsLike < ddActsLike.Items.Count)
                         ddActsLike.SelectedIndex = editedHouse.ActsLike ?? -1;
                     else
                         ddActsLike.SelectedIndex = -1;
