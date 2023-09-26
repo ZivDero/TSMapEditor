@@ -58,13 +58,13 @@ namespace TSMapEditor.UI.Windows
         private void BtnAdd_LeftClick(object sender, EventArgs e)
         {
             string houseName = Constants.UseCountries ? $"{HouseName} House" : HouseName;
-            string countryName = HouseName;
+            string houseTypeName = HouseName;
 
             var newHouse = new House(houseName)
             {
                 Allies = houseName,
                 Credits = 0,
-                Edge = "North",
+                Edge = "West",
                 IQ = 0,
                 PercentBuilt = 100,
                 PlayerControl = false,
@@ -75,35 +75,31 @@ namespace TSMapEditor.UI.Windows
 
             if (Constants.UseCountries)
             {
-                newHouseType = new HouseType(map.StandardHouseTypes.Find(c => c.ININame == ParentCountry), countryName)
+                newHouseType = new HouseType(map.StandardHouseTypes.Find(c => c.ININame == ParentCountry), houseTypeName)
                 {
                     ParentCountry = ParentCountry,
-                    Multiplay = false,
-                    MultiplayPassive = true,
                     Index = map.GetHouseTypes(true).Last().Index + 1
                 };
 
-                newHouse.Country = countryName;
                 newHouse.Color = newHouseType.Color;
                 newHouse.XNAColor = newHouseType.XNAColor;
+                newHouse.Country = houseTypeName;
             }
             else
             {
-                var newColor = map.Rules.Colors.Find(c => c.Name == "Gold");
-                if (newColor == null)
-                    newColor = map.Rules.Colors[0];
+                var newColor = map.Rules.Colors.Find(c => c.Name == "Gold") ?? map.Rules.Colors[0];
+
+                newHouseType = new HouseType(houseTypeName)
+                {
+                    Color = newColor.Name,
+                    XNAColor = newColor.XNAColor,
+                    Side = map.Rules.Sides[0],
+                    Index = map.GetHouseTypes(true).Last().Index + 1
+                };
 
                 newHouse.Color = newColor.Name;
                 newHouse.XNAColor = newColor.XNAColor;
                 newHouse.ActsLike = 0;
-
-                newHouseType = new HouseType(countryName)
-                {
-                    Color = newHouse.Color,
-                    XNAColor = newHouse.XNAColor,
-                    Side = map.Rules.Sides[0],
-                    Index = map.GetHouseTypes(true).Last().Index + 1
-                };
             }
 
             newHouse.HouseType = newHouseType;
