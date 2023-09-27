@@ -59,7 +59,7 @@ namespace TSMapEditor.Models
         public float? IncomeMult { get; set; }
 
         [INI(false)] public Color XNAColor { get; set; } = Microsoft.Xna.Framework.Color.Gray;
-        [INI(false)] public bool IsPlayerHouse { get; set; } = false;
+        [INI(false)] public bool IsPlayerHouseType { get; set; } = false;
 
         public void CopyFromOther(HouseType baseHouseType)
         {
