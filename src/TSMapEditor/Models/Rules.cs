@@ -186,7 +186,7 @@ namespace TSMapEditor.Models
                 HouseType houseType = new HouseType(houseTypeName)
                 {
                     Index = baseIndex + i,
-                    IsPlayerHouse = true,
+                    IsPlayerHouseType = true,
                     Color = colorName,
                     XNAColor = color
                 };

@@ -943,7 +943,7 @@ namespace TSMapEditor.Initialization
                               new House(houseName);
 
                 // Add the house to the list unless it's a player house (they don't get included in the total list)
-                if (!map.PlayerHouses.Contains(house))
+                if (!house.IsPlayerHouse)
                     loadedHouses.Add(house);
 
                 var houseSection = mapIni.GetSection(houseName);
@@ -1055,7 +1055,7 @@ namespace TSMapEditor.Initialization
                 }
 
                 // Add the HouseType to the list unless it's a player HouseType (they don't get included in the total list)
-                if (!map.PlayerHouseTypes.Contains(houseType))
+                if (!houseType.IsPlayerHouseType)
                     loadedHouseTypes.Add(houseType);
             }
 
