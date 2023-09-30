@@ -37,12 +37,12 @@ namespace TSMapEditor.Models
 
                 string bridgeEnd = iniSection.GetStringValue($"BridgeEnd.{suffix}", null);
                 if (bridgeEnd == null)
-                    throw new BridgeLoadException($"Low bridge {bridge.Name} has no start overlay!");
+                    throw new BridgeLoadException($"Low bridge {bridge.Name} has no end overlay!");
                 End = rules.FindOverlayType(bridgeEnd)?.Index ??
                       throw new BridgeLoadException($"Low bridge {bridge.Name} has an invalid end overlay {bridgeEnd}!");
 
                 Pieces = iniSection.GetListValue($"BridgePieces.{suffix}", ',', (overlayName) => rules.FindOverlayType(overlayName)?.Index ??
-                    throw new BridgeLoadException($"Low bridge {bridge.Name} has an invalid bridge piece overlay {overlayName}!"));
+                    throw new BridgeLoadException($"Low bridge {bridge.Name} has an invalid bridge piece {overlayName}!"));
                 if (Pieces.Count == 0)
                     throw new BridgeLoadException($"Low bridge {bridge.Name} has no bridge pieces!");
             }
