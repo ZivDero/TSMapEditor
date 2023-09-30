@@ -23,7 +23,6 @@ namespace TSMapEditor.UI.Windows
             base.Initialize();
 
             FindChild<EditorButton>("btnSelect").LeftClick += BtnSelect_LeftClick;
-
         }
 
         protected override void LbObjectList_SelectedIndexChanged(object sender, EventArgs e)
