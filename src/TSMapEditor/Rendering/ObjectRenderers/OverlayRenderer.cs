@@ -30,15 +30,13 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             {
                 if (bridge.Type == BridgeType.High)
                 {
-                    if (bridge.EastWest.Start == overlayIndex || bridge.EastWest.End == overlayIndex ||
-                        bridge.EastWest.Pieces.Contains(overlayIndex))
+                    if (bridge.EastWest.Pieces.Contains(overlayIndex))
                     {
                         drawPoint.Y -= Constants.CellHeight;
                         break;
                     }
                     
-                    if (bridge.NorthSouth.Start == overlayIndex || bridge.NorthSouth.End == overlayIndex ||
-                             bridge.NorthSouth.Pieces.Contains(overlayIndex))
+                    if (bridge.NorthSouth.Pieces.Contains(overlayIndex))
                     {
                         drawPoint.Y -= Constants.CellHeight * 2;
                         break;
