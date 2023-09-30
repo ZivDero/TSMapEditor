@@ -1,8 +1,7 @@
-﻿using System;
-using Rampastring.XNAUI;
+﻿using Rampastring.XNAUI;
 using Rampastring.XNAUI.XNAControls;
+using System;
 using TSMapEditor.Models;
-using TSMapEditor.Rendering;
 using TSMapEditor.UI.Controls;
 
 namespace TSMapEditor.UI.Windows

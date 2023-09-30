@@ -85,11 +85,11 @@ namespace TSMapEditor.Mutations.Classes
             {
                 if (bridgeDirection == BridgeDirection.EastWest)
                 {
-                    PlaceHighBridge(bridge.EastWest.Pieces[0], startPoint.X, endPoint.X, bridge.TileSetIndex, PlaceEastWestDirectionHighBridgePiece);
+                    PlaceHighBridge(bridge.EastWest.Pieces[0], startPoint.X, endPoint.X, PlaceEastWestDirectionHighBridgePiece);
                 }
                 else
                 {
-                    PlaceHighBridge(bridge.NorthSouth.Pieces[0], startPoint.Y, endPoint.Y, bridge.TileSetIndex, PlaceNorthSouthDirectionHighBridgePiece);
+                    PlaceHighBridge(bridge.NorthSouth.Pieces[0], startPoint.Y, endPoint.Y, PlaceNorthSouthDirectionHighBridgePiece);
                 }
             }
 
@@ -144,45 +144,44 @@ namespace TSMapEditor.Mutations.Classes
                 };
             }
         }
-        private void PlaceHighBridge(int bridgePiece, int beginCoord, int endCoord, int tileSetId, Action<int, int> piecePlacementFunction)
+        private void PlaceHighBridge(int bridgePiece, int beginCoord, int endCoord, Action<int, int, int> piecePlacementFunction)
         {
-            var startTile = MutationTarget.Map.GetTile(startPoint);
-            if (!(startTile == null || MutationTarget.Map.TheaterInstance.Theater.TryGetTileSetById(tileSetId).ContainsTile(startTile.TileIndex)))
-               piecePlacementFunction(bridgePiece, beginCoord);
+            var startCell = MutationTarget.Map.GetTile(startPoint);
+            if (startCell == null)
+                return;
 
-            for (int c = beginCoord + 1; c < endCoord; c++)
+            for (int c = beginCoord; c <= endCoord; c++)
             {
-                piecePlacementFunction(bridgePiece, c);
+                piecePlacementFunction(bridgePiece, c, startCell.Level);
             }
-
-            var endTile = MutationTarget.Map.GetTile(startPoint);
-            if (!(endTile == null || MutationTarget.Map.TheaterInstance.Theater.TryGetTileSetById(tileSetId).ContainsTile(endTile.TileIndex)))
-                piecePlacementFunction(bridgePiece, endCoord);
         }
 
-        private void PlaceEastWestDirectionHighBridgePiece(int overlayIndex, int x)
+        private void PlaceEastWestDirectionHighBridgePiece(int overlayIndex, int x, int startingHeight)
         {
             const int xStartFrame = 0;
             const int xEndFrame = 3;
             int frameIndex = MutationTarget.Randomizer.GetRandomNumber(xStartFrame, xEndFrame);
 
-            PlaceHighBridgePiece(overlayIndex, frameIndex, new Point2D(x, startPoint.Y));
+            PlaceHighBridgePiece(overlayIndex, frameIndex, new Point2D(x, startPoint.Y), startingHeight);
         }
 
-        private void PlaceNorthSouthDirectionHighBridgePiece(int overlayIndex, int y)
+        private void PlaceNorthSouthDirectionHighBridgePiece(int overlayIndex, int y, int startingHeight)
         {
             const int yStartFrame = 9;
             const int yEndFrame = 12;
             int frameIndex = MutationTarget.Randomizer.GetRandomNumber(yStartFrame, yEndFrame);
 
-            PlaceHighBridgePiece(overlayIndex, frameIndex, new Point2D(startPoint.X, y));
+            PlaceHighBridgePiece(overlayIndex, frameIndex, new Point2D(startPoint.X, y), startingHeight);
         }
 
-        private void PlaceHighBridgePiece(int overlayIndex, int frameIndex, Point2D cellCoords)
+        private void PlaceHighBridgePiece(int overlayIndex, int frameIndex, Point2D cellCoords, int startingHeight)
         {
             var mapCell = MutationTarget.Map.GetTile(cellCoords);
 
             if (mapCell == null)
+                return;
+
+            if (MutationTarget.Map.TheaterInstance.Theater.TryGetTileSetById(bridge.TileSetIndex).ContainsTile(mapCell.TileIndex) && mapCell.Level == startingHeight)
                 return;
 
             if (mapCell.Overlay == null || mapCell.Overlay.OverlayType == null)

@@ -26,20 +26,24 @@ namespace TSMapEditor.Rendering.ObjectRenderers
                 remapColor = Map.Rules.TiberiumTypes[tiberiumIndex].XNAColor;
 
             int overlayIndex = gameObject.OverlayType.Index;
-            foreach (var bridge in Map.EditorConfig.Bridges)
+
+            if (!RenderDependencies.EditorState.Is2DMode)
             {
-                if (bridge.Type == BridgeType.High)
+                foreach (var bridge in Map.EditorConfig.Bridges)
                 {
-                    if (bridge.EastWest.Pieces.Contains(overlayIndex))
+                    if (bridge.Type == BridgeType.High)
                     {
-                        drawPoint.Y -= Constants.CellHeight;
-                        break;
-                    }
-                    
-                    if (bridge.NorthSouth.Pieces.Contains(overlayIndex))
-                    {
-                        drawPoint.Y -= Constants.CellHeight * 2;
-                        break;
+                        if (bridge.EastWest.Pieces.Contains(overlayIndex))
+                        {
+                            drawPoint.Y -= Constants.CellHeight;
+                            break;
+                        }
+
+                        if (bridge.NorthSouth.Pieces.Contains(overlayIndex))
+                        {
+                            drawPoint.Y -= Constants.CellHeight * 2;
+                            break;
+                        }
                     }
                 }
             }
