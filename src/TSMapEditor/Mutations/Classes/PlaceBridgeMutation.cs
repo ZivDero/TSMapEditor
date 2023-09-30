@@ -147,7 +147,7 @@ namespace TSMapEditor.Mutations.Classes
         private void PlaceHighBridge(int bridgePiece, int beginCoord, int endCoord, int tileSetId, Action<int, int> piecePlacementFunction)
         {
             var startTile = MutationTarget.Map.GetTile(startPoint);
-            if (startTile == null || !MutationTarget.Map.TheaterInstance.Theater.TryGetTileSetById(tileSetId).ContainsTile(startTile.TileIndex))
+            if (!(startTile == null || MutationTarget.Map.TheaterInstance.Theater.TryGetTileSetById(tileSetId).ContainsTile(startTile.TileIndex)))
                piecePlacementFunction(bridgePiece, beginCoord);
 
             for (int c = beginCoord + 1; c < endCoord; c++)
@@ -156,7 +156,7 @@ namespace TSMapEditor.Mutations.Classes
             }
 
             var endTile = MutationTarget.Map.GetTile(startPoint);
-            if (endTile == null || !MutationTarget.Map.TheaterInstance.Theater.TryGetTileSetById(tileSetId).ContainsTile(endTile.TileIndex))
+            if (!(endTile == null || MutationTarget.Map.TheaterInstance.Theater.TryGetTileSetById(tileSetId).ContainsTile(endTile.TileIndex)))
                 piecePlacementFunction(bridgePiece, endCoord);
         }
 
