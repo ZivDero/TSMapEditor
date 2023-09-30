@@ -2,7 +2,7 @@
 {
     public enum BridgeDirection
     {
-        X,
-        Y
+        EastWest,
+        NorthSouth
     }
 }

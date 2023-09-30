@@ -25,6 +25,27 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             if (tiberiumIndex > -1 && tiberiumIndex < Map.Rules.TiberiumTypes.Count)
                 remapColor = Map.Rules.TiberiumTypes[tiberiumIndex].XNAColor;
 
+            int overlayIndex = gameObject.OverlayType.Index;
+            foreach (var bridge in Map.EditorConfig.Bridges)
+            {
+                if (bridge.Type == BridgeType.High)
+                {
+                    if (bridge.EastWest.Start == overlayIndex || bridge.EastWest.End == overlayIndex ||
+                        bridge.EastWest.Pieces.Contains(overlayIndex))
+                    {
+                        drawPoint.Y -= Constants.CellHeight;
+                        break;
+                    }
+                    
+                    if (bridge.NorthSouth.Start == overlayIndex || bridge.NorthSouth.End == overlayIndex ||
+                             bridge.NorthSouth.Pieces.Contains(overlayIndex))
+                    {
+                        drawPoint.Y -= Constants.CellHeight * 2;
+                        break;
+                    }
+                }
+            }
+
             DrawShadow(gameObject, commonDrawParams, drawPoint, yDrawPointWithoutCellHeight);
             DrawObjectImage(gameObject, commonDrawParams, commonDrawParams.Graphics, gameObject.FrameIndex, Color.White, true, remapColor, drawPoint, yDrawPointWithoutCellHeight);
         }
