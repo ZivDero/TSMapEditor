@@ -12,7 +12,7 @@ namespace TSMapEditor.Mutations.Classes
     /// </summary>
     public class PlaceBridgeMutation : Mutation
     {
-        public PlaceBridgeMutation(IMutationTarget mutationTarget, Point2D point1, Point2D point2, Bridge bridge) : base(mutationTarget)
+        public PlaceBridgeMutation(IMutationTarget mutationTarget, Point2D point1, Point2D point2, BridgeType bridgeType) : base(mutationTarget)
         {
             if (point1.X != point2.X && point1.Y != point2.Y)
             {
@@ -54,42 +54,42 @@ namespace TSMapEditor.Mutations.Classes
                 }
             }
 
-            this.bridge = bridge;
+            this.bridgeType = bridgeType;
         }
 
         private readonly Point2D startPoint;
         private readonly Point2D endPoint;
 
         private readonly BridgeDirection bridgeDirection;
-        private readonly Bridge bridge;
+        private readonly BridgeType bridgeType;
 
 
         private List<OriginalOverlayInfo> originalOverlayInfos = new List<OriginalOverlayInfo>();
 
         public override void Perform()
         {
-            if (bridge.Type == BridgeType.Low)
+            if (bridgeType.Kind == BridgeKind.Low)
             {
                 if (bridgeDirection == BridgeDirection.EastWest)
                 {
-                    PlaceLowBridge(bridge.EastWest.Start, bridge.EastWest.End, bridge.EastWest.Pieces,
+                    PlaceLowBridge(bridgeType.EastWest.Start, bridgeType.EastWest.End, bridgeType.EastWest.Pieces,
                         startPoint.X, endPoint.X, PlaceEastWestDirectionLowBridgePiece);
                 }
                 else
                 {
-                    PlaceLowBridge(bridge.NorthSouth.Start, bridge.NorthSouth.End, bridge.NorthSouth.Pieces,
+                    PlaceLowBridge(bridgeType.NorthSouth.Start, bridgeType.NorthSouth.End, bridgeType.NorthSouth.Pieces,
                         startPoint.Y, endPoint.Y, PlaceNorthSouthDirectionLowBridgePiece);
                 }
             }
-            else if (bridge.Type == BridgeType.High)
+            else if (bridgeType.Kind == BridgeKind.High)
             {
                 if (bridgeDirection == BridgeDirection.EastWest)
                 {
-                    PlaceHighBridge(bridge.EastWest.Pieces[0], startPoint.X, endPoint.X, PlaceEastWestDirectionHighBridgePiece);
+                    PlaceHighBridge(bridgeType.EastWest.Pieces[0], startPoint.X, endPoint.X, PlaceEastWestDirectionHighBridgePiece);
                 }
                 else
                 {
-                    PlaceHighBridge(bridge.NorthSouth.Pieces[0], startPoint.Y, endPoint.Y, PlaceNorthSouthDirectionHighBridgePiece);
+                    PlaceHighBridge(bridgeType.NorthSouth.Pieces[0], startPoint.Y, endPoint.Y, PlaceNorthSouthDirectionHighBridgePiece);
                 }
             }
 
@@ -181,7 +181,7 @@ namespace TSMapEditor.Mutations.Classes
             if (mapCell == null)
                 return;
 
-            if (MutationTarget.Map.TheaterInstance.Theater.TryGetTileSetById(bridge.TileSetIndex).ContainsTile(mapCell.TileIndex) && mapCell.Level == startingHeight)
+            if (MutationTarget.Map.TheaterInstance.Theater.TryGetTileSetById(bridgeType.TileSetIndex).ContainsTile(mapCell.TileIndex) && mapCell.Level == startingHeight)
                 return;
 
             if (mapCell.Overlay == null || mapCell.Overlay.OverlayType == null)

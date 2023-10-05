@@ -25,7 +25,7 @@ namespace TSMapEditor.Models
         public Dictionary<int, TriggerEventType> TriggerEventTypes { get; } = new Dictionary<int, TriggerEventType>();
         public Dictionary<int, TriggerActionType> TriggerActionTypes { get; } = new Dictionary<int, TriggerActionType>();
         public List<Theater> Theaters { get; } = new List<Theater>();
-        public List<Bridge> Bridges { get; } = new List<Bridge>();
+        public List<BridgeType> Bridges { get; } = new List<BridgeType>();
 
         public void Init(Rules rules)
         {
@@ -208,8 +208,8 @@ namespace TSMapEditor.Models
                 if (bridgeSection == null)
                     continue;
 
-                Bridge bridge = new Bridge(bridgeSection, rules);
-                Bridges.Add(bridge);
+                BridgeType bridgeType = new BridgeType(bridgeSection, rules);
+                Bridges.Add(bridgeType);
             }
         }
     }

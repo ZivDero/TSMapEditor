@@ -15,18 +15,18 @@ namespace TSMapEditor.UI.CursorActions
     /// </summary>
     public class PlaceBridgeCursorAction : CursorAction
     {
-        public PlaceBridgeCursorAction(ICursorActionTarget cursorActionTarget, Bridge bridge) : base(cursorActionTarget)
+        public PlaceBridgeCursorAction(ICursorActionTarget cursorActionTarget, BridgeType bridgeType) : base(cursorActionTarget)
         {
-            this.bridge = bridge;
+            this.bridgeType = bridgeType;
         }
 
-        public override string GetName() => "Place Bridge";
+        public override string GetName() => "Draw Bridge";
 
         public override bool HandlesKeyboardInput => true;
 
         public override bool DrawCellCursor => true;
 
-        private readonly Bridge bridge;
+        private readonly BridgeType bridgeType;
 
         private Point2D startPoint;
         private Point2D endPoint;
@@ -172,7 +172,7 @@ namespace TSMapEditor.UI.CursorActions
 
                 Point2D bridgeEndPoint = bridgeDirection == BridgeDirection.EastWest ? new Point2D(endPoint.X, startPoint.Y) : new Point2D(startPoint.X, endPoint.Y);
 
-                CursorActionTarget.MutationManager.PerformMutation(new PlaceBridgeMutation(CursorActionTarget.MutationTarget, startPoint, bridgeEndPoint, bridge));
+                CursorActionTarget.MutationManager.PerformMutation(new PlaceBridgeMutation(CursorActionTarget.MutationTarget, startPoint, bridgeEndPoint, bridgeType));
 
                 ExitAction();
 

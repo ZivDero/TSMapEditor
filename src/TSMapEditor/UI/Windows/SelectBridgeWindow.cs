@@ -6,7 +6,7 @@ using TSMapEditor.UI.Controls;
 
 namespace TSMapEditor.UI.Windows
 {
-    public class SelectBridgeWindow : SelectObjectWindow<Bridge>
+    public class SelectBridgeWindow : SelectObjectWindow<BridgeType>
     {
         public SelectBridgeWindow(WindowManager windowManager, Map map) : base(windowManager)
         {
@@ -32,7 +32,7 @@ namespace TSMapEditor.UI.Windows
                 return;
             }
 
-            SelectedObject = (Bridge)lbObjectList.SelectedItem.Tag;
+            SelectedObject = (BridgeType)lbObjectList.SelectedItem.Tag;
         }
 
         protected void BtnSelect_LeftClick(object sender, EventArgs e)
@@ -50,7 +50,7 @@ namespace TSMapEditor.UI.Windows
         {
             lbObjectList.Clear();
 
-            foreach (Bridge bridge in map.EditorConfig.Bridges)
+            foreach (BridgeType bridge in map.EditorConfig.Bridges)
             {
                 lbObjectList.AddItem(new XNAListBoxItem() { Text = bridge.Name, Tag = bridge });
             }

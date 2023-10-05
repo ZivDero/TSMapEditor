@@ -31,7 +31,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             {
                 foreach (var bridge in Map.EditorConfig.Bridges)
                 {
-                    if (bridge.Type == BridgeType.High)
+                    if (bridge.Kind == BridgeKind.High)
                     {
                         if (bridge.EastWest.Pieces.Contains(overlayIndex))
                         {

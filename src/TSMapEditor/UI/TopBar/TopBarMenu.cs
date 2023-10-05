@@ -107,7 +107,7 @@ namespace TSMapEditor.UI.TopBar
             if (bridgeCount > 0)
             {
                 var bridges = map.EditorConfig.Bridges;
-                if (bridgeCount == 1 && bridges[0].Type == BridgeType.Low)
+                if (bridgeCount == 1 && bridges[0].Kind == BridgeKind.Low)
                 {
                     editContextMenu.AddItem("Draw Low Bridge", () => mapView.EditorState.CursorAction =
                         new PlaceBridgeCursorAction(mapView, bridges[0]), null, null, null);
