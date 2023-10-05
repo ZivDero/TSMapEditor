@@ -8,7 +8,7 @@ using TSMapEditor.Rendering;
 namespace TSMapEditor.Mutations.Classes
 {
     /// <summary>
-    /// A mutation for creating low bridges.
+    /// A mutation for creating bridges.
     /// </summary>
     public class PlaceBridgeMutation : Mutation
     {

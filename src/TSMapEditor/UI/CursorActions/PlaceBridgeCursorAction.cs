@@ -11,7 +11,7 @@ using TSMapEditor.Rendering;
 namespace TSMapEditor.UI.CursorActions
 {
     /// <summary>
-    /// Cursor action for placing low bridges.
+    /// Cursor action for placing bridges.
     /// </summary>
     public class PlaceBridgeCursorAction : CursorAction
     {
