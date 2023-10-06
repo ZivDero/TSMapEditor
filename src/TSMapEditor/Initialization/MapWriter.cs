@@ -411,24 +411,26 @@ namespace TSMapEditor.Initialization
                 return;
 
             // Now find the section if it exists, else make one
-            var countriesSection = mapIni.GetSection(sectionName);
-            if (countriesSection == null)
+            var houseTypesSection = mapIni.GetSection(sectionName);
+            if (houseTypesSection == null)
             {
-                countriesSection = new IniSection(sectionName);
-                mapIni.AddSection(countriesSection);
+                houseTypesSection = new IniSection(sectionName);
+                mapIni.AddSection(houseTypesSection);
             }
 
-            foreach (var country in map.HouseTypes)
+            foreach (var houseType in map.HouseTypes)
             {
-                countriesSection.SetStringValue(country.Index.ToString(), country.ININame);
+                // Don't put YR <Player @ X> in the list, it's pointless
+                if (!(Constants.UseCountries && houseType.IsPlayerHouseType))
+                    houseTypesSection.SetStringValue(houseType.Index.ToString(), houseType.ININame);
 
-                mapIni.RemoveSection(country.ININame);
-                var countrySection = FindOrMakeSection(country.ININame, mapIni);
+                mapIni.RemoveSection(houseType.ININame);
+                var countrySection = FindOrMakeSection(houseType.ININame, mapIni);
 
-                if (map.PlayerHouseTypes.Contains(country))
-                    countrySection.SetStringValue("Color", country.Color);
+                if (map.PlayerHouseTypes.Contains(houseType))
+                    countrySection.SetStringValue("Color", houseType.Color);
                 else
-                    country.WriteToIniSection(countrySection);
+                    houseType.WriteToIniSection(countrySection);
             }
         }
 
@@ -477,9 +479,15 @@ namespace TSMapEditor.Initialization
                 // In YR, there can be multiple houses per country, but the house's index doesn't matter, so just write out as-is.
                 // In TS, there can only be one house per country, so just give it the country's index.
                 if (Constants.UseCountries)
-                    housesSection.SetStringValue(i.ToString(), house.ININame);
+                {
+                    // Don't put YR <Player @ X> in the list, it's pointless
+                    if (!house.IsPlayerHouse)
+                        housesSection.SetStringValue(i.ToString(), house.ININame);
+                }
                 else
+                {
                     housesSection.SetStringValue(house.HouseType.Index.ToString(), house.ININame);
+                }
 
                 if (house.ININame.StartsWith("Fake") && house.ININame.Length <= 6)
                     continue;
