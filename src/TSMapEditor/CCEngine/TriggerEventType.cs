@@ -16,6 +16,9 @@ namespace TSMapEditor.CCEngine
         public string Description { get; set; }
         public TriggerParamType P1Type { get; set; } = TriggerParamType.Unused;
         public TriggerParamType P2Type { get; set; } = TriggerParamType.Unused;
+        public TriggerParamType P3Type { get; set; } = TriggerParamType.Unused;
         public bool Available { get; set; } = true;
+
+        [INI(false)] public bool UsesP3 => P3Type != TriggerParamType.Unused;
     }
 }

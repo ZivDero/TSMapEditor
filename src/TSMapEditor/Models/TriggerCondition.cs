@@ -13,6 +13,7 @@ namespace TSMapEditor.Models
         public int ConditionIndex { get; set; }
         public int Parameter1 { get; set; }
         public int Parameter2 { get; set; }
+        public string Parameter3 { get; set; }
 
         public object Clone() => DoClone();
 
@@ -21,7 +22,7 @@ namespace TSMapEditor.Models
             return (TriggerCondition)MemberwiseClone();
         }
 
-        public static TriggerCondition ParseFromArray(string[] array, int startIndex)
+        public static TriggerCondition ParseFromArray(string[] array, int startIndex, bool useP3)
         {
             if (startIndex + INI_VALUE_COUNT > array.Length)
                 return null;
@@ -30,6 +31,9 @@ namespace TSMapEditor.Models
             triggerCondition.ConditionIndex = Conversions.IntFromString(array[startIndex], -1);
             triggerCondition.Parameter1 = Conversions.IntFromString(array[startIndex + 1], -1);
             triggerCondition.Parameter2 = Conversions.IntFromString(array[startIndex + 2], -1);
+
+            if (useP3)
+                triggerCondition.Parameter3 = array[startIndex + 3];
 
             if (triggerCondition.ConditionIndex < 0)
                 return null;

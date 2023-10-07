@@ -27,6 +27,7 @@ namespace TSMapEditor.UI.Windows
     {
         private const int EVENT_PARAM_FIRST = 0;
         private const int EVENT_PARAM_SECOND = 1;
+        private const int EVENT_PARAM_THIRD = 2;
 
         public TriggersWindow(WindowManager windowManager, Map map, EditorState editorState, ICursorActionTarget cursorActionTarget) : base(windowManager)
         {
@@ -63,7 +64,7 @@ namespace TSMapEditor.UI.Windows
         private EditorPopUpSelector selEventType;
         private EditorDescriptionPanel panelEventDescription;
         private EditorListBox lbEventParameters;
-        private EditorNumberTextBox tbEventParameterValue;
+        private EditorTextBox tbEventParameterValue;
 
         // Actions
         private EditorListBox lbActions;
@@ -83,6 +84,7 @@ namespace TSMapEditor.UI.Windows
         private SelectHouseWindow selectHouseWindow;
         private SelectTutorialLineWindow selectTutorialLineWindow;
         private SelectThemeWindow selectThemeWindow;
+        private SelectTechnoTypeWindow selectTechnoTypeWindow;
 
         private XNAContextMenu actionContextMenu;
         private XNAContextMenu eventContextMenu;
@@ -139,7 +141,7 @@ namespace TSMapEditor.UI.Windows
             selEventType = FindChild<EditorPopUpSelector>(nameof(selEventType));
             panelEventDescription = FindChild<EditorDescriptionPanel>(nameof(panelEventDescription));
             lbEventParameters = FindChild<EditorListBox>(nameof(lbEventParameters));
-            tbEventParameterValue = FindChild<EditorNumberTextBox>(nameof(tbEventParameterValue));
+            tbEventParameterValue = FindChild<EditorTextBox>(nameof(tbEventParameterValue));
 
             lbActions = FindChild<EditorListBox>(nameof(lbActions));
             selActionType = FindChild<EditorPopUpSelector>(nameof(selActionType));
@@ -220,6 +222,10 @@ namespace TSMapEditor.UI.Windows
             selectThemeWindow = new SelectThemeWindow(WindowManager, map);
             var themeDarkeningPanel = DarkeningPanel.InitializeAndAddToParentControlWithChild(WindowManager, Parent, selectThemeWindow);
             themeDarkeningPanel.Hidden += ThemeDarkeningPanel_Hidden;
+
+            selectTechnoTypeWindow = new SelectTechnoTypeWindow(WindowManager, map);
+            var technoTypeDarkeningPanel = DarkeningPanel.InitializeAndAddToParentControlWithChild(WindowManager, Parent, selectTechnoTypeWindow);
+            technoTypeDarkeningPanel.Hidden += TechnoTypeDarkeningPanel_Hidden;
 
             eventContextMenu = new XNAContextMenu(WindowManager);
             eventContextMenu.Name = nameof(eventContextMenu);
@@ -661,7 +667,8 @@ namespace TSMapEditor.UI.Windows
             if (triggerEventType == null)
                 return;
 
-            TriggerParamType triggerParamType = paramIndex == EVENT_PARAM_FIRST ? triggerEventType.P1Type : triggerEventType.P2Type;
+            TriggerParamType triggerParamType = paramIndex == EVENT_PARAM_FIRST ? triggerEventType.P1Type :
+                paramIndex == EVENT_PARAM_SECOND ? triggerEventType.P2Type : triggerEventType.P3Type;
             int paramValue = paramIndex == EVENT_PARAM_FIRST ? triggerEvent.Parameter1 : triggerEvent.Parameter2;
 
             switch (triggerParamType)
@@ -687,6 +694,11 @@ namespace TSMapEditor.UI.Windows
                     BuildingType existingBuilding = paramValue < 0 || paramValue >= map.Rules.BuildingTypes.Count ? null : map.Rules.BuildingTypes[paramValue];
                     selectBuildingTypeWindow.IsForEvent = true;
                     selectBuildingTypeWindow.Open(existingBuilding);
+                    break;
+                case TriggerParamType.Techno:
+                    TechnoType existingTechno = map.GetAllTechnoTypes().Find(t => t.ININame == triggerEvent.Parameter3);
+                    selectTechnoTypeWindow.IsForEvent = true;
+                    selectTechnoTypeWindow.Open(existingTechno);
                     break;
                 default:
                     break;
@@ -775,6 +787,14 @@ namespace TSMapEditor.UI.Windows
             AssignParamValue(selectThemeWindow.IsForEvent, selectThemeWindow.SelectedObject.Index);
         }
 
+        private void TechnoTypeDarkeningPanel_Hidden(object sender, EventArgs e)
+        {
+            if (selectTechnoTypeWindow.SelectedObject == null)
+                return;
+
+            AssignParamValue(selectTechnoTypeWindow.IsForEvent, selectTechnoTypeWindow.SelectedObject.ININame);
+        }
+
         private void TutorialDarkeningPanel_Hidden(object sender, EventArgs e)
         {
             if (selectTutorialLineWindow.SelectedObject.ID < 0 || selectTutorialLineWindow.SelectedObject.Text == null)
@@ -824,6 +844,22 @@ namespace TSMapEditor.UI.Windows
             {
                 GetTriggerActionAndParamIndex(out TriggerAction triggerAction, out int paramIndex);
                 triggerAction.Parameters[paramIndex] = paramValue.ToString();
+            }
+
+            EditTrigger(editedTrigger);
+        }
+
+        private void AssignParamValue(bool isForEvent, string paramValue)
+        {
+            if (isForEvent)
+            {
+                GetTriggerEventAndParamIndex(out TriggerCondition triggerCondition, out int paramIndex);
+                triggerCondition.Parameter3 = paramValue;
+            }
+            else
+            {
+                GetTriggerActionAndParamIndex(out TriggerAction triggerAction, out int paramIndex);
+                triggerAction.Parameters[paramIndex] = paramValue;
             }
 
             EditTrigger(editedTrigger);
@@ -927,6 +963,9 @@ namespace TSMapEditor.UI.Windows
 
             if (selectEventWindow.SelectedObject.P2Type == TriggerParamType.Unused)
                 condition.Parameter2 = 0;
+
+            if (selectEventWindow.SelectedObject.P3Type == TriggerParamType.Unused)
+                condition.Parameter3 = string.Empty;
 
             EditTrigger(editedTrigger);
         }
@@ -1346,6 +1385,9 @@ namespace TSMapEditor.UI.Windows
 
                 if (triggerEventType.P2Type != TriggerParamType.Unused)
                     lbEventParameters.AddItem(new XNAListBoxItem() { Text = triggerEventType.P2Type.ToString(), Tag = EVENT_PARAM_SECOND });
+
+                if (triggerEventType.P3Type != TriggerParamType.Unused)
+                    lbEventParameters.AddItem(new XNAListBoxItem() { Text = triggerEventType.P3Type.ToString(), Tag = EVENT_PARAM_THIRD });
             }
 
             if (lbEventParameters.SelectedItem == null && lbEventParameters.Items.Count > 0)
@@ -1378,25 +1420,32 @@ namespace TSMapEditor.UI.Windows
 
             var triggerEventType = GetTriggerEventType(editedTrigger.Conditions[lbEvents.SelectedIndex].ConditionIndex);
             var triggerParamType = TriggerParamType.Unknown;
-            int paramValue = -1;
+            string paramValue;
             int paramNumber = (int)lbEventParameters.SelectedItem.Tag;
             if (paramNumber == EVENT_PARAM_FIRST)
             {
-                paramValue = editedTrigger.Conditions[lbEvents.SelectedIndex].Parameter1;
+                paramValue = editedTrigger.Conditions[lbEvents.SelectedIndex].Parameter1.ToString();
 
                 if (triggerEventType != null)
                     triggerParamType = triggerEventType.P1Type;
             }
+            else if (paramNumber == EVENT_PARAM_SECOND)
+            {
+                paramValue = editedTrigger.Conditions[lbEvents.SelectedIndex].Parameter2.ToString();
+
+                if (triggerEventType != null)
+                    triggerParamType = triggerEventType.P2Type;
+            }
             else
             {
-                paramValue = editedTrigger.Conditions[lbEvents.SelectedIndex].Parameter2;
+                paramValue = editedTrigger.Conditions[lbEvents.SelectedIndex].Parameter3;
 
                 if (triggerEventType != null)
                     triggerParamType = triggerEventType.P2Type;
             }
 
-            tbEventParameterValue.Text = GetParamValueText(paramValue.ToString(), triggerParamType);
-            tbEventParameterValue.TextColor = GetParamValueColor(paramValue.ToString(), triggerParamType);
+            tbEventParameterValue.Text = GetParamValueText(paramValue, triggerParamType);
+            tbEventParameterValue.TextColor = GetParamValueColor(paramValue, triggerParamType);
 
             tbEventParameterValue.TextChanged += TbEventParameterValue_TextChanged;
         }
@@ -1412,9 +1461,11 @@ namespace TSMapEditor.UI.Windows
 
             var triggerCondition = (TriggerCondition)lbEvents.SelectedItem.Tag;
             if (paramNumber == EVENT_PARAM_FIRST)
-                triggerCondition.Parameter1 = tbEventParameterValue.Value;
+                triggerCondition.Parameter1 = Conversions.IntFromString(tbEventParameterValue.Text, -1);
+            else if (paramNumber == EVENT_PARAM_SECOND)
+                triggerCondition.Parameter2 = Conversions.IntFromString(tbEventParameterValue.Text, -1);
             else
-                triggerCondition.Parameter2 = tbEventParameterValue.Value;
+                triggerCondition.Parameter3 = tbEventParameterValue.Text;
         }
 
         private void AddEvent(TriggerCondition condition)
