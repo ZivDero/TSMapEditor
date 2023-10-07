@@ -1441,7 +1441,7 @@ namespace TSMapEditor.UI.Windows
                 paramValue = editedTrigger.Conditions[lbEvents.SelectedIndex].Parameter3;
 
                 if (triggerEventType != null)
-                    triggerParamType = triggerEventType.P2Type;
+                    triggerParamType = triggerEventType.P3Type;
             }
 
             tbEventParameterValue.Text = GetParamValueText(paramValue, triggerParamType);
