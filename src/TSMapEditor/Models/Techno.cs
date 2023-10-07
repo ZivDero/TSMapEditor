@@ -37,6 +37,6 @@ namespace TSMapEditor.Models
         public abstract double GetWeaponRange();
         public abstract double GetGuardRange();
 
-        public override Color GetRemapColor() => Remapable() ? Owner.XNAColor : Color.Gray;
+        public override Color GetRemapColor() => Remapable() ? Owner.XNAColor : Color.White;
     }
 }

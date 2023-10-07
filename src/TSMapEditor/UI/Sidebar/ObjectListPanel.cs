@@ -160,7 +160,7 @@ namespace TSMapEditor.UI.Sidebar
                 if (string.IsNullOrWhiteSpace(categoriesString))
                 {
                     categories.Add("Uncategorized");
-                    remapColors.Add(Color.Gray);
+                    remapColors.Add(Color.White);    
                 }
                 else
                 {
@@ -168,7 +168,7 @@ namespace TSMapEditor.UI.Sidebar
 
                     for (int ownerIndex = 0; ownerIndex < owners.Length; ownerIndex++)
                     {
-                        Color remapColor = Color.Gray;
+                        Color remapColor = Color.White;
 
                         string ownerName = owners[ownerIndex];
                         ownerName = Map.EditorConfig.EditorRulesIni.GetStringValue("ObjectOwnerOverrides", ownerName, ownerName);
