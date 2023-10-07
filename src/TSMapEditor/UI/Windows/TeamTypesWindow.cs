@@ -467,7 +467,7 @@ namespace TSMapEditor.UI.Windows
 
         private void DdMindControlDecision_SelectedIndexChanged(object sender, EventArgs e)
         {
-            editedTeamType.MindControlDecision = ddVeteranLevel.SelectedIndex;
+            editedTeamType.MindControlDecision = ddMindControlDecision.SelectedIndex;
         }
 
         private void TbName_TextChanged(object sender, EventArgs e)
