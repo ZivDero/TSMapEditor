@@ -138,11 +138,11 @@ namespace TSMapEditor.Models
             foreach (var condition in Conditions)
             {
                 conditionDataString.Append(condition.ConditionIndex);
-                conditionDataString.Append(condition.Parameter1);
-                conditionDataString.Append(condition.Parameter2);
+                for (int i = 0; i < TriggerCondition.DEF_PARAM_COUNT; i++)
+                    conditionDataString.Append(condition.ParamToString(i));
 
                 if (editorConfig.TriggerEventTypes[condition.ConditionIndex].UsesP3)
-                    conditionDataString.Append(condition.Parameter3);
+                    conditionDataString.Append(condition.Parameters[2]);
             }
 
             iniFile.SetStringValue("Events", ID, conditionDataString.ToString());
@@ -190,9 +190,10 @@ namespace TSMapEditor.Models
                 if (triggerEvent == null)
                     return;
 
-                startIndex += TriggerCondition.INI_VALUE_COUNT;
                 if (usesP3)
-                    startIndex++;
+                    startIndex += TriggerCondition.MAX_PARAM_COUNT + 1;
+                else
+                    startIndex += TriggerCondition.DEF_PARAM_COUNT + 1;
 
                 Conditions.Add(triggerEvent);
             }

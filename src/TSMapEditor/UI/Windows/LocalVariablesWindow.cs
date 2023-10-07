@@ -119,19 +119,16 @@ namespace TSMapEditor.UI.Windows
                     if (eventType == null)
                         continue;
 
-                    if (eventType.P1Type == TriggerParamType.LocalVariable)
+                    for (int i = 0; i < eventType.Parameters.Length; i++)
                     {
-                        if (triggerEvent.Parameter1 == editedLocalVariable.Index)
+                        var parameter = eventType.Parameters[i];
+                        if (parameter.TriggerParamType == TriggerParamType.LocalVariable)
                         {
-                            list.Add($"Trigger event of '{trigger.Name}' ({trigger.ID})");
-                        }
-                    }
-
-                    if (eventType.P2Type == TriggerParamType.LocalVariable)
-                    {
-                        if (triggerEvent.Parameter2 == editedLocalVariable.Index)
-                        {
-                            list.Add($"Trigger event of '{trigger.Name}' ({trigger.ID})");
+                            if (Conversions.IntFromString(triggerEvent.Parameters[i], -1) == editedLocalVariable.Index)
+                            {
+                                list.Add($"Trigger action of '{trigger.Name}' ({trigger.ID})");
+                                break;
+                            }
                         }
                     }
                 }
