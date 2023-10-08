@@ -29,6 +29,7 @@ namespace TSMapEditor.Models
             {
                 if (index == MAX_PARAM_COUNT - 1)
                     return string.Empty;
+
                 return "0";
             }
 
