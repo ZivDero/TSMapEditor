@@ -26,7 +26,11 @@ namespace TSMapEditor.Models
         public string ParamToString(int index)
         {
             if (string.IsNullOrWhiteSpace(Parameters[index]))
+            {
+                if (index == MAX_PARAM_COUNT - 1)
+                    return string.Empty;
                 return "0";
+            }
 
             return Parameters[index];
         }
