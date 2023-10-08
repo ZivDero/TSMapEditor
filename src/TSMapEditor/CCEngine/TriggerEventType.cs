@@ -32,7 +32,7 @@ namespace TSMapEditor.CCEngine
         public TriggerEventParam[] Parameters { get; } = new TriggerEventParam[MAX_PARAM_COUNT];
         public bool Available { get; set; } = true;
 
-        public bool UsesP3 => Parameters[2].TriggerParamType != TriggerParamType.Unused;
+        public bool UsesP3 => Parameters[MAX_PARAM_COUNT - 1].TriggerParamType != TriggerParamType.Unused;
 
         public void ReadPropertiesFromIniSection(IniSection iniSection)
         {
