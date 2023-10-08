@@ -142,7 +142,7 @@ namespace TSMapEditor.Models
                     conditionDataString.Append(condition.ParamToString(i));
 
                 if (editorConfig.TriggerEventTypes[condition.ConditionIndex].UsesP3)
-                    conditionDataString.Append(condition.Parameters[TriggerCondition.MAX_PARAM_COUNT - 1]);
+                    conditionDataString.Append(condition.ParamToString(TriggerCondition.MAX_PARAM_COUNT - 1));
             }
 
             iniFile.SetStringValue("Events", ID, conditionDataString.ToString());
