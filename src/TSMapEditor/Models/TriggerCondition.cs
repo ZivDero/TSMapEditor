@@ -53,7 +53,7 @@ namespace TSMapEditor.Models
                 if (startIndex + MAX_PARAM_COUNT + 1 > array.Length)
                     return null;
 
-                triggerCondition.Parameters[2] = array[startIndex + 3];
+                triggerCondition.Parameters[MAX_PARAM_COUNT - 1] = array[startIndex + MAX_PARAM_COUNT];
             }
 
             if (triggerCondition.ConditionIndex < 0)

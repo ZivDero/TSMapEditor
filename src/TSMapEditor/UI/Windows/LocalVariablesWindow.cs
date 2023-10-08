@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Rampastring.Tools;
+﻿using Rampastring.Tools;
 using Rampastring.XNAUI;
 using Rampastring.XNAUI.XNAControls;
-using TSMapEditor.Misc;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using TSMapEditor.Models;
 using TSMapEditor.Models.Enums;
 using TSMapEditor.UI.Controls;
@@ -126,7 +124,7 @@ namespace TSMapEditor.UI.Windows
                         {
                             if (Conversions.IntFromString(triggerEvent.Parameters[i], -1) == editedLocalVariable.Index)
                             {
-                                list.Add($"Trigger action of '{trigger.Name}' ({trigger.ID})");
+                                list.Add($"Trigger event of '{trigger.Name}' ({trigger.ID})");
                                 break;
                             }
                         }
