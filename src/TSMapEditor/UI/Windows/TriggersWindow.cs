@@ -962,7 +962,8 @@ namespace TSMapEditor.UI.Windows
 
                 if (triggerEventType.Parameters[i].TriggerParamType == TriggerParamType.Unused)
                 {
-                    if (i == 2)
+                    // P3 needs to be empty instead of 0 if it's unused
+                    if (i == TriggerCondition.MAX_PARAM_COUNT - 1)
                         condition.Parameters[i] = string.Empty;
                     else
                         condition.Parameters[i] = "0";

@@ -40,7 +40,7 @@ namespace TSMapEditor.Models
 
         public static TriggerCondition ParseFromArray(string[] array, int startIndex, bool useP3)
         {
-            if (startIndex + DEF_PARAM_COUNT + 1 > array.Length)
+            if (startIndex + DEF_PARAM_COUNT >= array.Length)
                 return null;
 
             var triggerCondition = new TriggerCondition();
@@ -50,7 +50,7 @@ namespace TSMapEditor.Models
 
             if (useP3)
             {
-                if (startIndex + MAX_PARAM_COUNT + 1 > array.Length)
+                if (startIndex + MAX_PARAM_COUNT >= array.Length)
                     return null;
 
                 triggerCondition.Parameters[MAX_PARAM_COUNT - 1] = array[startIndex + MAX_PARAM_COUNT];
