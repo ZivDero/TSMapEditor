@@ -417,11 +417,6 @@ namespace TSMapEditor.UI.Windows
                 selectedItem = lbHouseList.SelectedItem.Tag;
 
             lbHouseList.Clear();
-            ddHouseOfHumanPlayer.Items.Clear();
-
-            ddHouseOfHumanPlayer.AddItem("None");
-
-            ddActsLike.Items.Clear();
             foreach (House house in map.GetHouses(false, true))
             {
                 lbHouseList.AddItem(
@@ -432,8 +427,12 @@ namespace TSMapEditor.UI.Windows
                         Tag = house
                     }
                 );
+            }
 
-                ddActsLike.AddItem(new XNADropDownItem() { Text = house.ID.ToString(CultureInfo.InvariantCulture) + " " + house.ININame, Tag = house.ID });
+            ddActsLike.Items.Clear();
+            foreach (var houseType in map.GetHouseTypes(true))
+            {
+                ddActsLike.AddItem(new XNADropDownItem() { Text = $"{houseType.Index} {houseType.ININame}", Tag = houseType.Index });
             }
 
             lbHouseList.SelectedIndex = lbHouseList.Items.FindIndex(i => i.Tag == selectedItem);
