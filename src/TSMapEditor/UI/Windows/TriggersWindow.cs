@@ -715,7 +715,7 @@ namespace TSMapEditor.UI.Windows
                     // selectLocalVariableWindow.Open(existingLocalVariable);
                     break;
                 case TriggerParamType.House:
-                    selectCountryWindow.IsForEvent = true;
+                    selectHouseTypeWindow.IsForEvent = true;
                     paramValue = Conversions.IntFromString(triggerEvent.Parameters[paramIndex], -1);
                     if (paramValue > -1 && paramValue < map.GetHouses().Count)
                         selectHouseTypeWindow.Open(map.GetHouseTypes()[paramValue]);

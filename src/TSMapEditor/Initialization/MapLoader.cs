@@ -890,7 +890,7 @@ namespace TSMapEditor.Initialization
                         teamType.EnableFlag(ttflag.Name);
                 });
 
-                if (teamType.Country == null)
+                if (teamType.HouseType == null)
                 {
                     AddMapLoadError($"TeamType {teamType.ININame} has an invalid HouseType ({houseIniName}) specified!");
                 }
