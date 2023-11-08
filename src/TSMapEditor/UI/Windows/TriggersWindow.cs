@@ -223,8 +223,8 @@ namespace TSMapEditor.UI.Windows
             localVariableDarkeningPanel.Hidden += LocalVariableDarkeningPanel_Hidden;
 
             selectHouseTypeWindow = new SelectHouseTypeWindow(WindowManager, map);
-            var houseDarkeningPanel = DarkeningPanel.InitializeAndAddToParentControlWithChild(WindowManager, Parent, selectHouseTypeWindow);
-            houseDarkeningPanel.Hidden += HouseDarkeningPanel_Hidden;
+            var houseTypeDarkeningPanel = DarkeningPanel.InitializeAndAddToParentControlWithChild(WindowManager, Parent, selectHouseTypeWindow);
+            houseTypeDarkeningPanel.Hidden += HouseTypeDarkeningPanel_Hidden;
 
             selectTutorialLineWindow = new SelectTutorialLineWindow(WindowManager, map);
             var tutorialDarkeningPanel = DarkeningPanel.InitializeAndAddToParentControlWithChild(WindowManager, Parent, selectTutorialLineWindow);
@@ -714,7 +714,7 @@ namespace TSMapEditor.UI.Windows
                     // selectLocalVariableWindow.IsForEvent = true;
                     // selectLocalVariableWindow.Open(existingLocalVariable);
                     break;
-                case TriggerParamType.House:
+                case TriggerParamType.HouseType:
                     selectHouseTypeWindow.IsForEvent = true;
                     paramValue = Conversions.IntFromString(triggerEvent.Parameters[paramIndex], -1);
                     if (paramValue > -1 && paramValue < map.GetHouseTypes().Count)
@@ -810,7 +810,7 @@ namespace TSMapEditor.UI.Windows
                     // selectLocalVariableWindow.IsForEvent = false;
                     // selectLocalVariableWindow.Open(existingLocalVariable);
                     break;
-                case TriggerParamType.House:
+                case TriggerParamType.HouseType:
                     int houseTypeIndex = Conversions.IntFromString(triggerAction.Parameters[paramIndex], -1);
                     selectHouseTypeWindow.IsForEvent = false;
                     if (houseTypeIndex > -1 && houseTypeIndex < map.GetHouseTypes().Count)
@@ -889,7 +889,7 @@ namespace TSMapEditor.UI.Windows
             AssignParamValue(selectTutorialLineWindow.IsForEvent, selectTutorialLineWindow.SelectedObject.ID);
         }
 
-        private void HouseDarkeningPanel_Hidden(object sender, EventArgs e)
+        private void HouseTypeDarkeningPanel_Hidden(object sender, EventArgs e)
         {
             if (selectHouseTypeWindow.SelectedObject == null)
                 return;
@@ -1155,11 +1155,11 @@ namespace TSMapEditor.UI.Windows
         public void Open()
         {
             ListTriggers();
-            RefreshHouses();
+            RefreshHouseTypes();
             Show();
         }
 
-        private void RefreshHouses()
+        private void RefreshHouseTypes()
         {
             ddHouseType.Items.Clear();
             map.GetHouseTypes().ForEach(h => ddHouseType.AddItem(h.ININame, h.XNAColor));
@@ -1253,7 +1253,7 @@ namespace TSMapEditor.UI.Windows
 
             tbName.Text = editedTrigger.Name;
             ddHouseType.SelectedIndex = map.GetHouseTypes().FindIndex(h => h.ININame == trigger.HouseType);
-            ddType.SelectedIndex = tag == null ? 3 : tag.Repeating;
+            ddType.SelectedIndex = tag?.Repeating ?? 3;
             selAttachedTrigger.Text = editedTrigger.LinkedTrigger == null ? Constants.NoneValue1 : editedTrigger.LinkedTrigger.Name;
             selAttachedTrigger.Tag = editedTrigger.LinkedTrigger;
             chkDisabled.Checked = editedTrigger.Disabled;
@@ -1611,7 +1611,7 @@ namespace TSMapEditor.UI.Windows
 
             switch (paramType)
             {
-                case TriggerParamType.House:
+                case TriggerParamType.HouseType:
                     if (intParseSuccess)
                     {
                         var houseType = map.GetHouseTypes().Find(c => c.Index == intValue);
@@ -1654,7 +1654,7 @@ namespace TSMapEditor.UI.Windows
                         return $"{intValue} - nonexistent animation";
 
                     return $"{intValue} {map.Rules.AnimTypes[intValue].ININame}";
-                case TriggerParamType.House:
+                case TriggerParamType.HouseType:
                     if (intParseSuccess)
                     {
                         var houseType = map.GetHouseTypes().Find(c => c.Index == intValue);

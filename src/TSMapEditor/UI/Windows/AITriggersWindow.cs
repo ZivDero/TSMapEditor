@@ -178,7 +178,7 @@ namespace TSMapEditor.UI.Windows
         {
             tbName.TextChanged -= TbName_TextChanged;
             ddSide.SelectedIndexChanged -= DdSide_SelectedIndexChanged;
-            ddHouseType.SelectedIndexChanged -= DdHouse_SelectedIndexChanged;
+            ddHouseType.SelectedIndexChanged -= DdHouseType_SelectedIndexChanged;
             ddConditionType.SelectedIndexChanged -= DdConditionType_SelectedIndexChanged;
             ddComparator.SelectedIndexChanged -= DdComparator_SelectedIndexChanged;
             tbQuantity.TextChanged -= TbQuantity_TextChanged;
@@ -236,7 +236,7 @@ namespace TSMapEditor.UI.Windows
 
             tbName.TextChanged += TbName_TextChanged;
             ddSide.SelectedIndexChanged += DdSide_SelectedIndexChanged;
-            ddHouseType.SelectedIndexChanged += DdHouse_SelectedIndexChanged;
+            ddHouseType.SelectedIndexChanged += DdHouseType_SelectedIndexChanged;
             ddConditionType.SelectedIndexChanged += DdConditionType_SelectedIndexChanged;
             ddComparator.SelectedIndexChanged += DdComparator_SelectedIndexChanged;
             tbQuantity.TextChanged += TbQuantity_TextChanged;
@@ -262,7 +262,7 @@ namespace TSMapEditor.UI.Windows
             editedAITrigger.Side = ddSide.SelectedIndex;
         }
 
-        private void DdHouse_SelectedIndexChanged(object sender, System.EventArgs e)
+        private void DdHouseType_SelectedIndexChanged(object sender, System.EventArgs e)
         {
             editedAITrigger.OwnerName = ddHouseType.SelectedItem.Text;
         }

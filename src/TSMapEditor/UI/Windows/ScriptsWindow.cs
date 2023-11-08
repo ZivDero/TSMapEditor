@@ -426,11 +426,11 @@ namespace TSMapEditor.UI.Windows
                     btnEditorPresetValues.ContextMenu.AddItem(new XNAContextMenuItem() { Text = waypoint.Identifier.ToString() });
                 }
             }
-            else if (action.ParamType == TriggerParamType.House)
+            else if (action.ParamType == TriggerParamType.HouseType)
             {
-                foreach (var house in map.GetHouses())
+                foreach (var house in map.GetHouseTypes())
                 {
-                    btnEditorPresetValues.ContextMenu.AddItem(new XNAContextMenuItem() { Text = house.ININame, TextColor = Helpers.GetHouseUITextColor(house) });
+                    btnEditorPresetValues.ContextMenu.AddItem(new XNAContextMenuItem() { Text = house.ININame, TextColor = Helpers.GetHouseTypeUITextColor(house) });
                 }
             }
 
