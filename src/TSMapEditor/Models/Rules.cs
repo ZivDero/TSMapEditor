@@ -3,6 +3,7 @@ using Rampastring.Tools;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using TSMapEditor.Initialization;
 using TSMapEditor.Models.ArtConfig;
 
@@ -27,7 +28,7 @@ namespace TSMapEditor.Models
         public List<GlobalVariable> GlobalVariables = new List<GlobalVariable>();
         public List<Weapon> Weapons = new List<Weapon>();
 
-        public Dictionary<string, string> PlayerHouseColors = new Dictionary<string, string>();
+        public Dictionary<string, string> SpawnHouseColors = new Dictionary<string, string>();
         public TutorialLines TutorialLines { get; set; }
         public Themes Themes { get; set; }
 
@@ -79,17 +80,9 @@ namespace TSMapEditor.Models
         /// The original list of HouseTypes is not modified.
         /// </summary>
         /// <returns>List of standard HouseTypes</returns>
-        public List<HouseType> GetStandardHouseTypes()
+        public List<HouseType> GetHouseTypes()
         {
-            var houseTypes = new List<HouseType>();
-
-            foreach (HouseType houseType in HouseTypes)
-            {
-                HouseType newHouseType = new HouseType(houseType, houseType.ININame);
-                houseTypes.Add(newHouseType);
-            }
-
-            return houseTypes;
+            return HouseTypes.Select(houseType => new HouseType(houseType, houseType.ININame)).ToList();
         }
 
         /// <summary>
@@ -107,71 +100,7 @@ namespace TSMapEditor.Models
             return new HouseType(houseType, houseType.ININame);
         }
 
-        /// <summary>
-        /// Returns a deep copy of the list of houses based on HouseTypes from the rules.
-        /// </summary>
-        /// <returns>List of standard Houses</returns>
-        public List<House> GetStandardHouses()
-        {
-            var houses = new List<House>();
-
-            foreach (HouseType houseType in HouseTypes)
-            {
-                houses.Add(GetStandardHouse(houseType));
-            }
-
-            return houses;
-        }
-
-        /// <summary>
-        /// Creates a new House object based on the specified HouseType.
-        /// </summary>
-        /// <param name="houseType"></param>
-        /// <returns>Standard House</returns>
-        public House GetStandardHouse(HouseType houseType)
-        {
-            House house = new House(houseType.ININame)
-            {
-                HouseType = houseType,
-                Allies = houseType.ININame,
-                Color = houseType.Color,
-                XNAColor = houseType.XNAColor,
-                Credits = 0,
-                Edge = "North",
-                IQ = 0,
-                PercentBuilt = 100,
-                PlayerControl = false,
-                TechLevel = 10
-            };
-
-            if (Constants.UseCountries)
-            {
-                // RA2/YR Houses have a country field
-                house.Country = houseType.ININame;
-            }
-            else
-            {
-                // TS Houses contain ActsLike
-                house.ActsLike = houseType.Index;
-            }
-
-            return house;
-        }
-
-        public List<House> GetPlayerHouses()
-        {
-            List<House> houses = new List<House>();
-            foreach (var houseType in GetPlayerHouseTypes())
-            {
-                var house = GetStandardHouse(houseType);
-                house.IsPlayerHouse = true;
-                houses.Add(house);
-            }
-
-            return houses;
-        }
-
-        public List<HouseType> GetPlayerHouseTypes()
+        public List<HouseType> MakeSpawnHouseTypes()
         {
             List<HouseType> houseTypes = new List<HouseType>();
             int baseIndex = Constants.UseCountries ? 4475 : 50;
@@ -180,13 +109,13 @@ namespace TSMapEditor.Models
             for (int i = 0; i < 8; i++)
             {
                 string houseTypeName = Constants.UseCountries ? $"<Player @ {letters[i]}>" : $"Spawn{i + 1}";
-                string colorName = PlayerHouseColors.TryGetValue(houseTypeName, out var c) ? c : "Grey";
+                string colorName = SpawnHouseColors.TryGetValue(houseTypeName, out var c) ? c : "Grey";
                 Color color = FindColor(colorName);
 
                 HouseType houseType = new HouseType(houseTypeName)
                 {
                     Index = baseIndex + i,
-                    IsPlayerHouseType = true,
+                    IsSpawnHouseType = true,
                     Color = colorName,
                     XNAColor = color
                 };
@@ -317,14 +246,14 @@ namespace TSMapEditor.Models
             }
         }
 
-        public void InitPlayerHouseColors(IniFile iniFile)
+        public void InitSpawnHouseColors(IniFile iniFile)
         {
             var section = iniFile.GetSection("SpawnColors");
             if (section != null)
             {
                 foreach (var keyValuePair in section.Keys)
                 {
-                    PlayerHouseColors.Add(keyValuePair.Key, keyValuePair.Value);
+                    SpawnHouseColors.Add(keyValuePair.Key, keyValuePair.Value);
                 }
             }
         }

@@ -424,13 +424,13 @@ namespace TSMapEditor.Initialization
             foreach (var houseType in map.HouseTypes)
             {
                 // Don't put YR <Player @ X> in the list, it's pointless
-                if (!(Constants.UseCountries && houseType.IsPlayerHouseType))
+                if (!(Constants.UseCountries && houseType.IsSpawnHouseType))
                     houseTypesSection.SetStringValue(houseType.Index.ToString(), houseType.ININame);
 
                 mapIni.RemoveSection(houseType.ININame);
                 var countrySection = FindOrMakeSection(houseType.ININame, mapIni);
 
-                if (map.PlayerHouseTypes.Contains(houseType))
+                if (map.SpawnHouseTypes.Contains(houseType))
                     countrySection.SetStringValue("Color", houseType.Color);
                 else
                     houseType.WriteToIniSection(countrySection);
@@ -462,7 +462,7 @@ namespace TSMapEditor.Initialization
             // Player houses for Skirmish
             if (map.Basic.MultiplayerOnly)
             {
-                houses.AddRange(map.PlayerHouses);
+                houses.AddRange(map.SpawnHouses);
             }
 
             const string sectionName = "Houses";
@@ -484,7 +484,7 @@ namespace TSMapEditor.Initialization
                 if (Constants.UseCountries)
                 {
                     // Don't put YR <Player @ X> in the list, it's pointless
-                    if (!house.IsPlayerHouse)
+                    if (!house.IsSpawnHouse)
                         housesSection.SetStringValue(i.ToString(), house.ININame);
                 }
                 else

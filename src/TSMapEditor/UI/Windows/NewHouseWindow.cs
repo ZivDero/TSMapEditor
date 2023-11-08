@@ -19,6 +19,7 @@ namespace TSMapEditor.UI.Windows
 
         private EditorTextBox tbHouseName;
         private XNADropDown ddParentCountry;
+        private EditorButton btnAdd;
 
         public string HouseName { get; set; }
         public string ParentCountry { get; set; }
@@ -33,10 +34,11 @@ namespace TSMapEditor.UI.Windows
 
             tbHouseName = FindChild<EditorTextBox>(nameof(tbHouseName));
             ddParentCountry = FindChild<XNADropDown>(nameof(ddParentCountry));
+            btnAdd = FindChild<EditorButton>(nameof(btnAdd));
 
             tbHouseName.TextChanged += TbHouseName_TextChanged;
             ddParentCountry.SelectedIndexChanged += DdParentCountry_SelectedIndexChanged;
-            FindChild<EditorButton>("btnAdd").LeftClick += BtnAdd_LeftClick;
+            btnAdd.LeftClick += BtnAdd_LeftClick;
 
             if (!Constants.UseCountries)
             {
@@ -53,6 +55,7 @@ namespace TSMapEditor.UI.Windows
         private void TbHouseName_TextChanged(object sender, EventArgs e)
         {
             HouseName = tbHouseName.Text;
+            btnAdd.Enabled = !(string.IsNullOrWhiteSpace(HouseName) || map.FindHouseType(HouseName) != null);
         }
 
         private void BtnAdd_LeftClick(object sender, EventArgs e)
@@ -75,7 +78,7 @@ namespace TSMapEditor.UI.Windows
 
             if (Constants.UseCountries)
             {
-                newHouseType = new HouseType(map.StandardHouseTypes.Find(c => c.ININame == ParentCountry), houseTypeName)
+                newHouseType = new HouseType(map.StandardHouseTypes.ToList().Find(c => c.ININame == ParentCountry), houseTypeName)
                 {
                     ParentCountry = ParentCountry,
                     Index = map.GetHouseTypes(true).Last().Index + 1
@@ -115,7 +118,7 @@ namespace TSMapEditor.UI.Windows
         private void ListParentCountries()
         {
             ddParentCountry.Items.Clear();
-            map.StandardHouseTypes.ForEach(h => ddParentCountry.AddItem(h.ININame, h.XNAColor));
+            map.StandardHouseTypes.ToList().ForEach(h => ddParentCountry.AddItem(h.ININame, h.XNAColor));
         }
 
         public void Open()

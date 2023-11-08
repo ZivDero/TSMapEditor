@@ -59,6 +59,12 @@ namespace TSMapEditor.Models
             ININame = iniName;
         }
 
+        public House(HouseType houseType)
+        {
+            ININame = houseType.ININame;
+            Reset(houseType);
+        }
+
         [INI(false)]
         public string ININame { get; set; }
         public int IQ { get; set; }
@@ -73,17 +79,35 @@ namespace TSMapEditor.Models
         public bool PlayerControl { get; set; }
 
         [INI(false)] public HouseType HouseType { get; set; }
-        [INI(false)] public bool IsPlayerHouse { get; set; } = false;
+        [INI(false)] public bool IsSpawnHouse { get; set; } = false;
         [INI(false)] public Color XNAColor { get; set; } = Microsoft.Xna.Framework.Color.Gray;
 
         public List<BaseNode> BaseNodes { get; } = new List<BaseNode>();
-        public void CopyFromOther(House baseHouse)
+        public void Reset(HouseType baseHouseType)
         {
-            foreach (var property in typeof(House).GetProperties())
+            HouseType = baseHouseType;
+            Allies = baseHouseType.ININame;
+            Color = baseHouseType.Color;
+            XNAColor = baseHouseType.XNAColor;
+            Credits = 0;
+            Edge = "North";
+            IQ = 0;
+            PercentBuilt = 100;
+            PlayerControl = false;
+            TechLevel = 10;
+
+            if (Constants.UseCountries)
             {
-                if (property.Name != "BaseNodes" && property.Name != "HouseType")
-                    property.SetValue(this, property.GetValue(baseHouse));
+                // RA2/YR Houses have a country field
+                Country = baseHouseType.ININame;
             }
+            else
+            {
+                // TS Houses contain ActsLike
+                ActsLike = baseHouseType.Index;
+            }
+
+            BaseNodes.Clear();
         }
 
         public void ReadFromIniSection(IniSection iniSection)
@@ -105,7 +129,7 @@ namespace TSMapEditor.Models
 
         public void WriteToIniSection(IniSection iniSection)
         {
-            if (IsPlayerHouse)
+            if (IsSpawnHouse)
                 iniSection.SetStringValue("Color", Color);
             else
                 WritePropertiesToIniSection(iniSection);
@@ -115,7 +139,7 @@ namespace TSMapEditor.Models
             // Index is from 000 to 999
 
             // Player houses only get BaseNodes in TS
-            if (IsPlayerHouse && Constants.UseCountries)
+            if (IsSpawnHouse && Constants.UseCountries)
                 return;
 
             iniSection.SetIntValue("NodeCount", BaseNodes.Count);

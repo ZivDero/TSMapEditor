@@ -17,13 +17,13 @@ namespace TSMapEditor.Initialization
         MapTile[][] Tiles { get; }
         MapTile GetTile(int x, int y);
         MapTile GetTile(Point2D cellCoords);
-        List<HouseType> StandardHouseTypes { get; }
+        SortedSet<HouseType> StandardHouseTypes { get; }
         List<House> StandardHouses { get; }
-        List<HouseType> PlayerHouseTypes { get; set; }
-        List<House> PlayerHouses { get; set; }
-        List<Aircraft> Aircraft { get; }
-        List<HouseType> HouseTypes { get; }
+        SortedSet<HouseType> SpawnHouseTypes { get; set; }
+        List<House> SpawnHouses { get; set; }
+        SortedSet<HouseType> HouseTypes { get; }
         List<House> Houses { get; }
+        List<Aircraft> Aircraft { get; }
         List<Infantry> Infantry { get; }
         IniFile LoadedINI { get; }
         Rules Rules { get; }

@@ -115,11 +115,14 @@ namespace TSMapEditor.Models
         /// objects whose owner does not exist in the map's list of houses
         /// or in the Rules.ini standard house list.
         /// </summary>
-        public List<HouseType> StandardHouseTypes { get; protected set; } = new List<HouseType>();
+        public SortedSet<HouseType> StandardHouseTypes { get; protected set; } = new SortedSet<HouseType>(
+            Comparer<HouseType>.Create((a, b) => a.Index.CompareTo(b.Index)));
         public List<House> StandardHouses { get; set; } = new List<House>();
-        public List<HouseType> PlayerHouseTypes { get; set; } = new List<HouseType>();
-        public List<House> PlayerHouses { get; set; } = new List<House>();
-        public List<HouseType> HouseTypes { get; protected set; } = new List<HouseType>();
+        public SortedSet<HouseType> SpawnHouseTypes { get; set; } = new SortedSet<HouseType>(
+            Comparer<HouseType>.Create((a, b) => a.Index.CompareTo(b.Index)));
+        public List<House> SpawnHouses { get; set; } = new List<House>();
+        public SortedSet<HouseType> HouseTypes { get; protected set; } = new SortedSet<HouseType>(
+            Comparer<HouseType>.Create((a, b) => a.Index.CompareTo(b.Index)));
         public List<House> Houses { get; protected set; } = new List<House>();
         public List<TerrainObject> TerrainObjects { get; private set; } = new List<TerrainObject>();
         public List<Waypoint> Waypoints { get; private set; } = new List<Waypoint>();
@@ -183,26 +186,22 @@ namespace TSMapEditor.Models
         {
             List<House> houses = Houses.Count == 0 && !noStandards ? new(StandardHouses) : new(Houses);
 
-            if (Basic.MultiplayerOnly)
-            {
-                if (!noPlayers)
-                    houses.AddRange(PlayerHouses);
-            }
+            if (Basic.MultiplayerOnly && !noPlayers)
+                houses.AddRange(SpawnHouses);
 
             return houses;
         }
 
-        public List<HouseType> GetHouseTypes(bool noPlayers = false, bool noStandards = false)
+        public List<HouseType> GetHouseTypes(bool noPlayers = false)
         {
-            List<HouseType> houseTypes = HouseTypes.Count == 0 && !noStandards ? new(StandardHouseTypes) : new(HouseTypes);
+            SortedSet<HouseType> houseTypes = new SortedSet<HouseType>(HouseTypes,
+                Comparer<HouseType>.Create((a, b) => a.Index.CompareTo(b.Index)));
+            houseTypes.UnionWith(StandardHouseTypes);
 
-            if (Basic.MultiplayerOnly)
-            {
-                if (!noPlayers)
-                    houseTypes.AddRange(PlayerHouseTypes);
-            }
+            if (Basic.MultiplayerOnly && !noPlayers)
+                houseTypes.UnionWith(SpawnHouseTypes);
 
-            return houseTypes;
+            return houseTypes.ToList();
         }
 
         private void InitEditorConfig()
@@ -244,8 +243,8 @@ namespace TSMapEditor.Models
             MapLoader.ReadMapSection(this, mapIni);
             MapLoader.ReadIsoMapPack(this, mapIni);
 
+            MapLoader.ReadHouseTypes(this, mapIni);
             MapLoader.ReadHouses(this, mapIni);
-            MapLoader.ReadOrMakeHouseTypes(this, mapIni);
             
             MapLoader.ReadSmudges(this, mapIni);
             MapLoader.ReadOverlays(this, mapIni);
@@ -389,11 +388,11 @@ namespace TSMapEditor.Models
             if (house != null)
                 return house;
 
-            house = PlayerHouses.Find(h => h.ININame == houseName);
+            house = SpawnHouses.Find(h => h.ININame == houseName);
             if (house != null)
                 return house;
 
-            throw new InvalidOperationException($"Tried to find invalid house {houseName}");
+            return null;
         }
 
         /// <summary>
@@ -403,19 +402,19 @@ namespace TSMapEditor.Models
         /// <param name="houseTypeName">The name of the HouseType to find.</param>
         public HouseType FindHouseType(string houseTypeName)
         {
-            var houseType = HouseTypes.Find(h => h.ININame == houseTypeName);
+            var houseType = HouseTypes.ToList().Find(ht => ht.ININame == houseTypeName);
             if (houseType != null)
                 return houseType;
 
-            houseType = StandardHouseTypes.Find(h => h.ININame == houseTypeName);
+            houseType = StandardHouseTypes.ToList().Find(ht => ht.ININame == houseTypeName);
             if (houseType != null)
                 return houseType;
 
-            houseType = PlayerHouseTypes.Find(h => h.ININame == houseTypeName);
+            houseType = SpawnHouseTypes.ToList().Find(ht => ht.ININame == houseTypeName);
             if (houseType != null)
                 return houseType;
 
-            throw new InvalidOperationException($"Tried to find invalid HouseType {houseTypeName}");
+            return null;
         }
 
         public bool IsCoordWithinMap(int x, int y) => IsCoordWithinMap(new Point2D(x, y));
@@ -793,30 +792,15 @@ namespace TSMapEditor.Models
             if (Houses.Contains(house))
                 return;
 
-            if (StandardHouses.Contains(house))
-            {
-                for (int i = 0; i < Houses.Count; i++)
-                {
-                    if (Houses[i].HouseType.Index > house.HouseType.Index)
-                    {
-                        Houses.Insert(i, house);
-                        HousesChanged?.Invoke(this, EventArgs.Empty);
-                        return;
-                    }
-                }
-            }
-
             Houses.Add(house);
+            Houses = Houses.OrderBy(h => h.HouseType.Index).ToList();
             HousesChanged?.Invoke(this, EventArgs.Empty);
         }
 
         public bool DeleteHouse(House house)
         {
             if (StandardHouses.Contains(house))
-            {
-                house.BaseNodes.Clear();
-                house.CopyFromOther(Rules.GetStandardHouse(house.HouseType));
-            }
+                house.Reset(house.HouseType);
 
             if (Houses.Remove(house))
             {
@@ -830,41 +814,22 @@ namespace TSMapEditor.Models
 
         public void AddHouseType(HouseType houseType)
         {
-            if (HouseTypes.Contains(houseType))
-                return;
-
-            if (StandardHouseTypes.Contains(houseType))
-            {
-                for (int i = 0; i < HouseTypes.Count; i++)
-                {
-                    if (HouseTypes[i].Index > houseType.Index)
-                    {
-                        HouseTypes.Insert(i, houseType);
-                        HouseTypesChanged?.Invoke(this, EventArgs.Empty);
-                        return;
-                    }
-                }
-            }
-
+            // This makes sure that if another house that is actually different but has the same ID is in the set, it gets replaced
+            HouseTypes.Remove(houseType);
             HouseTypes.Add(houseType);
             HouseTypesChanged?.Invoke(this, EventArgs.Empty);
         }
 
         public bool DeleteHouseType(HouseType houseType)
         {
-            int index = HouseTypes.IndexOf(houseType);
             if (HouseTypes.Remove(houseType))
             {
                 if (StandardHouseTypes.Contains(houseType))
-                {
-                    houseType.CopyFromOther(Rules.GetStandardHouseType(houseType.ININame));
-                }
+                    houseType.Reset(Rules.GetStandardHouseType(houseType.ININame));
 
-                for (int i = index; i < HouseTypes.Count; i++)
-                {
-                    if (HouseTypes[i].Index >= StandardHouseTypes.Count)
-                        HouseTypes[i].Index--;
-                }
+                foreach (var ht in HouseTypes)
+                    if (ht.Index >= houseType.Index)
+                        ht.Index--;
 
                 LoadedINI.RemoveSection(houseType.ININame);
                 HouseTypesChanged?.Invoke(this, EventArgs.Empty);
@@ -1441,13 +1406,15 @@ namespace TSMapEditor.Models
 
             var editorRulesIni = new IniFile(Environment.CurrentDirectory + "/Config/EditorRules.ini");
             Rules.InitEditorOverrides(editorRulesIni);
-            Rules.InitPlayerHouseColors(editorRulesIni);
+            Rules.InitSpawnHouseColors(editorRulesIni);
             Rules.InitFromINI(editorRulesIni, initializer);
 
-            StandardHouseTypes = Rules.GetStandardHouseTypes();
-            StandardHouses = Rules.GetStandardHouses();
-            PlayerHouseTypes = Rules.GetPlayerHouseTypes();
-            PlayerHouses = Rules.GetPlayerHouses();
+            StandardHouseTypes = new SortedSet<HouseType>(Rules.GetHouseTypes(),
+                Comparer<HouseType>.Create((a, b) => a.Index.CompareTo(b.Index)));
+            StandardHouses = StandardHouseTypes.Select(ht => new House(ht)).ToList();
+            SpawnHouseTypes = new SortedSet<HouseType>(Rules.MakeSpawnHouseTypes(),
+                Comparer<HouseType>.Create((a, b) => a.Index.CompareTo(b.Index)));
+            SpawnHouses = SpawnHouseTypes.Select(ht => new House(ht)).ToList();
 
             // Load impassable cell information for terrain types
             var impassableTerrainObjectsIni = new IniFile(Environment.CurrentDirectory + "/Config/TerrainTypeImpassability.ini");
@@ -1852,8 +1819,8 @@ namespace TSMapEditor.Models
             Infantry.Clear();
             Units.Clear();
             Structures.Clear();
-            PlayerHouses.Clear();
-            PlayerHouseTypes.Clear();
+            SpawnHouses.Clear();
+            SpawnHouseTypes.Clear();
             StandardHouses.Clear();
             StandardHouseTypes.Clear();
             Houses.Clear();

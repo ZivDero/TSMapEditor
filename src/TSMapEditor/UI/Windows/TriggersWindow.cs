@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Rampastring.Tools;
 using Rampastring.XNAUI;
 using Rampastring.XNAUI.XNAControls;
@@ -717,7 +717,7 @@ namespace TSMapEditor.UI.Windows
                 case TriggerParamType.House:
                     selectHouseTypeWindow.IsForEvent = true;
                     paramValue = Conversions.IntFromString(triggerEvent.Parameters[paramIndex], -1);
-                    if (paramValue > -1 && paramValue < map.GetHouses().Count)
+                    if (paramValue > -1 && paramValue < map.GetHouseTypes().Count)
                         selectHouseTypeWindow.Open(map.GetHouseTypes()[paramValue]);
                     else
                         selectHouseTypeWindow.Open(null);

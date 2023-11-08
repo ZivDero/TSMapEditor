@@ -182,7 +182,7 @@ namespace TSMapEditor.UI.Windows
             chkMultiplayPassive.CheckedChanged -= ChkMultiplayPassive_CheckedChanged;
             chkWallOwner.CheckedChanged -= ChkWallOwner_CheckedChanged;
 
-            int parentCountryIndex = map.StandardHouseTypes.FindIndex(c => c.ININame == editedCountry.ParentCountry);
+            int parentCountryIndex = map.StandardHouseTypes.ToList().FindIndex(c => c.ININame == editedCountry.ParentCountry);
             ddParentCountry.SelectedIndex = parentCountryIndex;
             ddParentCountry.AllowDropDown = parentCountryIndex != -1;
 

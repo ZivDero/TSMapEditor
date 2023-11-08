@@ -133,7 +133,7 @@ namespace TSMapEditor.UI.Windows
 
         private void BtnEditCountry_LeftClick(object sender, EventArgs e)
         {
-            if (editedHouse != null && editedHouse.HouseType != null && !editedHouse.IsPlayerHouse)
+            if (editedHouse != null && editedHouse.HouseType != null && !editedHouse.IsSpawnHouse)
                 editCountryWindow.Open(editedHouse.HouseType);
         }
 
@@ -193,7 +193,7 @@ namespace TSMapEditor.UI.Windows
                 return;
 
             // Player houses don't get deleted
-            if (map.PlayerHouses.Contains(editedHouse))
+            if (map.SpawnHouses.Contains(editedHouse))
                 return;
 
             if (map.DeleteHouseType(editedHouse.HouseType))

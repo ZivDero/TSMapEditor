@@ -1009,7 +1009,6 @@ namespace TSMapEditor.Initialization
             if (housesSection == null)
                 return;
 
-            // First get all the houses no matter how they're ordered
             var loadedHouses = new List<House>();
 
             foreach (var kvp in housesSection.Keys)
@@ -1024,12 +1023,10 @@ namespace TSMapEditor.Initialization
                 }
 
                 // Try to find a house in the standard list, or the list of player houses, else create a new one
-                House house = map.StandardHouses.Find(h => h.ININame == houseName) ?? 
-                              map.PlayerHouses.Find(h => h.ININame == houseName) ??
-                              new House(houseName);
+                House house = map.FindHouse(houseName) ?? new House(houseName);
 
                 // Add the house to the list unless it's a player house (they don't get included in the total list)
-                if (!house.IsPlayerHouse)
+                if (!house.IsSpawnHouse)
                     loadedHouses.Add(house);
 
                 var houseSection = mapIni.GetSection(houseName);
@@ -1037,29 +1034,13 @@ namespace TSMapEditor.Initialization
                 {
                     house.ReadFromIniSection(houseSection);
                     house.XNAColor = map.Rules.FindColor(house.Color);
+                    house.HouseType = map.FindHouseType(Constants.UseCountries ? house.Country : house.ININame);
                 }
             }
 
-            // Now first add the Houses that match the standard ones
-            var housesInOrder = new List<House>();
-            for (int i = 0; i < map.StandardHouses.Count; i++)
-            {
-                var standardHouse = map.StandardHouses[i];
-                if (loadedHouses.IndexOf(standardHouse) is var index && index != -1)
-                {
-                    var foundHouse = loadedHouses[index];
-                    housesInOrder.Add(foundHouse);
-                    loadedHouses.Remove(foundHouse);
-                }
-            }
-
-            // Now add the rest to the end
-            foreach (var house in loadedHouses)
-            {
-                housesInOrder.Add(house);
-            }
-
-            map.Houses.AddRange(housesInOrder);
+            // Now sort the houses (the sorting is stable, and thus houses that may use the same house type maintain order),
+            // and add them to the map's list
+            map.Houses.AddRange(loadedHouses.OrderBy(h => h.HouseType.Index).ToList());
 
             // Make sure to load in properties of standard houses even if they aren't listed
             foreach (var house in map.StandardHouses)
@@ -1076,7 +1057,7 @@ namespace TSMapEditor.Initialization
             }
         }
 
-        public static void ReadOrMakeHouseTypes(IMap map, IniFile mapIni)
+        public static void ReadHouseTypes(IMap map, IniFile mapIni)
         {
             var loadedHouseTypes = new List<HouseType>(); 
             
@@ -1085,22 +1066,25 @@ namespace TSMapEditor.Initialization
             if (section == null)
                 return;
 
+            int index = map.StandardHouseTypes.Count;
             foreach (var kvp in section.Keys)
             {
                 string houseTypeName = kvp.Value;
 
-                // If we find fake houses, discard them but remember TS Coop mode
+                // If we find fake house types, discard them but remember TS Coop mode
                 if (houseTypeName.StartsWith("Fake") && houseTypeName.Length <= 6)
                 {
                     map.TsCoop = true;
                     continue;
                 }
 
-                // Try to find a house in the standard list, else create a new one
-                HouseType houseType = map.StandardHouseTypes.Find(h => h.ININame == houseTypeName) ??
-                                      map.PlayerHouseTypes.Find(h => h.ININame == houseTypeName) ??
-                                      new HouseType(houseTypeName);
+                // Try to find an existing house type, else create a new one
+                HouseType houseType = map.FindHouseType(houseTypeName) ?? new HouseType(houseTypeName)
+                {
+                    Index = index++
+                };
 
+                // Now load the house type from the ini section
                 var houseTypeSection = mapIni.GetSection(houseTypeName);
                 if (houseTypeSection != null)
                 {
@@ -1111,61 +1095,7 @@ namespace TSMapEditor.Initialization
                 loadedHouseTypes.Add(houseType);
             }
 
-            // Make sure that every house has a proper HouseType
-            foreach (var house in map.Houses)
-            {
-                string houseTypeName = Constants.UseCountries ? house.Country : house.ININame;
-
-                if (house.HouseType != null)
-                    continue;
-
-                if (map.StandardHouseTypes.Find(ht => ht.ININame == houseTypeName) is { } ht1)
-                {
-                    house.HouseType = ht1;
-                    continue;
-                }
-
-                if (loadedHouseTypes.Find(ht => ht.ININame == houseTypeName) is { } ht2)
-                {
-                    house.HouseType = ht2;
-                    continue;
-                }
-
-                var houseType = new HouseType(houseTypeName);
-                var houseTypeSection = mapIni.GetSection(houseTypeName);
-
-                if (houseTypeSection != null)
-                {
-                    houseType.ReadFromIniSection(houseTypeSection);
-                    houseType.XNAColor = map.Rules.FindColor(houseType.Color);
-                }
-
-                // Add the HouseType to the list unless it's a player HouseType (they don't get included in the total list)
-                if (!houseType.IsPlayerHouseType)
-                    loadedHouseTypes.Add(houseType);
-            }
-
-            // Now first put in the HouseTypes that match the standard ones
-            var houseTypesInOrder = new List<HouseType>();
-            for (int i = 0; i < map.StandardHouseTypes.Count; i++)
-            {
-                var standardHouseType = map.StandardHouseTypes[i];
-                if (loadedHouseTypes.IndexOf(standardHouseType) is var index && index != -1)
-                {
-                    houseTypesInOrder.Add(standardHouseType);
-                    loadedHouseTypes.RemoveAt(index);
-                }
-            }
-
-            // Now add the rest to the end, assigning indices after the standard ones
-            for (int i = 0; i < loadedHouseTypes.Count; i++)
-            {
-                var houseType = loadedHouseTypes[i];
-                houseTypesInOrder.Add(houseType);
-                houseType.Index = map.Rules.HouseTypes.Count + i;
-            }
-
-            map.HouseTypes.AddRange(houseTypesInOrder);
+            map.HouseTypes.UnionWith(loadedHouseTypes);
 
             // Make sure to load in properties of standard countries even if they aren't listed
             foreach (var houseType in map.StandardHouseTypes)
@@ -1180,6 +1110,7 @@ namespace TSMapEditor.Initialization
                     houseType.XNAColor = map.Rules.FindColor(houseType.Color);
                 }
             }
+
             Logger.Log("Houses read successfully.");
         }
 
