@@ -196,10 +196,10 @@ namespace TSMapEditor.UI.Windows
             if (map.SpawnHouses.Contains(editedHouse))
                 return;
 
-            if (map.DeleteHouseType(editedHouse.HouseType))
+            if (map.RemoveHouseType(editedHouse.HouseType))
                 RefreshHouseInfo();
 
-            if (map.DeleteHouse(editedHouse))
+            if (map.RemoveHouse(editedHouse))
                 ListHouses();
         }
 

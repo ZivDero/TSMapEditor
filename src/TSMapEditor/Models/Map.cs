@@ -796,7 +796,7 @@ namespace TSMapEditor.Models
             HousesChanged?.Invoke(this, EventArgs.Empty);
         }
 
-        public bool DeleteHouse(House house)
+        public bool RemoveHouse(House house)
         {
             if (StandardHouses.Contains(house))
                 house.Reset(house.HouseType);
@@ -813,13 +813,11 @@ namespace TSMapEditor.Models
 
         public void AddHouseType(HouseType houseType)
         {
-            // This makes sure that if another house that is actually different but has the same ID is in the set, it gets replaced
-            HouseTypes.Remove(houseType);
             HouseTypes.Add(houseType);
             HouseTypesChanged?.Invoke(this, EventArgs.Empty);
         }
 
-        public bool DeleteHouseType(HouseType houseType)
+        public bool RemoveHouseType(HouseType houseType)
         {
             if (HouseTypes.Remove(houseType))
             {
