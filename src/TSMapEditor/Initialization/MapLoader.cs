@@ -1022,10 +1022,10 @@ namespace TSMapEditor.Initialization
                     continue;
                 }
 
-                // Try to find a house in the standard list, or the list of player houses, else create a new one
+                // Try to find an existing house, else create a new one
                 House house = map.FindHouse(houseName) ?? new House(houseName);
 
-                // Add the house to the list unless it's a player house (they don't get included in the total list)
+                // Add the house to the list unless it's a spawn house (they don't get included in the total list)
                 if (!house.IsSpawnHouse)
                     loadedHouses.Add(house);
 
@@ -1084,6 +1084,10 @@ namespace TSMapEditor.Initialization
                     Index = index++
                 };
 
+                // Add the house to the list unless it's a spawn house type (they don't get included in the total list)
+                if (!houseType.IsSpawnHouseType)
+                    loadedHouseTypes.Add(houseType);
+
                 // Now load the house type from the ini section
                 var houseTypeSection = mapIni.GetSection(houseTypeName);
                 if (houseTypeSection != null)
@@ -1091,8 +1095,6 @@ namespace TSMapEditor.Initialization
                     houseType.ReadFromIniSection(houseTypeSection);
                     houseType.XNAColor = map.Rules.FindColor(houseType.Color);
                 }
-
-                loadedHouseTypes.Add(houseType);
             }
 
             map.HouseTypes.UnionWith(loadedHouseTypes);

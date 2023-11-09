@@ -138,7 +138,7 @@ namespace TSMapEditor.Models
             // Format: Index=BuildingTypeName,X,Y
             // Index is from 000 to 999
 
-            // Player houses only get BaseNodes in TS
+            // Spawn houses only get BaseNodes in TS
             if (IsSpawnHouse && Constants.UseCountries)
                 return;
 

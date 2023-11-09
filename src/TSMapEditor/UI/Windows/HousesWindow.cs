@@ -192,7 +192,7 @@ namespace TSMapEditor.UI.Windows
             if (editedHouse == null)
                 return;
 
-            // Player houses don't get deleted
+            // Spawn houses don't get deleted
             if (map.SpawnHouses.Contains(editedHouse))
                 return;
 

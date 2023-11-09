@@ -51,6 +51,8 @@ namespace TSMapEditor.Initialization
         void PlaceTerrainTileAt(ITileImage tile, Point2D cellCoords);
         House FindHouse(string houseName);
         HouseType FindHouseType(string houseTypeName);
+        List<House> GetHouses(bool noPlayers = false, bool noStandards = false);
+        List<HouseType> GetHouseTypes(bool noPlayers = false);
         bool IsCoordWithinMap(int x, int y);
         bool IsCoordWithinMap(Point2D coord);
         void AddWaypoint(Waypoint waypoint);

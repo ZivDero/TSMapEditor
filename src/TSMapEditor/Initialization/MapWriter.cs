@@ -404,36 +404,28 @@ namespace TSMapEditor.Initialization
 
         public static void WriteHouseTypes(IMap map, IniFile mapIni)
         {
-            string sectionName = Constants.UseCountries ? "Countries" : "Houses";
-
-            // If we are in YR, we need to remove the old section, for TS it's already been overwritten when writing houses
-            if (Constants.UseCountries)
-                mapIni.RemoveSection(sectionName);
-
             if (map.HouseTypes.Count == 0)
                 return;
 
-            // Now find the section if it exists, else make one
-            var houseTypesSection = mapIni.GetSection(sectionName);
-            if (houseTypesSection == null)
+            IniSection countriesSection = null;
+            if (Constants.UseCountries)
             {
-                houseTypesSection = new IniSection(sectionName);
-                mapIni.AddSection(houseTypesSection);
+                // For YR, make a separate countries section
+                const string sectionName = "Countries";
+                mapIni.RemoveSection(sectionName);
+                countriesSection = FindOrMakeSection(sectionName, mapIni);
             }
 
             foreach (var houseType in map.HouseTypes)
             {
-                // Don't put YR <Player @ X> in the list, it's pointless
-                if (!(Constants.UseCountries && houseType.IsSpawnHouseType))
-                    houseTypesSection.SetStringValue(houseType.Index.ToString(), houseType.ININame);
+                // Write YR countries to [Countries], except for spawn countries
+                if (!(countriesSection == null || houseType.IsSpawnHouseType))
+                    countriesSection.SetStringValue(houseType.Index.ToString(), houseType.ININame);
 
+                // Then write house type properties to the ini section
                 mapIni.RemoveSection(houseType.ININame);
                 var countrySection = FindOrMakeSection(houseType.ININame, mapIni);
-
-                if (map.SpawnHouseTypes.Contains(houseType))
-                    countrySection.SetStringValue("Color", houseType.Color);
-                else
-                    houseType.WriteToIniSection(countrySection);
+                houseType.WriteToIniSection(countrySection);
             }
         }
 
@@ -445,56 +437,36 @@ namespace TSMapEditor.Initialization
             // Fake houses for TS Coop
             if (!Constants.UseCountries && map.TsCoop)
             {
-                List<House> housesToCount = new List<House>(map.Houses);
-                housesToCount.AddRange(map.StandardHouses);
-                housesToCount = new List<House>(housesToCount.Distinct());
-
-                for (int i = housesToCount.Count; i < 50; i++)
+                for (int i = map.GetHouseTypes(noPlayers: true).Count; i < 50; i++)
                 {
-                    House house = new House($"Fake{i}");
-                    HouseType houseType = new HouseType($"Fake{i}");
-                    houseType.Index = i;
-                    house.HouseType = houseType;
+                    HouseType houseType = new HouseType($"Fake{i}") { Index = i };
+                    House house = new House(houseType);
                     houses.Add(house);
                 }
             }
 
-            // Player houses for Skirmish
+            // Spawn houses for Skirmish
             if (map.Basic.MultiplayerOnly)
-            {
                 houses.AddRange(map.SpawnHouses);
-            }
-
-            const string sectionName = "Houses";
-
-            mapIni.RemoveSection(sectionName);
 
             if (houses.Count == 0)
                 return;
 
-            var housesSection = new IniSection(sectionName);
-            mapIni.AddSection(housesSection);
+            const string sectionName = "Houses";
+            mapIni.RemoveSection(sectionName);
+            var housesSection = FindOrMakeSection(sectionName, mapIni);
 
             for (int i = 0; i < houses.Count; i++)
             {
                 House house = houses[i];
-
-                // In YR, there can be multiple houses per country, but the house's index doesn't matter, so just write out as-is.
-                // In TS, there can only be one house per country, so just give it the country's index.
-                if (Constants.UseCountries)
-                {
-                    // Don't put YR <Player @ X> in the list, it's pointless
-                    if (!house.IsSpawnHouse)
-                        housesSection.SetStringValue(i.ToString(), house.ININame);
-                }
-                else
-                {
-                    housesSection.SetStringValue(house.HouseType.Index.ToString(), house.ININame);
-                }
+                if (!(Constants.UseCountries && house.IsSpawnHouse))
+                    housesSection.SetStringValue(i.ToString(), house.ININame);
 
                 if (house.ININame.StartsWith("Fake") && house.ININame.Length <= 6)
                     continue;
 
+                if (house.ININame != house.HouseType.ININame)
+                    mapIni.RemoveSection(house.ININame);
                 var houseSection = FindOrMakeSection(house.ININame, mapIni);
                 house.WriteToIniSection(houseSection);
             }

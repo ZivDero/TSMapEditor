@@ -77,7 +77,10 @@ namespace TSMapEditor.Models
 
         public void WriteToIniSection(IniSection iniSection)
         {
-            WritePropertiesToIniSection(iniSection);
+            if (IsSpawnHouseType)
+                iniSection.SetStringValue("Color", Color);
+            else
+                WritePropertiesToIniSection(iniSection);
         }
         public bool HasDarkHouseColor() => XNAColor.R < 32 && XNAColor.G < 32 && XNAColor.B < 64;
 
