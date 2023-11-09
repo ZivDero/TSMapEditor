@@ -1406,7 +1406,6 @@ namespace TSMapEditor.Models
 
             var editorRulesIni = new IniFile(Environment.CurrentDirectory + "/Config/EditorRules.ini");
             Rules.InitEditorOverrides(editorRulesIni);
-            Rules.InitSpawnHouseColors(editorRulesIni);
             Rules.InitFromINI(editorRulesIni, initializer);
 
             StandardHouseTypes = new SortedSet<HouseType>(Rules.GetHouseTypes(),
@@ -1415,6 +1414,8 @@ namespace TSMapEditor.Models
             SpawnHouseTypes = new SortedSet<HouseType>(Rules.MakeSpawnHouseTypes(),
                 Comparer<HouseType>.Create((a, b) => a.Index.CompareTo(b.Index)));
             SpawnHouses = SpawnHouseTypes.Select(ht => new House(ht)).ToList();
+
+            InitializeSpawnHouses(editorRulesIni);
 
             // Load impassable cell information for terrain types
             var impassableTerrainObjectsIni = new IniFile(Environment.CurrentDirectory + "/Config/TerrainTypeImpassability.ini");
@@ -1456,6 +1457,30 @@ namespace TSMapEditor.Models
                 Rules.InitArt(artFirestormIni, initializer);
             }
         }
+
+        /// <summary>
+        /// Reads the ini configuration for spawn houses and house types from editor rules.
+        /// </summary>
+        public void InitializeSpawnHouses(IniFile editorRulesIni)
+        {
+            foreach (var houseType in SpawnHouseTypes)
+            {
+                var section = editorRulesIni.GetSection(houseType.ININame);
+                if (section == null)
+                    continue;
+
+                houseType.ReadFromIniSection(section);
+            }
+
+            foreach (var house in SpawnHouses)
+            {
+                var section = editorRulesIni.GetSection(house.ININame);
+                if (section == null)
+                    continue;
+
+                house.ReadFromIniSection(section);
+            }
+        }   
 
         /// <summary>
         /// Checks the map for issues.

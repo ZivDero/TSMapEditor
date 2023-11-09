@@ -28,7 +28,6 @@ namespace TSMapEditor.Models
         public List<GlobalVariable> GlobalVariables = new List<GlobalVariable>();
         public List<Weapon> Weapons = new List<Weapon>();
 
-        public Dictionary<string, string> SpawnHouseColors = new Dictionary<string, string>();
         public TutorialLines TutorialLines { get; set; }
         public Themes Themes { get; set; }
 
@@ -109,15 +108,13 @@ namespace TSMapEditor.Models
             for (int i = 0; i < 8; i++)
             {
                 string houseTypeName = Constants.UseCountries ? $"<Player @ {letters[i]}>" : $"Spawn{i + 1}";
-                string colorName = SpawnHouseColors.TryGetValue(houseTypeName, out var c) ? c : "Grey";
-                Color color = FindColor(colorName);
 
                 HouseType houseType = new HouseType(houseTypeName)
                 {
                     Index = baseIndex + i,
                     IsSpawnHouseType = true,
-                    Color = colorName,
-                    XNAColor = color
+                    Color = "Grey",
+                    XNAColor = Microsoft.Xna.Framework.Color.Gray
                 };
 
                 houseTypes.Add(houseType);
@@ -242,18 +239,6 @@ namespace TSMapEditor.Models
                     var obj = gameObjectTypes.Find(o => o.ININame == keyValuePair.Key);
                     if (obj != null)
                         obj.EditorVisible = !section.GetBooleanValue(keyValuePair.Key, !obj.EditorVisible);
-                }
-            }
-        }
-
-        public void InitSpawnHouseColors(IniFile iniFile)
-        {
-            var section = iniFile.GetSection("SpawnColors");
-            if (section != null)
-            {
-                foreach (var keyValuePair in section.Keys)
-                {
-                    SpawnHouseColors.Add(keyValuePair.Key, keyValuePair.Value);
                 }
             }
         }
