@@ -1040,7 +1040,7 @@ namespace TSMapEditor.Initialization
 
             // Now sort the houses (the sorting is stable, and thus houses that may use the same house type maintain order),
             // and add them to the map's list
-            map.Houses.AddRange(loadedHouses.OrderBy(h => h.HouseType.Index).ToList());
+            map.Houses.AddRange(loadedHouses.OrderBy(h => h.HouseType.Index));
 
             // Make sure to load in properties of standard houses even if they aren't listed
             foreach (var house in map.StandardHouses)
