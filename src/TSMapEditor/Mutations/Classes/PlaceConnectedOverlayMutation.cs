@@ -8,7 +8,7 @@ using TSMapEditor.UI;
 namespace TSMapEditor.Mutations.Classes
 {
     /// <summary>
-    /// A mutation that allows placing regular, individual overlay.
+    /// A mutation that allows placing connected overlays.
     /// </summary>
     class PlaceConnectedOverlayMutation : Mutation
     {

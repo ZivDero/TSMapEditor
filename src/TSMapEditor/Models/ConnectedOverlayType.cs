@@ -15,6 +15,7 @@ namespace TSMapEditor.Models
         public int FrameIndex { get; set; }
         public BitArray ConnectsTo { get; set; }
     }
+
     public class ConnectedOverlayType
     {
         public ConnectedOverlayType(IniSection iniSection, Rules rules)
@@ -27,7 +28,8 @@ namespace TSMapEditor.Models
 
             string connectionMaskString = iniSection.GetStringValue("ConnectionMask", null);
             if (connectionMaskString == null || connectionMaskString.Length != 8 || Regex.IsMatch(connectionMaskString, "[^01]"))
-                throw new Exception($"Connected overlay type has an invalid connection mask {connectionMaskString}!");
+                throw new Exception($"Connected overlay type {Name} has an invalid connection mask {connectionMaskString}!");
+
             ConnectionMask = new BitArray(connectionMaskString.Select(c => c == '1').ToArray());
 
             Frames = new List<ConnectedOverlayFrame>();
@@ -36,15 +38,16 @@ namespace TSMapEditor.Models
             {
                 string overlayName = iniSection.GetStringValue($"Frame{i}.Overlay", null);
                 OverlayType overlayType = rules.FindOverlayType(overlayName) ??
-                              throw new Exception($"Connected overlay type {i} has an invalid overlay name {overlayName}!");
+                              throw new Exception($"Connected overlay type {Name}, frame {i} has an invalid overlay name {overlayName}!");
 
                 int frameIndex = iniSection.GetIntValue($"Frame{i}.FrameIndex", -1);
                 if (frameIndex < 0)
-                    throw new Exception($"Connected overlay type {i} has an invalid frame index {frameIndex}!");
+                    throw new Exception($"Connected overlay type {Name}, frame {i} has an invalid frame index {frameIndex}!");
 
                 string connectsToString = iniSection.GetStringValue($"Frame{i}.ConnectsTo", null);
-                if (connectsToString == null || connectsToString.Length != 8 || Regex.IsMatch(connectsToString, "[^01]"))
-                    throw new Exception($"Connected overlay type {i} has an invalid ConnectsTo mask {connectsToString}!");
+                if (connectsToString == null || connectsToString.Length != (int)Direction.Count || Regex.IsMatch(connectsToString, "[^01]"))
+                    throw new Exception($"Connected overlay type {Name}, frame {i} has an invalid ConnectsTo mask {connectsToString}!");
+
                 BitArray connectsTo = new BitArray(connectsToString.Select(c => c == '1').ToArray());
 
                 Frames.Add(new ConnectedOverlayFrame()
