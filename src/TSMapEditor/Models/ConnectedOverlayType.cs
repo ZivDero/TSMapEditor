@@ -72,7 +72,7 @@ namespace TSMapEditor.Models
             {
                 var tile = mutationTarget.Map.GetTile(cellCoords + Helpers.VisualDirectionToPoint((Direction)direction));
 
-                if (tile == null || tile.Overlay == null)
+                if (tile?.Overlay == null)
                     continue;
 
                 if (ContainsOverlay(tile.Overlay))
@@ -85,6 +85,9 @@ namespace TSMapEditor.Models
 
         public bool ContainsOverlay(Overlay overlay)
         {
+            if (overlay == null)
+                return false;
+
             return ContainsOverlay(overlay.OverlayType, overlay.FrameIndex);
         }
 

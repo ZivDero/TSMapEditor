@@ -27,12 +27,9 @@ namespace TSMapEditor.Mutations.Classes
 
         public override void Perform()
         {
-            var originTile = MutationTarget.Map.GetTile(cellCoords);
-            if (originTile == null)
-                return;
-
             var originalOverlayInfos = new List<OriginalOverlayInfo>();
 
+            // Save the original overlays
             brush.DoForBrushSizeAndSurroundings(offset =>
             {
                 var tile = MutationTarget.Map.GetTile(cellCoords + offset);
@@ -47,31 +44,24 @@ namespace TSMapEditor.Mutations.Classes
                 });
             });
 
-            var connectedOverlayFrame = connectedOverlayType.GetOverlayForCell(MutationTarget, cellCoords) ?? connectedOverlayType.Frames[0];
-
-            originTile.Overlay = new Overlay()
-            {
-                Position = originTile.CoordsToPoint(),
-                OverlayType = connectedOverlayFrame.OverlayType,
-                FrameIndex = connectedOverlayFrame.FrameIndex
-            };
-
+            // Now place overlays and update all the tiles to make sure they are connected properly
             brush.DoForBrushSizeAndSurroundings(offset =>
             {
                 var tile = MutationTarget.Map.GetTile(cellCoords + offset);
                 if (tile == null)
                     return;
 
-                UpdateConnectedOverlay(tile);
+                bool isSurrounding = offset.X == -1 || offset.Y == -1 || offset.X == brush.Width || offset.Y == brush.Height;
+                PlaceConnectedOverlay(tile, isSurrounding);
             });
 
             undoData = originalOverlayInfos.ToArray();
             MutationTarget.AddRefreshPoint(cellCoords, Math.Max(brush.Width, brush.Height) + 1);
         }
 
-        private void UpdateConnectedOverlay(MapTile tile)
+        private void PlaceConnectedOverlay(MapTile tile, bool updateOnly = false)
         {
-            if (tile?.Overlay == null || !connectedOverlayType.ContainsOverlay(tile.Overlay))
+            if (tile == null || (updateOnly && !connectedOverlayType.ContainsOverlay(tile.Overlay)))
                 return;
 
             var connectedOverlayFrame = connectedOverlayType.GetOverlayForCell(MutationTarget, tile.CoordsToPoint());
