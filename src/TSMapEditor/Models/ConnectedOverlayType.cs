@@ -66,7 +66,7 @@ namespace TSMapEditor.Models
 
         public ConnectedOverlayFrame GetOverlayForCell(IMutationTarget mutationTarget, Point2D cellCoords)
         {
-            BitArray connectionMask = new BitArray(8);
+            BitArray connectionMask = new BitArray((int)Direction.Count);
 
             for (int direction = 0; direction < (int)Direction.Count; direction++)
             {
