@@ -27,80 +27,63 @@ namespace TSMapEditor.Mutations.Classes
 
         public override void Perform()
         {
+            var originTile = MutationTarget.Map.GetTile(cellCoords);
+            if (originTile == null)
+                return;
+
             var originalOverlayInfos = new List<OriginalOverlayInfo>();
 
-            brush.DoForBrushSize(offset =>
+            brush.DoForBrushSizeAndSurroundings(offset =>
             {
                 var tile = MutationTarget.Map.GetTile(cellCoords + offset);
                 if (tile == null)
                     return;
 
-                for (int xOffset = -1; xOffset <= 1; xOffset++)
+                originalOverlayInfos.Add(new OriginalOverlayInfo()
                 {
-                    for (int yOffset = -1; yOffset <= 1; yOffset++)
-                    {
-                        var originalTile = MutationTarget.Map.GetTile(cellCoords + new Point2D(xOffset, yOffset));
-                        if (originalTile == null)
-                            continue;
+                    CellCoords = tile.CoordsToPoint(),
+                    OverlayTypeIndex = tile.Overlay?.OverlayType.Index ?? -1,
+                    FrameIndex = tile.Overlay?.FrameIndex ?? -1,
+                });
+            });
 
-                        originalOverlayInfos.Add(new OriginalOverlayInfo()
-                        {
-                            CellCoords = originalTile.CoordsToPoint(),
-                            OverlayTypeIndex = originalTile.Overlay?.OverlayType.Index ?? -1,
-                            FrameIndex = originalTile.Overlay?.FrameIndex ?? -1,
-                        });
-                    }
-                }
+            var connectedOverlayFrame = connectedOverlayType.GetOverlayForCell(MutationTarget, cellCoords) ?? connectedOverlayType.Frames[0];
 
-                if (connectedOverlayType != null)
-                {
-                    var connectedOverlayFrame = connectedOverlayType.GetOverlayForCell(MutationTarget, cellCoords + offset) ?? connectedOverlayType.Frames[0];
+            originTile.Overlay = new Overlay()
+            {
+                Position = originTile.CoordsToPoint(),
+                OverlayType = connectedOverlayFrame.OverlayType,
+                FrameIndex = connectedOverlayFrame.FrameIndex
+            };
 
-                    tile.Overlay = new Overlay()
-                    {
-                        Position = tile.CoordsToPoint(),
-                        OverlayType = connectedOverlayFrame.OverlayType,
-                        FrameIndex = connectedOverlayFrame.FrameIndex
-                    };
+            brush.DoForBrushSizeAndSurroundings(offset =>
+            {
+                var tile = MutationTarget.Map.GetTile(cellCoords + offset);
+                if (tile == null)
+                    return;
 
-                    UpdateNeighborTiles(cellCoords + offset);
-                }
-                else
-                {
-                    tile.Overlay = null;
-                }
+                UpdateConnectedOverlay(tile);
             });
 
             undoData = originalOverlayInfos.ToArray();
             MutationTarget.AddRefreshPoint(cellCoords, Math.Max(brush.Width, brush.Height) + 1);
         }
 
-        private void UpdateNeighborTiles(Point2D cellCoords)
+        private void UpdateConnectedOverlay(MapTile tile)
         {
-            for (int xOffset = -1; xOffset <= 1; xOffset++)
+            if (tile?.Overlay == null || !connectedOverlayType.ContainsOverlay(tile.Overlay))
+                return;
+
+            var connectedOverlayFrame = connectedOverlayType.GetOverlayForCell(MutationTarget, tile.CoordsToPoint());
+            if (connectedOverlayFrame == null)
+                return;
+
+            tile.Overlay = new Overlay()
             {
-                for (int yOffset = -1; yOffset <= 1; yOffset++)
-                {
-                    if (xOffset == 0 && yOffset == 0)
-                        continue;
-
-                    var tile = MutationTarget.Map.GetTile(cellCoords + new Point2D(xOffset, yOffset));
-
-                    if (tile?.Overlay == null || !connectedOverlayType.ContainsOverlay(tile.Overlay))
-                        continue;
-
-                    var connectedOverlayFrame = connectedOverlayType.GetOverlayForCell(MutationTarget, tile.CoordsToPoint());
-                    if (connectedOverlayFrame == null)
-                        continue;
-
-                    tile.Overlay = new Overlay()
-                    {
-                        Position = tile.CoordsToPoint(),
-                        OverlayType = connectedOverlayFrame.OverlayType,
-                        FrameIndex = connectedOverlayFrame.FrameIndex
-                    };
-                }
-            }
+                Position = tile.CoordsToPoint(),
+                OverlayType = connectedOverlayFrame.OverlayType,
+                FrameIndex = connectedOverlayFrame.FrameIndex
+            };
         }
 
         public override void Undo()

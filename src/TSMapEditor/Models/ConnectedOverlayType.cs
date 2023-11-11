@@ -27,7 +27,7 @@ namespace TSMapEditor.Models
                 throw new Exception($"Connected overlay type {Name} has an invalid frame count {FrameCount}!");
 
             string connectionMaskString = iniSection.GetStringValue("ConnectionMask", null);
-            if (connectionMaskString == null || connectionMaskString.Length != 8 || Regex.IsMatch(connectionMaskString, "[^01]"))
+            if (connectionMaskString == null || connectionMaskString.Length != (int)Direction.Count || Regex.IsMatch(connectionMaskString, "[^01]"))
                 throw new Exception($"Connected overlay type {Name} has an invalid connection mask {connectionMaskString}!");
 
             ConnectionMask = new BitArray(connectionMaskString.Select(c => c == '1').ToArray());
@@ -67,26 +67,16 @@ namespace TSMapEditor.Models
         public ConnectedOverlayFrame GetOverlayForCell(IMutationTarget mutationTarget, Point2D cellCoords)
         {
             BitArray connectionMask = new BitArray(8);
-            for (int xOffset = -1; xOffset <= 1; xOffset++)
+
+            for (int direction = 0; direction < (int)Direction.Count; direction++)
             {
-                for (int yOffset = -1; yOffset <= 1; yOffset++)
-                {
-                    int bitIndex = (yOffset + 1) + (xOffset + 1) * 3;
+                var tile = mutationTarget.Map.GetTile(cellCoords + Helpers.VisualDirectionToPoint((Direction)direction));
 
-                    if (bitIndex == 4)
-                        continue;
+                if (tile == null || tile.Overlay == null)
+                    continue;
 
-                    if (bitIndex >= 5)
-                        bitIndex--;
-
-                    var tile = mutationTarget.Map.GetTile(cellCoords + new Point2D(xOffset, yOffset));
-
-                    if (tile == null || tile.Overlay == null)
-                        continue;
-
-                    if (ContainsOverlay(tile.Overlay))
-                        connectionMask.Set(bitIndex, true);
-                }
+                if (ContainsOverlay(tile.Overlay))
+                    connectionMask.Set(direction, true);
             }
 
             connectionMask.And(ConnectionMask);
