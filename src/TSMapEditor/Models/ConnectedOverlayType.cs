@@ -1,4 +1,4 @@
-﻿using Rampastring.Tools;
+using Rampastring.Tools;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -68,8 +68,13 @@ namespace TSMapEditor.Models
             {
                 for (int yOffset = -1; yOffset <= 1; yOffset++)
                 {
-                    if (xOffset == 0 && yOffset == 0)
+                    int bitIndex = (yOffset + 1) + (xOffset + 1) * 3;
+
+                    if (bitIndex == 4)
                         continue;
+
+                    if (bitIndex >= 5)
+                        bitIndex--;
 
                     var tile = mutationTarget.Map.GetTile(cellCoords + new Point2D(xOffset, yOffset));
 
@@ -77,12 +82,7 @@ namespace TSMapEditor.Models
                         continue;
 
                     if (ContainsOverlay(tile.Overlay))
-                    {
-                        int bitIndex = (yOffset + 1) + (xOffset + 1) * 3;
-                        if (bitIndex >= 4)
-                            bitIndex--;
                         connectionMask.Set(bitIndex, true);
-                    }
                 }
             }
 
