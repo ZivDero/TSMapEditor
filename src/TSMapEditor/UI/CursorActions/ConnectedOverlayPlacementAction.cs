@@ -47,11 +47,8 @@ namespace TSMapEditor.UI.CursorActions
                     originalOverlay.Add(new OriginalOverlayInfo(null, Constants.NO_OVERLAY));
             });
 
-            CursorActionTarget.BrushSize.DoForBrushSize(offset =>
-            {
-                var previewMutation = new PlaceConnectedOverlayMutation(CursorActionTarget.MutationTarget, ConnectedOverlayType, cellCoords);
-                previewMutation.Perform();
-            });
+            var mutation = new PlaceConnectedOverlayMutation(CursorActionTarget.MutationTarget, ConnectedOverlayType, cellCoords);
+            CursorActionTarget.MutationManager.PerformMutation(mutation);
         }
 
         public override void PostMapDraw(Point2D cellCoords)
