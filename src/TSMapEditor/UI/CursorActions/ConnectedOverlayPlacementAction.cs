@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection.Metadata.Ecma335;
 using TSMapEditor.GameMath;
 using TSMapEditor.Models;
 using TSMapEditor.Mutations.Classes;
@@ -41,14 +40,12 @@ namespace TSMapEditor.UI.CursorActions
                     return;
 
                 // Store original overlay info
-                if (tile.Overlay != null)
-                    originalOverlay.Add(new OriginalOverlayInfo(tile.Overlay.OverlayType, tile.Overlay.FrameIndex));
-                else
-                    originalOverlay.Add(new OriginalOverlayInfo(null, Constants.NO_OVERLAY));
+                originalOverlay.Add(tile.Overlay != null
+                    ? new OriginalOverlayInfo(tile.Overlay.OverlayType, tile.Overlay.FrameIndex)
+                    : new OriginalOverlayInfo(null, Constants.NO_OVERLAY));
             });
 
-            var mutation = new PlaceConnectedOverlayMutation(CursorActionTarget.MutationTarget, ConnectedOverlayType, cellCoords);
-            CursorActionTarget.MutationManager.PerformMutation(mutation);
+            new PlaceConnectedOverlayMutation(CursorActionTarget.MutationTarget, ConnectedOverlayType, cellCoords).Perform();
         }
 
         public override void PostMapDraw(Point2D cellCoords)
