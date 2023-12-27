@@ -63,6 +63,7 @@ namespace TSMapEditor.Models
         public BitArray ConnectionMask { get; protected set; }
         public List<ConnectedOverlayFrame> Frames { get; protected set; } = new();
         public List<ConnectedOverlayType> RelatedOverlays { get; protected set; } = new();
+        private readonly Random random = new ();
 
         public void InitializeRelatedOverlays(IniSection iniSection, List<ConnectedOverlayType> connectedOverlays)
         {
@@ -95,7 +96,9 @@ namespace TSMapEditor.Models
             }
 
             connectionMask.And(ConnectionMask);
-            return Frames.Find(frame => ((BitArray)frame.ConnectsTo.Clone()).Xor(connectionMask).OfType<bool>().All(e => !e));
+            var frames = Frames.FindAll(frame =>
+                ((BitArray)frame.ConnectsTo.Clone()).Xor(connectionMask).OfType<bool>().All(e => !e));
+            return frames.ElementAt(random.Next(frames.Count));
         }
 
         public bool ContainsOverlay(Overlay overlay, bool searchRelated = true)
