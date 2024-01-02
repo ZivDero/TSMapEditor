@@ -22,6 +22,7 @@ namespace TSMapEditor.Models
         public ConnectedOverlayType(IniSection iniSection, Rules rules)
         {
             Name = iniSection.SectionName;
+            UIName = iniSection.GetStringValue("UIName", Name);
             FrameCount = iniSection.GetIntValue("Frames", 0);
 
             if (FrameCount < 1)
@@ -59,6 +60,7 @@ namespace TSMapEditor.Models
         }
 
         public string Name { get; protected set; }
+        public string UIName { get; protected set; }
         public int FrameCount { get; protected set; }
         public BitArray ConnectionMask { get; protected set; }
         public List<ConnectedOverlayFrame> Frames { get; protected set; } = new();
