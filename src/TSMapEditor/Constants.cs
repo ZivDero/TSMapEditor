@@ -23,7 +23,7 @@ namespace TSMapEditor
         public static string GameRegistryInstallPath = "SOFTWARE\\DawnOfTheTiberiumAge";
 
         public static bool EnableIniInclude = false;
-        public static string OpenFileMapDialogFilter = "TS maps|*.map|All files|*.*";
+        public static string OpenMapFileDialogFilter = "TS maps|*.map|All files|*.*";
         public static string OpenImageFileDialogFilter = "Images|*.bmp;*.png;*.jpg;*.jpeg|All files|*.*";
 
         public static bool EnableIniInheritance = false;
@@ -111,7 +111,7 @@ namespace TSMapEditor
 
             ExpectedClientExecutableName = constantsIni.GetStringValue(ConstantsSectionName, nameof(ExpectedClientExecutableName), ExpectedClientExecutableName);
             GameRegistryInstallPath = constantsIni.GetStringValue(ConstantsSectionName, nameof(GameRegistryInstallPath), GameRegistryInstallPath);
-            OpenFileMapDialogFilter = constantsIni.GetStringValue(ConstantsSectionName, nameof(OpenFileMapDialogFilter), OpenFileMapDialogFilter);
+            OpenMapFileDialogFilter = constantsIni.GetStringValue(ConstantsSectionName, nameof(OpenMapFileDialogFilter), OpenMapFileDialogFilter);
 
             EnableIniInclude = constantsIni.GetBooleanValue(ConstantsSectionName, nameof(EnableIniInclude), EnableIniInclude);
             EnableIniInheritance = constantsIni.GetBooleanValue(ConstantsSectionName, nameof(EnableIniInheritance), EnableIniInheritance);
