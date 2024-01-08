@@ -1072,15 +1072,12 @@ namespace TSMapEditor.Initialization
             if (section == null)
                 return;
 
-            int id = 0;
             foreach (var kvp in section.Keys)
             {
                 string houseName = kvp.Value;
                 HouseType houseType = null;
 
                 var house = new House(houseName);
-                house.ID = id;
-                id++;
 
                 map.Houses.Add(house);
 
@@ -1109,7 +1106,7 @@ namespace TSMapEditor.Initialization
                 }
                 else
                 {
-                    houseType = map.HouseTypes[house.ID];
+                    houseType = map.FindHouseType(houseName);
                 }
 
                 house.HouseType = houseType;

@@ -87,7 +87,6 @@ namespace TSMapEditor.UI.Windows
                 PercentBuilt = 100,
                 PlayerControl = false,
                 TechLevel = 10,
-                ID = map.Houses.Count
             };
 
             newHouse.Color = newHouseType.Color;

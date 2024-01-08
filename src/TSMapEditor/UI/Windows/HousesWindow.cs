@@ -146,7 +146,6 @@ namespace TSMapEditor.UI.Windows
                 Color = map.Rules.Colors[0].Name,
                 Credits = 0, 
                 Edge = "North",
-                ID = map.Houses.Count,
                 IQ = 0, 
                 PercentBuilt = 100, 
                 PlayerControl = false, 
@@ -422,20 +421,20 @@ namespace TSMapEditor.UI.Windows
 
             ddActsLike.Items.Clear();
 
-            foreach (House house in map.Houses)
+            foreach (HouseType houseType in map.GetHouseTypes())
             {
                 lbHouseList.AddItem(
                     new XNAListBoxItem()
                     {
-                        Text = house.ININame,
-                        TextColor = house.XNAColor,
-                        Tag = house
+                        Text = houseType.ININame,
+                        TextColor = houseType.XNAColor,
+                        Tag = houseType
                     }
                 );
 
-                ddActsLike.AddItem(new XNADropDownItem() { Text = house.ID.ToString(CultureInfo.InvariantCulture) + " " + house.ININame, Tag = house.ID });
+                ddActsLike.AddItem(new XNADropDownItem() { Text = houseType.Index.ToString(CultureInfo.InvariantCulture) + " " + houseType.ININame, Tag = houseType.Index });
 
-                ddHouseOfHumanPlayer.AddItem(house.ININame, house.XNAColor);
+                ddHouseOfHumanPlayer.AddItem(houseType.ININame, houseType.XNAColor);
             }
 
             ddCountry.Items.Clear();

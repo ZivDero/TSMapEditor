@@ -90,8 +90,6 @@ namespace TSMapEditor.Models
         public int PercentBuilt { get; set; }
         public bool PlayerControl { get; set; }
 
-        [INI(false)]
-        public int ID { get; set; }
 
         [INI(false)]
         public Color XNAColor { get; set; } = Microsoft.Xna.Framework.Color.White;

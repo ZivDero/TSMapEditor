@@ -48,7 +48,6 @@ namespace TSMapEditor.UI.Windows
             for (int i = 0; i < houses.Count; i++)
             {
                 var house = houses[i];
-                house.ID = i;
                 house.Edge = "North";
                 house.Allies = house.ININame;
                 house.TechLevel = 7;

@@ -798,9 +798,6 @@ namespace TSMapEditor.Models
         {
             if (Houses.Remove(house))
             {
-                for (int i = 0; i < Houses.Count; i++)
-                    Houses[i].ID = i;
-
                 LoadedINI.RemoveSection(house.ININame);
                 HousesChanged?.Invoke(this, EventArgs.Empty);
                 return true;
