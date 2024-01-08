@@ -330,18 +330,12 @@ namespace TSMapEditor.UI.Windows
             tbPriority.Value = editedTeamType.Priority;
             tbMax.Value = editedTeamType.Max;
             tbTechLevel.Value = editedTeamType.TechLevel;
-
-            if (Constants.UseCountries)
-            {
-                ddMindControlDecision.SelectedIndex = editedTeamType.MindControlDecision ?? -1;
-            }
-
             tbGroup.Value = editedTeamType.Group;
-
             tbWaypoint.Value = Helpers.GetWaypointNumberFromAlphabeticalString(editedTeamType.Waypoint);
 
             if (Constants.UseCountries)
             {
+                ddMindControlDecision.SelectedIndex = editedTeamType.MindControlDecision ?? -1;
                 tbTransportWaypoint.Value = Helpers.GetWaypointNumberFromAlphabeticalString(editedTeamType.TransportWaypoint);
             }
             
