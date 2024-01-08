@@ -63,11 +63,7 @@ namespace TSMapEditor.UI.Windows
             tbGreenDominator = FindChild<EditorNumberTextBox>(nameof(tbGreenDominator));
             tbBlueDominator = FindChild<EditorNumberTextBox>(nameof(tbBlueDominator));
 
-            FindChild<EditorButton>("btnApply").LeftClick += BtnApply_LeftClick; ;
-            var lblAmbientChangeRateDominator = FindChild<XNALabel>("lblAmbientChangeRateDominator");
-            lblAmbientChangeRateDominator.Text = "Ambient\nChange Rate:";
-            lblAmbientChangeRateDominator.Y = tbAmbientChangeRateDominator.Y +
-                tbAmbientChangeRateDominator.Height / 2 - lblAmbientChangeRateDominator.Height / 2;
+            FindChild<EditorButton>("btnApply").LeftClick += BtnApply_LeftClick;
         }
 
         public void Open()
