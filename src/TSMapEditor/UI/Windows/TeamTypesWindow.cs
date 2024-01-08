@@ -47,9 +47,9 @@ namespace TSMapEditor.UI.Windows
         private EditorNumberTextBox tbMax;
         private EditorNumberTextBox tbTechLevel;
         private XNADropDown ddMindControlDecision;
-        private EditorPopUpSelector selTransportWaypoint;
+        private EditorNumberTextBox tbTransportWaypoint;
         private EditorNumberTextBox tbGroup;
-        private EditorPopUpSelector selWaypoint;
+        private EditorNumberTextBox tbWaypoint;
         private EditorPopUpSelector selTaskForce;
         private EditorPopUpSelector selScript;
         private EditorPopUpSelector selTag;
@@ -60,8 +60,6 @@ namespace TSMapEditor.UI.Windows
         private SelectTaskForceWindow selectTaskForceWindow;
         private SelectScriptWindow selectScriptWindow;
         private SelectTagWindow selectTagWindow;
-        private SelectWaypointWindow selectWaypointWindow;
-        private SelectWaypointWindow selectTransportWaypointWindow;
 
         public override void Initialize()
         {
@@ -76,9 +74,9 @@ namespace TSMapEditor.UI.Windows
             tbMax = FindChild<EditorNumberTextBox>(nameof(tbMax));
             tbTechLevel = FindChild<EditorNumberTextBox>(nameof(tbTechLevel));
             ddMindControlDecision = FindChild<XNADropDown>(nameof(ddMindControlDecision));
-            selTransportWaypoint = FindChild<EditorPopUpSelector>(nameof(selTransportWaypoint));
+            tbTransportWaypoint = FindChild<EditorNumberTextBox>(nameof(tbTransportWaypoint));
             tbGroup = FindChild<EditorNumberTextBox>(nameof(tbGroup));
-            selWaypoint = FindChild<EditorPopUpSelector>(nameof(selWaypoint));
+            tbWaypoint = FindChild<EditorNumberTextBox>(nameof(tbWaypoint));
             selTaskForce = FindChild<EditorPopUpSelector>(nameof(selTaskForce));
             selScript = FindChild<EditorPopUpSelector>(nameof(selScript));
             selTag = FindChild<EditorPopUpSelector>(nameof(selTag));
@@ -115,41 +113,6 @@ namespace TSMapEditor.UI.Windows
             var tagDarkeningPanel = DarkeningPanel.InitializeAndAddToParentControlWithChild(WindowManager, Parent, selectTagWindow);
             tagDarkeningPanel.Hidden += (s, e) => SelectionWindow_ApplyEffect(w => editedTeamType.Tag = w.SelectedObject, selectTagWindow);
 
-            selectWaypointWindow = new SelectWaypointWindow(WindowManager, map);
-            var waypointDarkeningPanel = DarkeningPanel.InitializeAndAddToParentControlWithChild(WindowManager, Parent, selectWaypointWindow);
-            waypointDarkeningPanel.Hidden += (s, e) =>
-            {
-                SelectionWindow_ApplyEffect(
-                    w => editedTeamType.Waypoint =
-                        Helpers.WaypointNumberToAlphabeticalString(w.SelectedObject?.Identifier ?? -1),
-                    selectWaypointWindow);
-            };
-
-            selectTransportWaypointWindow = new SelectWaypointWindow(WindowManager, map);
-            var transportWaypointDarkeningPanel = DarkeningPanel.InitializeAndAddToParentControlWithChild(WindowManager, Parent, selectTransportWaypointWindow);
-            transportWaypointDarkeningPanel.Hidden += (s, e) =>
-            {
-                SelectionWindow_ApplyEffect(
-                    w => editedTeamType.TransportWaypoint =
-                        Helpers.WaypointNumberToAlphabeticalString(w.SelectedObject?.Identifier ?? -1),
-                    selectTransportWaypointWindow);
-            };
-
-            selWaypoint.LeftClick += (s, e) =>
-            {
-                if (editedTeamType == null)
-                    return;
-
-                selectWaypointWindow.Open(map.Waypoints.Find(w => w.Identifier == Helpers.GetWaypointNumberFromAlphabeticalString(editedTeamType.Waypoint)));
-            };
-
-            selTransportWaypoint.LeftClick += (s, e) =>
-            {
-                if (editedTeamType == null)
-                    return;
-
-                selectTransportWaypointWindow.Open(map.Waypoints.Find(w => w.Identifier == Helpers.GetWaypointNumberFromAlphabeticalString(editedTeamType.TransportWaypoint)));
-            };
 
             selTaskForce.LeftClick += (s, e) => 
             {
@@ -353,13 +316,13 @@ namespace TSMapEditor.UI.Windows
                 tbTechLevel.Text = string.Empty;
                 ddMindControlDecision.SelectedIndex = -1;
 
-                selTransportWaypoint.Text = string.Empty;
-                selTransportWaypoint.Tag = null;
+                tbTransportWaypoint.Text = string.Empty;
+                tbTransportWaypoint.Tag = null;
 
                 tbGroup.Text = string.Empty;
 
-                selWaypoint.Text = string.Empty;
-                selWaypoint.Tag = null;
+                tbWaypoint.Text = string.Empty;
+                tbWaypoint.Tag = null;
 
                 selTaskForce.Text = string.Empty;
                 selTaskForce.Tag = null;
@@ -381,20 +344,21 @@ namespace TSMapEditor.UI.Windows
             tbPriority.Value = editedTeamType.Priority;
             tbMax.Value = editedTeamType.Max;
             tbTechLevel.Value = editedTeamType.TechLevel;
-            ddMindControlDecision.SelectedIndex = editedTeamType.MindControlDecision;
 
-            if (editedTeamType.TransportWaypoint != null)
-                selTransportWaypoint.Text = Helpers.GetWaypointNumberFromAlphabeticalString(editedTeamType.TransportWaypoint).ToString();
-            else
-                selTransportWaypoint.Text = string.Empty;
+            if (Constants.UseCountries)
+            {
+                ddMindControlDecision.SelectedIndex = editedTeamType.MindControlDecision ?? -1;
+            }
 
             tbGroup.Value = editedTeamType.Group;
 
-            if (editedTeamType.Waypoint != null)
-                selWaypoint.Text = Helpers.GetWaypointNumberFromAlphabeticalString(editedTeamType.Waypoint).ToString();
-            else
-                selWaypoint.Text = string.Empty;
+            tbWaypoint.Value = Helpers.GetWaypointNumberFromAlphabeticalString(editedTeamType.Waypoint);
 
+            if (Constants.UseCountries)
+            {
+                tbTransportWaypoint.Value = Helpers.GetWaypointNumberFromAlphabeticalString(editedTeamType.TransportWaypoint);
+            }
+            
             if (editedTeamType.TaskForce != null)
                 selTaskForce.Text = editedTeamType.TaskForce.Name + " (" + editedTeamType.TaskForce.ININame + ")";
             else
@@ -420,6 +384,8 @@ namespace TSMapEditor.UI.Windows
             tbTechLevel.TextChanged += TbTechLevel_TextChanged;
             ddMindControlDecision.SelectedIndexChanged += DdMindControlDecision_SelectedIndexChanged;
             tbGroup.TextChanged += TbGroup_TextChanged;
+            tbWaypoint.TextChanged += TbWaypoint_TextChanged;
+            tbTransportWaypoint.TextChanged += TbTransportWaypoint_TextChanged;
             checkBoxes.ForEach(chk => chk.CheckedChanged += FlagCheckBox_CheckedChanged);
         }
 
@@ -430,6 +396,19 @@ namespace TSMapEditor.UI.Windows
                 editedTeamType.EnableFlag((string)checkBox.Tag);
             else
                 editedTeamType.DisableFlag((string)checkBox.Tag);
+        }
+
+        private void TbWaypoint_TextChanged(object sender, EventArgs e)
+        {
+            editedTeamType.Waypoint = Helpers.WaypointNumberToAlphabeticalString(tbWaypoint.Value);
+        }
+
+        private void TbTransportWaypoint_TextChanged(object sender, EventArgs e)
+        {
+            if (Constants.UseCountries)
+            {
+                editedTeamType.TransportWaypoint = Helpers.WaypointNumberToAlphabeticalString(tbTransportWaypoint.Value);
+            }
         }
 
         private void TbGroup_TextChanged(object sender, EventArgs e)
@@ -465,7 +444,10 @@ namespace TSMapEditor.UI.Windows
 
         private void DdMindControlDecision_SelectedIndexChanged(object sender, EventArgs e)
         {
-            editedTeamType.MindControlDecision = ddMindControlDecision.SelectedIndex;
+            if (Constants.UseCountries)
+            {
+                editedTeamType.MindControlDecision = ddMindControlDecision.SelectedIndex;
+            }
         }
 
         private void TbName_TextChanged(object sender, EventArgs e)
