@@ -113,7 +113,6 @@ namespace TSMapEditor.UI.Windows
             var tagDarkeningPanel = DarkeningPanel.InitializeAndAddToParentControlWithChild(WindowManager, Parent, selectTagWindow);
             tagDarkeningPanel.Hidden += (s, e) => SelectionWindow_ApplyEffect(w => editedTeamType.Tag = w.SelectedObject, selectTagWindow);
 
-
             selTaskForce.LeftClick += (s, e) => 
             {
                 if (editedTeamType == null)
@@ -302,6 +301,8 @@ namespace TSMapEditor.UI.Windows
             tbTechLevel.TextChanged -= TbTechLevel_TextChanged;
             ddMindControlDecision.SelectedIndexChanged -= DdMindControlDecision_SelectedIndexChanged;
             tbGroup.TextChanged -= TbGroup_TextChanged;
+            tbWaypoint.TextChanged -= TbWaypoint_TextChanged;
+            tbTransportWaypoint.TextChanged -= TbTransportWaypoint_TextChanged;
             checkBoxes.ForEach(chk => chk.CheckedChanged -= FlagCheckBox_CheckedChanged);
 
             editedTeamType = teamType;
@@ -316,13 +317,9 @@ namespace TSMapEditor.UI.Windows
                 tbTechLevel.Text = string.Empty;
                 ddMindControlDecision.SelectedIndex = -1;
 
-                tbTransportWaypoint.Text = string.Empty;
-                tbTransportWaypoint.Tag = null;
-
                 tbGroup.Text = string.Empty;
-
                 tbWaypoint.Text = string.Empty;
-                tbWaypoint.Tag = null;
+                tbTransportWaypoint.Text = string.Empty;
 
                 selTaskForce.Text = string.Empty;
                 selTaskForce.Tag = null;

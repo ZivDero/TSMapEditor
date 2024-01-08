@@ -69,7 +69,12 @@ namespace TSMapEditor.Models
             }
 
             stringBuilder.Append("Waypoint: " + (string.IsNullOrWhiteSpace(Waypoint) ? Constants.NoneValue2 : Helpers.GetWaypointNumberFromAlphabeticalString(Waypoint)));
-            stringBuilder.Append("TransportWaypoint: " + (string.IsNullOrWhiteSpace(TransportWaypoint) ? Constants.NoneValue2 : Helpers.GetWaypointNumberFromAlphabeticalString(TransportWaypoint)));
+
+            if (Constants.UseCountries)
+            {
+                stringBuilder.Append("TransportWaypoint: " + (string.IsNullOrWhiteSpace(TransportWaypoint) ? Constants.NoneValue2 : Helpers.GetWaypointNumberFromAlphabeticalString(TransportWaypoint)));
+            }
+
             stringBuilder.Append(Environment.NewLine + Environment.NewLine);
 
             if (VeteranLevel > 1)
