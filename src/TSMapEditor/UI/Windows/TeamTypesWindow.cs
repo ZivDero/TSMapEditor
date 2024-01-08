@@ -84,17 +84,6 @@ namespace TSMapEditor.UI.Windows
             var panelBooleans = FindChild<EditorPanel>("panelBooleans");
             AddBooleanProperties(panelBooleans);
 
-            ddVeteranLevel.AddItem("Regular");
-            ddVeteranLevel.AddItem("Veteran");
-            ddVeteranLevel.AddItem("Elite");
-
-            ddMindControlDecision.AddItem("Don't care");
-            ddMindControlDecision.AddItem("Add to Team");
-            ddMindControlDecision.AddItem("Send to Grinder");
-            ddMindControlDecision.AddItem("Send to Bio Reactor");
-            ddMindControlDecision.AddItem("Go to Hunt");
-            ddMindControlDecision.AddItem("Do Nothing");
-
             lbTeamTypes.SelectedIndexChanged += LbTeamTypes_SelectedIndexChanged;
 
             FindChild<EditorButton>("btnNewTeamType").LeftClick += BtnNewTeamType_LeftClick;
