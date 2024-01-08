@@ -133,8 +133,6 @@ namespace TSMapEditor.UI.Windows
                     w => editedTeamType.TransportWaypoint =
                         Helpers.WaypointNumberToAlphabeticalString(w.SelectedObject?.Identifier ?? -1),
                     selectTransportWaypointWindow);
-
-                editedTeamType.UseTransportOrigin = !string.IsNullOrWhiteSpace(editedTeamType.TransportWaypoint);
             };
 
             selWaypoint.LeftClick += (s, e) =>

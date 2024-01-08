@@ -30,7 +30,7 @@ namespace TSMapEditor.Models
         public int Priority { get; set; }
         public string Waypoint { get; set; }
         public string TransportWaypoint { get; set; }
-        public int MindControlDecision { get; set; }
+        public int? MindControlDecision { get; set; }
         public int TechLevel { get; set; }
         public int VeteranLevel { get; set; }
 
