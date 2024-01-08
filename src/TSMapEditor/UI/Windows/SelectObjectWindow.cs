@@ -143,9 +143,11 @@ namespace TSMapEditor.UI.Windows
                  return;
             }
 
-            var item = (T)lbObjectList.HoveredItem.Tag;
-            if (item == null)
+            object nullableItem = lbObjectList.HoveredItem.Tag;
+            if (nullableItem == null)
                 return;
+
+            var item = (T)lbObjectList.HoveredItem.Tag;
 
             if (item is not IHintable)
                 return;
