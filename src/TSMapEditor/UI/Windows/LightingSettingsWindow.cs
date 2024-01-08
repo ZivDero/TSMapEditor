@@ -1,4 +1,5 @@
 ﻿using Rampastring.XNAUI;
+using Rampastring.XNAUI.XNAControls;
 using TSMapEditor.Models;
 using TSMapEditor.UI.Controls;
 
@@ -25,6 +26,13 @@ namespace TSMapEditor.UI.Windows
         private EditorNumberTextBox tbGreenIS;
         private EditorNumberTextBox tbBlueIS;
 
+        private EditorNumberTextBox tbAmbientDominator;
+        private EditorNumberTextBox tbAmbientChangeRateDominator;
+        private EditorNumberTextBox tbLevelDominator;
+        private EditorNumberTextBox tbRedDominator;
+        private EditorNumberTextBox tbGreenDominator;
+        private EditorNumberTextBox tbBlueDominator;
+
         public override void Initialize()
         {
             Name = nameof(LightingSettingsWindow);
@@ -42,7 +50,18 @@ namespace TSMapEditor.UI.Windows
             tbGreenIS = FindChild<EditorNumberTextBox>(nameof(tbGreenIS));
             tbBlueIS = FindChild<EditorNumberTextBox>(nameof(tbBlueIS));
 
+            tbAmbientDominator = FindChild<EditorNumberTextBox>(nameof(tbAmbientDominator));
+            tbAmbientChangeRateDominator = FindChild<EditorNumberTextBox>(nameof(tbAmbientChangeRateDominator));
+            tbLevelDominator = FindChild<EditorNumberTextBox>(nameof(tbLevelDominator));
+            tbRedDominator = FindChild<EditorNumberTextBox>(nameof(tbRedDominator));
+            tbGreenDominator = FindChild<EditorNumberTextBox>(nameof(tbGreenDominator));
+            tbBlueDominator = FindChild<EditorNumberTextBox>(nameof(tbBlueDominator));
+
             FindChild<EditorButton>("btnApply").LeftClick += BtnApply_LeftClick; ;
+            var lblAmbientChangeRateDominator = FindChild<XNALabel>("lblAmbientChangeRateDominator");
+            lblAmbientChangeRateDominator.Text = "Ambient\nChange Rate:"; ;
+            lblAmbientChangeRateDominator.Y = tbAmbientChangeRateDominator.Y +
+                tbAmbientChangeRateDominator.Height / 2 - lblAmbientChangeRateDominator.Height / 2;
         }
 
         public void Open()
@@ -61,6 +80,16 @@ namespace TSMapEditor.UI.Windows
             tbGreenIS.Text = map.Lighting.IonGreen.ToString(format);
             tbBlueIS.Text = map.Lighting.IonBlue.ToString(format);
 
+            if (Constants.UseCountries)
+            {
+                tbAmbientDominator.Text = (map.Lighting.DominatorAmbient ?? 0).ToString(format);
+                tbAmbientChangeRateDominator.Text = (map.Lighting.DominatorAmbientChangeRate ?? 0).ToString(format);
+                tbLevelDominator.Text = (map.Lighting.DominatorLevel ?? 0).ToString(format);
+                tbRedDominator.Text = (map.Lighting.DominatorRed ?? 0).ToString(format);
+                tbGreenDominator.Text = (map.Lighting.DominatorGreen ?? 0).ToString(format);
+                tbBlueDominator.Text = (map.Lighting.DominatorBlue ?? 0).ToString(format);
+            }
+
             Show();
         }
 
@@ -77,6 +106,16 @@ namespace TSMapEditor.UI.Windows
             map.Lighting.IonRed = tbRedIS.DoubleValue;
             map.Lighting.IonGreen = tbGreenIS.DoubleValue;
             map.Lighting.IonBlue = tbBlueIS.DoubleValue;
+
+            if (Constants.UseCountries)
+            {
+                map.Lighting.DominatorAmbient = tbAmbientDominator.DoubleValue;
+                map.Lighting.DominatorAmbientChangeRate = tbAmbientChangeRateDominator.DoubleValue;
+                map.Lighting.DominatorLevel = tbLevelDominator.DoubleValue;
+                map.Lighting.DominatorRed = tbRedDominator.DoubleValue;
+                map.Lighting.DominatorGreen = tbGreenDominator.DoubleValue;
+                map.Lighting.DominatorBlue = tbBlueDominator.DoubleValue;
+            }
 
             Hide();
         }
