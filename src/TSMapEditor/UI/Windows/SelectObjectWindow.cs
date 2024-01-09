@@ -143,8 +143,7 @@ namespace TSMapEditor.UI.Windows
                  return;
             }
 
-            object nullableItem = lbObjectList.HoveredItem.Tag;
-            if (nullableItem == null)
+            if (lbObjectList.HoveredItem.Tag == null)
                 return;
 
             var item = (T)lbObjectList.HoveredItem.Tag;
