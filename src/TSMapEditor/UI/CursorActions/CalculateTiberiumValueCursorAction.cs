@@ -12,9 +12,7 @@ namespace TSMapEditor.UI.CursorActions
     /// </summary>
     public class CalculateTiberiumValueCursorAction : CursorAction
     {
-        public CalculateTiberiumValueCursorAction(ICursorActionTarget cursorActionTarget) : base(cursorActionTarget)
-        {
-        }
+        public CalculateTiberiumValueCursorAction(ICursorActionTarget cursorActionTarget) : base(cursorActionTarget) { }
 
         public override string GetName() => "Calculate Resource Value";
 
