@@ -57,10 +57,13 @@ namespace TSMapEditor.UI.Windows.MainMenuWindows
 
             ddTheater.SelectedIndex = 0;
 
-            for (byte i = 0; i <= Constants.MaxMapHeightLevel; i++)
-                ddStartingLevel.AddItem(new XNADropDownItem() { Text = i.ToString(CultureInfo.InvariantCulture), Tag = i });
+            if (!Constants.IsFlatWorld)
+            {
+                for (byte i = 0; i <= Constants.MaxMapHeightLevel; i++)
+                    ddStartingLevel.AddItem(new XNADropDownItem() { Text = i.ToString(CultureInfo.InvariantCulture), Tag = i });
 
-            ddStartingLevel.SelectedIndex = 0;
+                ddStartingLevel.SelectedIndex = 0;
+            }
 
             CenterOnParent();
         }
@@ -102,7 +105,8 @@ namespace TSMapEditor.UI.Windows.MainMenuWindows
                 return;
             }
 
-            OnCreateNewMap?.Invoke(this, new CreateNewMapEventArgs(ddTheater.SelectedItem.Text, new Point2D(tbWidth.Value, tbHeight.Value), (byte)ddStartingLevel.SelectedItem.Tag));
+            OnCreateNewMap?.Invoke(this, new CreateNewMapEventArgs(ddTheater.SelectedItem.Text, 
+                new Point2D(tbWidth.Value, tbHeight.Value), Constants.IsFlatWorld ? (byte)0 : (byte)ddStartingLevel.SelectedItem.Tag));
             WindowManager.RemoveControl(this);
         }
     }
