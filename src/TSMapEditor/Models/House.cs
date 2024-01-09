@@ -8,9 +8,7 @@ namespace TSMapEditor.Models
 {
     public class BaseNode : IPositioned
     {
-        public BaseNode()
-        {
-        }
+        public BaseNode() { }
 
         public BaseNode(string structureTypeName, Point2D location)
         {

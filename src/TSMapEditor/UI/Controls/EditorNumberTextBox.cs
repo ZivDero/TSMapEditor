@@ -6,9 +6,7 @@ namespace TSMapEditor.UI.Controls
 {
     public class EditorNumberTextBox : EditorTextBox
     {
-        public EditorNumberTextBox(WindowManager windowManager) : base(windowManager)
-        {
-        }
+        public EditorNumberTextBox(WindowManager windowManager) : base(windowManager) { }
 
         public int DefaultValue { get; set; } = 0;
         public double DoubleDefaultValue { get; set; } = 0.0;

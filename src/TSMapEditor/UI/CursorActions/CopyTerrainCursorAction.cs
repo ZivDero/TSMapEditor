@@ -13,9 +13,7 @@ namespace TSMapEditor.UI.CursorActions
     /// </summary>
     public class CopyTerrainCursorAction : CursorAction
     {
-        public CopyTerrainCursorAction(ICursorActionTarget cursorActionTarget) : base(cursorActionTarget)
-        {
-        }
+        public CopyTerrainCursorAction(ICursorActionTarget cursorActionTarget) : base(cursorActionTarget) { }
 
         public override string GetName() => "Copy Terrain";
 

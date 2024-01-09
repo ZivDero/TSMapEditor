@@ -13,9 +13,7 @@ namespace TSMapEditor.Mutations.Classes.HeightMutations
     /// </summary>
     public class RaiseGroundMutation : RaiseGroundMutationBase
     {
-        public RaiseGroundMutation(IMutationTarget mutationTarget, Point2D originCell, BrushSize brushSize) : base(mutationTarget, originCell, brushSize)
-        {
-        }
+        public RaiseGroundMutation(IMutationTarget mutationTarget, Point2D originCell, BrushSize brushSize) : base(mutationTarget, originCell, brushSize) { }
 
         private static readonly TransitionRampInfo[] transitionRampInfos = new[]
         {

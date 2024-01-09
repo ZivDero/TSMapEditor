@@ -14,9 +14,7 @@ namespace TSMapEditor.UI.CursorActions
     /// </summary>
     class GenerateTerrainCursorAction : CursorAction
     {
-        public GenerateTerrainCursorAction(ICursorActionTarget cursorActionTarget) : base(cursorActionTarget)
-        {
-        }
+        public GenerateTerrainCursorAction(ICursorActionTarget cursorActionTarget) : base(cursorActionTarget) { }
 
         public override string GetName() => "Generate Terrain";
 

@@ -10,9 +10,7 @@ namespace TSMapEditor.UI.Controls
     {
         private const float ALPHA_RATE = 0.6f;
 
-        public DarkeningPanel(WindowManager windowManager) : base(windowManager)
-        {
-        }
+        public DarkeningPanel(WindowManager windowManager) : base(windowManager) { }
 
         public event EventHandler Hidden;
 

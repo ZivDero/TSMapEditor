@@ -10,9 +10,7 @@ namespace TSMapEditor.Models
     {
         public const int STANDARD_STANDING_FRAME_COUNT = 8;
 
-        public UnitType(string iniName) : base(iniName)
-        {
-        }
+        public UnitType(string iniName) : base(iniName) { }
 
         public VehicleArtConfig ArtConfig { get; private set; } = new VehicleArtConfig();
         public IArtConfig GetArtConfig() => ArtConfig;

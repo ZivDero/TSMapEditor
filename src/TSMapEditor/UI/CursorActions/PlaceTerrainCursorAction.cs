@@ -10,9 +10,7 @@ namespace TSMapEditor.UI.CursorActions
 {
     public class PlaceTerrainCursorAction : CursorAction
     {
-        public PlaceTerrainCursorAction(ICursorActionTarget cursorActionTarget) : base(cursorActionTarget)
-        {
-        }
+        public PlaceTerrainCursorAction(ICursorActionTarget cursorActionTarget) : base(cursorActionTarget) { }
 
         public override string GetName() => "Place Terrain Tiles";
 

@@ -13,9 +13,7 @@ namespace TSMapEditor.UI.CursorActions
     /// </summary>
     public class ManageBaseNodesCursorAction : CursorAction
     {
-        public ManageBaseNodesCursorAction(ICursorActionTarget cursorActionTarget) : base(cursorActionTarget)
-        {
-        }
+        public ManageBaseNodesCursorAction(ICursorActionTarget cursorActionTarget) : base(cursorActionTarget) { }
 
         public override string GetName() => "Manage Base Nodes";
 

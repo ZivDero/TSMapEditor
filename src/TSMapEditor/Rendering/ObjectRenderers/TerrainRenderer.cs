@@ -6,9 +6,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
 {
     public sealed class TerrainRenderer : ObjectRenderer<TerrainObject>
     {
-        public TerrainRenderer(RenderDependencies renderDependencies) : base(renderDependencies)
-        {
-        }
+        public TerrainRenderer(RenderDependencies renderDependencies) : base(renderDependencies) { }
 
         protected override Color ReplacementColor => Color.Green;
 

@@ -10,9 +10,7 @@ namespace TSMapEditor.UI.CursorActions
 {
     public class PlaceTubeCursorAction : CursorAction
     {
-        public PlaceTubeCursorAction(ICursorActionTarget cursorActionTarget) : base(cursorActionTarget)
-        {
-        }
+        public PlaceTubeCursorAction(ICursorActionTarget cursorActionTarget) : base(cursorActionTarget) { }
 
         public override string GetName() => "Place Tube";
 

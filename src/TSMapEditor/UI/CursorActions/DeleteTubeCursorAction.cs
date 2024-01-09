@@ -10,9 +10,7 @@ namespace TSMapEditor.UI.CursorActions
 {
     public class DeleteTubeCursorAction : CursorAction
     {
-        public DeleteTubeCursorAction(ICursorActionTarget cursorActionTarget) : base(cursorActionTarget)
-        {
-        }
+        public DeleteTubeCursorAction(ICursorActionTarget cursorActionTarget) : base(cursorActionTarget) { }
 
         public override string GetName() => "Delete Tube";
 

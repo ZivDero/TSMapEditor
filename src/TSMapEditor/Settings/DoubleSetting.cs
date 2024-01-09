@@ -5,9 +5,7 @@ namespace TSMapEditor.Settings
 {
     public class DoubleSetting : SettingBase<double>
     {
-        public DoubleSetting(string section, string key, double defaultValue) : base(section, key, defaultValue)
-        {
-        }
+        public DoubleSetting(string section, string key, double defaultValue) : base(section, key, defaultValue) { }
 
         protected override double GetValueFromString(string iniValue)
         {

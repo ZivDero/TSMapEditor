@@ -10,9 +10,7 @@ namespace TSMapEditor.UI.CursorActions
 {
     public class PlaceWaypointCursorAction : CursorAction
     {
-        public PlaceWaypointCursorAction(ICursorActionTarget cursorActionTarget) : base(cursorActionTarget)
-        {
-        }
+        public PlaceWaypointCursorAction(ICursorActionTarget cursorActionTarget) : base(cursorActionTarget) { }
 
         public override string GetName() => "Place Waypoint";
 

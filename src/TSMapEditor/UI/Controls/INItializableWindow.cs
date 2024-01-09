@@ -14,9 +14,7 @@ namespace TSMapEditor.UI.Controls
     /// </summary>
     public class INItializableWindow : EditorWindow
     {
-        public INItializableWindow(WindowManager windowManager) : base(windowManager)
-        {
-        }
+        public INItializableWindow(WindowManager windowManager) : base(windowManager) { }
 
         protected IniFile ConfigIni { get; private set; }
 

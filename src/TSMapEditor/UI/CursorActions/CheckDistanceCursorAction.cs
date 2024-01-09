@@ -14,9 +14,7 @@ namespace TSMapEditor.UI.CursorActions
     /// </summary>
     public class CheckDistanceCursorAction : CursorAction
     {
-        public CheckDistanceCursorAction(ICursorActionTarget cursorActionTarget) : base(cursorActionTarget)
-        {
-        }
+        public CheckDistanceCursorAction(ICursorActionTarget cursorActionTarget) : base(cursorActionTarget) { }
 
         public override string GetName() => "Check Distance";
 

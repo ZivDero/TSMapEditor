@@ -8,9 +8,7 @@ namespace TSMapEditor.UI.CursorActions
 {
     public class PlaceSmudgeCollectionCursorAction : CursorAction
     {
-        public PlaceSmudgeCollectionCursorAction(ICursorActionTarget cursorActionTarget) : base(cursorActionTarget)
-        {
-        }
+        public PlaceSmudgeCollectionCursorAction(ICursorActionTarget cursorActionTarget) : base(cursorActionTarget) { }
 
         public override string GetName() => "Place Smudge Collection";
 

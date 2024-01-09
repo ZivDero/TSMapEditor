@@ -12,9 +12,7 @@ namespace TSMapEditor.UI.CursorActions
     /// </summary>
     public class ChangeTechnoOwnerAction : CursorAction
     {
-        public ChangeTechnoOwnerAction(ICursorActionTarget cursorActionTarget) : base(cursorActionTarget)
-        {
-        }
+        public ChangeTechnoOwnerAction(ICursorActionTarget cursorActionTarget) : base(cursorActionTarget) { }
 
         public override string GetName() => "Change Object Owner";
 

@@ -6,9 +6,7 @@ namespace TSMapEditor.CCEngine
 {
     public class ShpLoadException : Exception
     {
-        public ShpLoadException(string message) : base(message)
-        {
-        }
+        public ShpLoadException(string message) : base(message) { }
     }
 
     [Flags]

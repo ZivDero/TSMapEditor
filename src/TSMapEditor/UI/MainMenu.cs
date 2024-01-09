@@ -23,9 +23,7 @@ namespace TSMapEditor.UI
         private const string DirectoryPrefix = "<DIR> ";
         private const int BrowseButtonWidth = 70;
 
-        public MainMenu(WindowManager windowManager) : base(windowManager)
-        {
-        }
+        public MainMenu(WindowManager windowManager) : base(windowManager) { }
 
         private string gameDirectory;
 

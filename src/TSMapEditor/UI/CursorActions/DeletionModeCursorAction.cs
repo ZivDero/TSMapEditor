@@ -10,9 +10,7 @@ namespace TSMapEditor.UI.CursorActions
     /// </summary>
     public class DeletionModeCursorAction : CursorAction
     {
-        public DeletionModeCursorAction(ICursorActionTarget cursorActionTarget) : base(cursorActionTarget)
-        {
-        }
+        public DeletionModeCursorAction(ICursorActionTarget cursorActionTarget) : base(cursorActionTarget) { }
 
         public override string GetName() => "Delete Object";
 

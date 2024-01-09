@@ -6,9 +6,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
 {
     public sealed class BuildingRenderer : ObjectRenderer<Structure>
     {
-        public BuildingRenderer(RenderDependencies renderDependencies) : base(renderDependencies)
-        {
-        }
+        public BuildingRenderer(RenderDependencies renderDependencies) : base(renderDependencies) { }
 
         protected override Color ReplacementColor => Color.Yellow;
 

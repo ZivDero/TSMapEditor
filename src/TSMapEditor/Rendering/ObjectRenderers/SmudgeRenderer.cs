@@ -6,9 +6,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
 {
     public class SmudgeRenderer : ObjectRenderer<Smudge>
     {
-        public SmudgeRenderer(RenderDependencies renderDependencies) : base(renderDependencies)
-        {
-        }
+        public SmudgeRenderer(RenderDependencies renderDependencies) : base(renderDependencies) { }
 
         protected override Color ReplacementColor => Color.Cyan;
 

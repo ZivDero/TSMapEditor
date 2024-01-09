@@ -6,9 +6,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
 {
     public class OverlayRenderer : ObjectRenderer<Overlay>
     {
-        public OverlayRenderer(RenderDependencies renderDependencies) : base(renderDependencies)
-        {
-        }
+        public OverlayRenderer(RenderDependencies renderDependencies) : base(renderDependencies) { }
 
         protected override Color ReplacementColor => new Color(255, 0, 255);
 

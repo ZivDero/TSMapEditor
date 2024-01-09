@@ -6,9 +6,7 @@ namespace TSMapEditor.Models
 {
     public class BridgeLoadException : Exception
     {
-        public BridgeLoadException(string message) : base(message)
-        {
-        }
+        public BridgeLoadException(string message) : base(message) { }
     }
 
     public enum BridgeKind

@@ -7,9 +7,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
 {
     public sealed class UnitRenderer : ObjectRenderer<Unit>
     {
-        public UnitRenderer(RenderDependencies renderDependencies) : base(renderDependencies)
-        {
-        }
+        public UnitRenderer(RenderDependencies renderDependencies) : base(renderDependencies) { }
 
         protected override Color ReplacementColor => Color.Red;
 

@@ -70,9 +70,7 @@ namespace TSMapEditor.UI
 
     public class SettingsPanel : EditorPanel
     {
-        public SettingsPanel(WindowManager windowManager) : base(windowManager)
-        {
-        }
+        public SettingsPanel(WindowManager windowManager) : base(windowManager) { }
 
         private XNADropDown ddRenderScale;
         private XNACheckBox chkBorderless;

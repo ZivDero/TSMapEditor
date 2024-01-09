@@ -9,9 +9,7 @@ namespace TSMapEditor.UI.CursorActions
 {
     public class ConnectedOverlayPlacementAction : CursorAction
     {
-        public ConnectedOverlayPlacementAction(ICursorActionTarget cursorActionTarget) : base(cursorActionTarget)
-        {
-        }
+        public ConnectedOverlayPlacementAction(ICursorActionTarget cursorActionTarget) : base(cursorActionTarget) { }
 
         public override string GetName() => "Place Connected Overlay";
         public ConnectedOverlayType ConnectedOverlayType { get; set; }

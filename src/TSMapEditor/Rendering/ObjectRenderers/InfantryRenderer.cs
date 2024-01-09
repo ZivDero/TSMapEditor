@@ -6,9 +6,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
 {
     public sealed class InfantryRenderer : ObjectRenderer<Infantry>
     {
-        public InfantryRenderer(RenderDependencies renderDependencies) : base(renderDependencies)
-        {
-        }
+        public InfantryRenderer(RenderDependencies renderDependencies) : base(renderDependencies) { }
 
         protected override Color ReplacementColor => Color.Teal;
 

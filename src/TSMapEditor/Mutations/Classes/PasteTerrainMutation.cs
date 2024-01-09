@@ -27,9 +27,7 @@ namespace TSMapEditor.Mutations.Classes
 
     public class CopiedMapDataSerializationException : Exception
     {
-        public CopiedMapDataSerializationException(string message) : base(message)
-        {
-        }
+        public CopiedMapDataSerializationException(string message) : base(message) { }
     }
 
     /// <summary>
@@ -42,9 +40,7 @@ namespace TSMapEditor.Mutations.Classes
 
         private byte[] buffer;
 
-        protected CopiedMapEntry()
-        {
-        }
+        protected CopiedMapEntry() { }
 
         protected CopiedMapEntry(Point2D offset)
         {
@@ -134,9 +130,7 @@ namespace TSMapEditor.Mutations.Classes
         public byte SubTileIndex;
         public byte HeightOffset;
 
-        public CopiedTerrainEntry()
-        {
-        }
+        public CopiedTerrainEntry() { }
 
         public CopiedTerrainEntry(Point2D offset, int tileIndex, byte subTileIndex, byte heightOffset) : base(offset)
         {
@@ -170,9 +164,7 @@ namespace TSMapEditor.Mutations.Classes
         public string OverlayTypeName;
         public int FrameIndex;
 
-        public CopiedOverlayEntry()
-        {
-        }
+        public CopiedOverlayEntry() { }
 
         public CopiedOverlayEntry(Point2D offset, string overlayTypeName, int frameIndex) : base(offset)
         {
@@ -202,9 +194,7 @@ namespace TSMapEditor.Mutations.Classes
     {
         public string SmudgeTypeName;
 
-        public CopiedSmudgeEntry() 
-        {
-        }
+        public CopiedSmudgeEntry()  { }
 
         public CopiedSmudgeEntry(Point2D offset, string smudgeTypeName) : base(offset)
         {
@@ -251,22 +241,16 @@ namespace TSMapEditor.Mutations.Classes
 
     public class CopiedTerrainObjectEntry : CopiedObjectEntry
     {
-        public CopiedTerrainObjectEntry()
-        {
-        }
+        public CopiedTerrainObjectEntry() { }
 
-        public CopiedTerrainObjectEntry(Point2D offset, string terrainObjectTypeName) : base(offset, terrainObjectTypeName)
-        {
-        }
+        public CopiedTerrainObjectEntry(Point2D offset, string terrainObjectTypeName) : base(offset, terrainObjectTypeName) { }
 
         public override CopiedEntryType EntryType => CopiedEntryType.TerrainObject;
     }
 
     public class CopiedTechnoEntry : CopiedObjectEntry
     {
-        public CopiedTechnoEntry()
-        {
-        }
+        public CopiedTechnoEntry() { }
 
         public CopiedTechnoEntry(Point2D offset, string objectTypeName, string ownerName, int hp, int veterancy, byte facing, string mission) : base(offset, objectTypeName)
         {
@@ -311,35 +295,25 @@ namespace TSMapEditor.Mutations.Classes
 
     public class CopiedVehicleEntry : CopiedTechnoEntry
     {
-        public CopiedVehicleEntry()
-        {
-        }
+        public CopiedVehicleEntry() { }
 
-        public CopiedVehicleEntry(Point2D offset, string vehicleTypeName, string ownerName, int hp, int veterancy, byte facing, string mission) : base(offset, vehicleTypeName, ownerName, hp, veterancy, facing, mission)
-        {
-        }
+        public CopiedVehicleEntry(Point2D offset, string vehicleTypeName, string ownerName, int hp, int veterancy, byte facing, string mission) : base(offset, vehicleTypeName, ownerName, hp, veterancy, facing, mission) { }
 
         public override CopiedEntryType EntryType => CopiedEntryType.Vehicle;
     }
 
     public class CopiedStructureEntry : CopiedTechnoEntry
     {
-        public CopiedStructureEntry()
-        {
-        }
+        public CopiedStructureEntry() { }
 
-        public CopiedStructureEntry(Point2D offset, string structureTypeName, string ownerName, int hp, int veterancy, byte facing, string mission) : base(offset, structureTypeName, ownerName, hp, veterancy, facing, mission)
-        {
-        }
+        public CopiedStructureEntry(Point2D offset, string structureTypeName, string ownerName, int hp, int veterancy, byte facing, string mission) : base(offset, structureTypeName, ownerName, hp, veterancy, facing, mission) { }
 
         public override CopiedEntryType EntryType => CopiedEntryType.Structure;
     }
 
     public class CopiedInfantryEntry : CopiedTechnoEntry
     {
-        public CopiedInfantryEntry()
-        {
-        }
+        public CopiedInfantryEntry() { }
 
         public CopiedInfantryEntry(Point2D offset, string infantryTypeName, string ownerName, int hp, int veterancy, byte facing, string mission, SubCell subCell) : base(offset, infantryTypeName, ownerName, hp, veterancy, facing, mission)
         {

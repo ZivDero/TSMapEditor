@@ -14,9 +14,7 @@ namespace TSMapEditor.UI.CursorActions.HeightActions
     /// </summary>
     public class FlattenGroundCursorAction : CursorAction
     {
-        public FlattenGroundCursorAction(ICursorActionTarget cursorActionTarget) : base(cursorActionTarget)
-        {
-        }
+        public FlattenGroundCursorAction(ICursorActionTarget cursorActionTarget) : base(cursorActionTarget) { }
 
         private int desiredHeightLevel = -1;
 
