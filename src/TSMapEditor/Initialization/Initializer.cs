@@ -84,7 +84,10 @@ namespace TSMapEditor.Initialization
                 action(map, obj, iniFile, objectSection);
         }
 
-        public void InitArt(IniFile iniFile) { }
+        public void InitArt(IniFile iniFile)
+        {
+
+        }
 
         private Weapon FindOrCreateWeapon(string weaponName, IniFile rulesIni)
         {
@@ -188,7 +191,10 @@ namespace TSMapEditor.Initialization
             terrainType.Image = artSection.GetStringValue("Image", terrainType.Image);
         }
 
-        private static void InitSmudgeType(INIDefineable obj, IniFile rulesIni, IniSection section) { }
+        private static void InitSmudgeType(INIDefineable obj, IniFile rulesIni, IniSection section)
+        {
+
+        }
 
         private static void InitSmudgeTypeArt(IMap map, AbstractObject obj, IniFile artIni, IniSection artSection)
         {
@@ -196,6 +202,9 @@ namespace TSMapEditor.Initialization
             smudgeType.Theater = artSection.GetBooleanValue("Theater", smudgeType.Theater);
         }
 
-        private static void InitAnimType(INIDefineable obj, IniFile rulesIni, IniSection section) { }
+        private static void InitAnimType(INIDefineable obj, IniFile rulesIni, IniSection section)
+        {
+
+        }
     }
 }
