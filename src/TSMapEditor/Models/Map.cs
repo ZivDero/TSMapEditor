@@ -199,7 +199,7 @@ namespace TSMapEditor.Models
             EditorConfig.Init(Rules);
         }
 
-        public void InitNew(IniFile rulesIni, IniFile firestormIni, IniFile artIni, IniFile artFirestormIni, string theaterName, Point2D size)
+        public void InitNew(IniFile rulesIni, IniFile firestormIni, IniFile artIni, IniFile artFirestormIni, string theaterName, Point2D size, byte startingLevel)
         {
             const int marginY = 6;
             const int marginX = 4;
@@ -211,11 +211,11 @@ namespace TSMapEditor.Models
             baseMap.SetStringValue("Map", "Theater", theaterName);
             baseMap.SetStringValue("Map", "Size", $"0,0,{size.X},{size.Y}");
             baseMap.SetStringValue("Map", "LocalSize", $"{marginX},{marginY},{size.X - (marginX * 2)},{size.Y - (marginY * 2)}");
-            LoadExisting(rulesIni, firestormIni, artIni, artFirestormIni, baseMap);
-            SetTileData(null);
+            LoadExisting(rulesIni, firestormIni, artIni, artFirestormIni, baseMap, ignoreIsoMapPack: true);
+            SetTileData(null, startingLevel);
         }
 
-        public void LoadExisting(IniFile rulesIni, IniFile firestormIni, IniFile artIni, IniFile artFirestormIni, IniFile mapIni)
+        public void LoadExisting(IniFile rulesIni, IniFile firestormIni, IniFile artIni, IniFile artFirestormIni, IniFile mapIni, bool ignoreIsoMapPack = false)
         {
             InitializeRules(rulesIni, artIni, firestormIni, artFirestormIni);
 
@@ -230,7 +230,9 @@ namespace TSMapEditor.Models
 
             MapLoader.ReadBasicSection(this, mapIni);
             MapLoader.ReadMapSection(this, mapIni);
-            MapLoader.ReadIsoMapPack(this, mapIni);
+
+            if (!ignoreIsoMapPack)
+                MapLoader.ReadIsoMapPack(this, mapIni);
 
             MapLoader.ReadHouseTypes(this, mapIni);
             MapLoader.ReadHouses(this, mapIni);
@@ -446,7 +448,7 @@ namespace TSMapEditor.Models
             return true;
         }
 
-        public void SetTileData(List<MapTile> tiles)
+        public void SetTileData(List<MapTile> tiles, byte defaultLevel = 0)
         {
             if (tiles != null)
             {
@@ -474,12 +476,12 @@ namespace TSMapEditor.Models
                 {
                     if (Tiles[ty][tx] == null)
                     {
-                        Tiles[ty][tx] = new MapTile() { X = (short)tx, Y = (short)ty };
+                        Tiles[ty][tx] = new MapTile() { X = (short)tx, Y = (short)ty, Level = defaultLevel };
                     }
 
                     if (tx < Size.X + ox - 1 && Tiles[ty][tx + 1] == null)
                     {
-                        Tiles[ty][tx + 1] = new MapTile() { X = (short)(tx + 1), Y = (short)ty };
+                        Tiles[ty][tx + 1] = new MapTile() { X = (short)(tx + 1), Y = (short)ty, Level = defaultLevel };
                     }
 
                     tx++;
