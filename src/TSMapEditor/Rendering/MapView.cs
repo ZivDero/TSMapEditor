@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text;
+using TSMapEditor.CCEngine;
 using TSMapEditor.GameMath;
 using TSMapEditor.Models;
 using TSMapEditor.Mutations;
@@ -495,8 +496,17 @@ namespace TSMapEditor.Rendering
             Renderer.PushSettings(colorDrawSettings);
             DoForVisibleCells(DrawTerrainTileAndRegisterObjects);
 
+            VxlRenderer vl = new() { GraphicsDevice = GraphicsDevice };
+            var tex = vl.TestDraw();
+
             Renderer.PushRenderTarget(objectRenderTarget, colorDrawSettings);
             GraphicsDevice.Clear(Color.Transparent);
+
+            DrawTexture(tex,
+                new Rectangle(0, 0, 400, 400),
+                new Rectangle(100, 100, 400, 400),
+                Color.White);
+
             DrawSmudges();
             DrawObjects();
             Renderer.PopRenderTarget();
