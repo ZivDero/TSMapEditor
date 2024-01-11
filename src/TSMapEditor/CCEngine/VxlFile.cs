@@ -6,37 +6,44 @@ using CNCMaps.FileFormats.VirtualFileSystem;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace CNCMaps.FileFormats
+namespace TSMapEditor.CCEngine
 {
-    /// <summary>
-    /// Based on descriptions in Red Alert 2 File Format Descriptions by Shiny
-    /// http://www.ppmsite.com/forum/viewtopic.php?t=29369&sid=12b41f85a5578715a87fc323bf834cca
-    /// Uses some helper functions by DCoder1337 from https://github.com/DCoderLT/cncpp/blob/master/CCClasses/FileFormats/Binary/VXL.cs
-    /// </summary>
+    public class VxlLoadException : Exception
+    {
+        public VxlLoadException(string message) : base(message) { }
+    }
 
     public class VxlFile : VirtualFile
     {
-        private bool _initialized, _valid = false;
-
-        public FileHeader Header = new FileHeader();
-        public List<Section> Sections = new List<Section>();
+        public FileHeader Header = new();
+        public List<Section> Sections = new();
 
         public VxlFile(Stream baseStream, string filename, int baseOffset, int fileSize, bool isBuffered = false)
-            : base(baseStream, filename, baseOffset, fileSize, isBuffered) { }
-        public VxlFile(Stream baseStream, string filename = "", bool isBuffered = true)
-            : base(baseStream, filename, isBuffered) { }
-
-        public bool Initialize()
+            : base(baseStream, filename, baseOffset, fileSize, isBuffered)
         {
-            if (_initialized) return _valid;
-            _initialized = true;
+            Initialize();
+        }
 
+        public VxlFile(Stream baseStream, string filename = "", bool isBuffered = true)
+            : base(baseStream, filename, isBuffered)
+        {
+            Initialize();
+        }
+
+        public VxlFile(byte[] buffer) : base(new MemoryStream(buffer), "", true)
+        {
+            Initialize();
+        }
+
+
+        private void Initialize()
+        {
             if (Length < FileHeader.Size)
-                return false;
+                throw new VxlLoadException(nameof(VxlFile) + " .vxl is shorter than specified in its header!");
 
             Header.Read(this);
             if (Header.HeaderCount == 0 || Header.TailerCount == 0 || Header.TailerCount != Header.HeaderCount)
-                return false;
+                throw new VxlLoadException(nameof(VxlFile) + " .vxl has no header or tailer sections, or their count doesn't match!");
 
             // start with headers
             for (int i = 0; i < Header.HeaderCount; ++i)
@@ -56,9 +63,6 @@ namespace CNCMaps.FileFormats
                 Seek(bodyStart, SeekOrigin.Begin);
                 Sections[i].ReadBodySpans(this);
             }
-
-            _valid = true;
-            return _valid;
         }
 
         public class FileHeader
@@ -74,7 +78,7 @@ namespace CNCMaps.FileFormats
             public byte PaletteRemapEnd;
             // public Palette Palette; // not actually used
 
-            public bool Read(VxlFile f)
+            public void Read(VxlFile f)
             {
                 FileName = f.ReadCString(16);
                 PaletteCount = f.ReadUInt32();
@@ -86,7 +90,6 @@ namespace CNCMaps.FileFormats
                 PaletteRemapEnd = f.ReadByte();
                 var pal = f.Read(768);
                 // Palette = new Palette(pal, "voxel palette");
-                return true;
             }
 
         };
@@ -108,13 +111,9 @@ namespace CNCMaps.FileFormats
 
             public byte Height;
 
-            public List<Voxel> Voxels = new List<Voxel>();
+            public List<Voxel> Voxels = new();
 
-            public int SpanLength
-            {
-                get { return (EndIndex - StartIndex) + 1; }
-            }
-
+            public int SpanLength => (EndIndex - StartIndex) + 1;
             public void Read(VirtualFile f)
             {
                 if (StartIndex == -1 || EndIndex == -1)
@@ -158,67 +157,39 @@ namespace CNCMaps.FileFormats
             // header
             public string Name;
             public uint LimbNumber;
-            public uint unknown1;
-            public uint unknown2;
+            private uint unknown1;
+            private uint unknown2;
 
             // body
             public SectionSpan[,] Spans;
 
             // tailer
-            public UInt32 StartingSpanOffset;
-            public UInt32 EndingSpanOffset;
-            public UInt32 DataSpanOffset;
-            public float HVAMultiplier;
-            public TransfMatrix TM = new TransfMatrix();
-            public Vector3 MinBounds = new Vector3();
-            public Vector3 MaxBounds = new Vector3();
+            public uint StartingSpanOffset;
+            public uint EndingSpanOffset;
+            public uint DataSpanOffset;
+            public float HvaMultiplier;
+            public TransfMatrix TransfMatrix = new();
+            public Vector3 MinBounds;
+            public Vector3 MaxBounds;
             public byte SizeX;
             public byte SizeY;
             public byte SizeZ;
             public byte NormalsMode;
 
-            public float SpanX
-            {
-                get { return MaxBounds.X - MinBounds.X; }
-            }
-
-            public float SpanY
-            {
-                get { return MaxBounds.Y - MinBounds.Y; }
-            }
-
-            public float SpanZ
-            {
-                get { return MaxBounds.Z - MinBounds.Z; }
-            }
-
-            public float ScaleX
-            {
-                get { return SpanX * 1.0f / SizeX; }
-            }
-
-            public float ScaleY
-            {
-                get { return SpanY * 1.0f / SizeY; }
-            }
-
-            public float ScaleZ
-            {
-                get { return SpanZ * 1.0f / SizeZ; }
-            }
-
-            public Vector3 Scale
-            {
-                get { return new Vector3(ScaleX, ScaleY, ScaleZ); }
-            }
-
-            public bool ReadHeader(VxlFile f)
+            public float SpanX => MaxBounds.X - MinBounds.X;
+            public float SpanY => MaxBounds.Y - MinBounds.Y;
+            public float SpanZ => MaxBounds.Z - MinBounds.Z;
+            public float ScaleX => SpanX * 1.0f / SizeX;
+            public float ScaleY => SpanY * 1.0f / SizeY;
+            public float ScaleZ => SpanZ * 1.0f / SizeZ;
+            public Vector3 Scale => new(ScaleX, ScaleY, ScaleZ);
+            
+            public void ReadHeader(VxlFile f)
             {
                 Name = f.ReadCString(16);
                 LimbNumber = f.ReadUInt32();
                 unknown1 = f.ReadUInt32();
                 unknown2 = f.ReadUInt32();
-                return true;
             }
 
             public void ReadBodySpans(VxlFile f)
@@ -252,13 +223,13 @@ namespace CNCMaps.FileFormats
                 }
             }
 
-            public bool ReadTailer(VxlFile f)
+            public void ReadTailer(VxlFile f)
             {
                 StartingSpanOffset = f.ReadUInt32();
                 EndingSpanOffset = f.ReadUInt32();
                 DataSpanOffset = f.ReadUInt32();
-                HVAMultiplier = f.ReadFloat();
-                TM.Read(f);
+                HvaMultiplier = f.ReadFloat();
+                TransfMatrix.Read(f);
                 MinBounds.X = f.ReadFloat();
                 MinBounds.Y = f.ReadFloat();
                 MinBounds.Z = f.ReadFloat();
@@ -270,8 +241,6 @@ namespace CNCMaps.FileFormats
                 SizeY = f.ReadByte();
                 SizeZ = f.ReadByte();
                 NormalsMode = f.ReadByte();
-
-                return true;
             }
 
             public Vector3[] GetNormals()
@@ -287,7 +256,7 @@ namespace CNCMaps.FileFormats
                     case 4:
                         return Normals4;
                     default:
-                        throw new ArgumentException();
+                        throw new ArgumentException("Voxel normals index ranges from 1 to 4");
                 }
             }
 
@@ -303,7 +272,7 @@ namespace CNCMaps.FileFormats
                 var normals = GetNormals();
                 return normals[p < normals.Length ? p : normals.Length - 1];
             }
-        };
+        }
 
         #region Normal Tables
 

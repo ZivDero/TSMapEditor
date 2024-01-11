@@ -1,20 +1,21 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using CNCMaps.FileFormats.VirtualFileSystem;
+using Microsoft.Xna.Framework;
 using Rampastring.Tools;
-using SharpDX;
 
-namespace CNCMaps.FileFormats
+namespace TSMapEditor.CCEngine
 {
+    public class HvaLoadException : Exception
+    {
+        public HvaLoadException(string message) : base(message) { }
+    }
 
-    /// <summary>Hva file.</summary>
     public class HvaFile : VirtualFile
     {
-
         public int NumFrames { get; set; }
         public List<Section> Sections { get; set; }
-
-        bool _initialized;
 
         public class Section
         {
@@ -29,12 +30,22 @@ namespace CNCMaps.FileFormats
         public HvaFile(Stream baseStream, string filename, int baseOffset, int fileSize, bool isBuffered = true)
             : base(baseStream, filename, baseOffset, fileSize, isBuffered)
         {
+            Initialize();
         }
 
-        public void Initialize()
+        public HvaFile(Stream baseStream, string filename = "", bool isBuffered = true)
+            : base(baseStream, filename, isBuffered)
         {
-            if (_initialized) return;
+            Initialize();
+        }
 
+        public HvaFile(byte[] buffer) : base(new MemoryStream(buffer), "", true)
+        {
+            Initialize();
+        }
+
+        private void Initialize()
+        {
             Logger.Log("Loading HVA file {0}", FileName);
             Seek(0, SeekOrigin.Begin);
             ReadCString(16); // filename
@@ -51,10 +62,8 @@ namespace CNCMaps.FileFormats
             for (int frame = 0; frame < NumFrames; frame++)
                 for (int section = 0; section < Sections.Count; section++)
                     Sections[section].Matrices.Add(ReadMatrix());
-
             
             Logger.Log("Loaded HVA file {0} with {1} sections", FileName, Sections.Count);
-            _initialized = true;
         }
 
         private float[] ReadMatrix()
@@ -67,31 +76,23 @@ namespace CNCMaps.FileFormats
             return ret;
         }
 
-        //public Matrix4 LoadGLMatrix(string section, int frame = 0)
-        //{
-        //    return ToGLMatrix(Sections.Find(s => s.Name == section).Matrices[frame]);
-        //}
+        public Matrix LoadMatrix(string section, int frame = 0)
+        {
+            return ToMatrix(Sections.Find(s => s.Name == section).Matrices[frame]);
+        }
 
-        //public Matrix4 LoadGLMatrix(int section, int frame = 0)
-        //{
-        //    Initialize();
-        //    var hvaMatrix = Sections[section].Matrices[frame];
-        //    return ToGLMatrix(hvaMatrix);
-        //}
+        public Matrix LoadMatrix(int section, int frame = 0)
+        {
+            return ToMatrix(Sections[section].Matrices[frame]);
+        }
 
-        //private static Matrix4 ToGLMatrix(float[] hvaMatrix)
-        //{
-        //    //return new Matrix4(
-        //    //	hvaMatrix[0], hvaMatrix[1], hvaMatrix[2], 0,
-        //    //	hvaMatrix[3], hvaMatrix[4], hvaMatrix[5], 0,
-        //    //	hvaMatrix[6], hvaMatrix[7], hvaMatrix[8], 0,
-        //    //	hvaMatrix[9], hvaMatrix[10], hvaMatrix[11], 1);
-
-        //    return new Matrix4(
-        //        hvaMatrix[0], hvaMatrix[4], hvaMatrix[8], 0,
-        //        hvaMatrix[1], hvaMatrix[5], hvaMatrix[9], 0,
-        //        hvaMatrix[2], hvaMatrix[6], hvaMatrix[10], 0,
-        //        hvaMatrix[3], hvaMatrix[7], hvaMatrix[11], 1);
-        //}
+        private static Matrix ToMatrix(float[] hvaMatrix)
+        {
+            return new Matrix(
+                hvaMatrix[0], hvaMatrix[4], hvaMatrix[8], 0,
+                hvaMatrix[1], hvaMatrix[5], hvaMatrix[9], 0,
+                hvaMatrix[2], hvaMatrix[6], hvaMatrix[10], 0,
+                hvaMatrix[3], hvaMatrix[7], hvaMatrix[11], 1);
+        }
     }
 }

@@ -9,6 +9,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using TSMapEditor.CCEngine;
 using TSMapEditor.Models;
+using TSMapEditor.Rendering.ObjectRenderers;
 using TSMapEditor.Settings;
 
 namespace TSMapEditor.Rendering
@@ -26,9 +27,62 @@ namespace TSMapEditor.Rendering
         Theater Theater { get; }
     }
 
-    public class ObjectImage
+    public class VoxelImage : IDisposable
     {
-        public ObjectImage(GraphicsDevice graphicsDevice, ShpFile shp, byte[] shpFileData, Palette palette, List<int> framesToLoad = null, bool remapable = false, PositionedTexture pngTexture = null)
+        public VoxelImage(GraphicsDevice graphicsDevice, VxlFile vxl, HvaFile hva, Palette palette,
+            bool remapable = false)
+        {
+            this.graphicsDevice = graphicsDevice;
+            this.vxl = vxl;
+            this.hva = hva;
+            this.palette = palette;
+            this.remapable = remapable;
+        }
+
+        private readonly GraphicsDevice graphicsDevice;
+        private readonly VxlFile vxl;
+        private readonly HvaFile hva;
+        private readonly Palette palette;
+        private readonly bool remapable;
+
+        public void Dispose()
+        {
+            foreach (var f in Frames)
+                f.Value.Dispose();
+
+            foreach (var f in RemapFrames)
+                f.Value.Dispose();
+        }
+
+        public PositionedTexture GetFrame(byte facing, RampType ramp)
+        {
+            var key = (facing, ramp);
+            if (Frames.TryGetValue(key, out PositionedTexture value))
+                return value;
+
+            var texture = VxlRenderer.Render(graphicsDevice, facing, ramp, vxl, hva, palette);
+            var positionedTexture = new PositionedTexture(texture.Width, texture.Height, 0, 0, texture);
+            Frames[key] = positionedTexture;
+            return positionedTexture;
+        }
+
+        public PositionedTexture GetRemapFrame(byte facing, RampType ramp)
+        {
+            var key = (facing, ramp);
+            if (RemapFrames.TryGetValue(key, out PositionedTexture value))
+                return value;
+
+            return null;
+        }
+
+        public Dictionary<(byte facing, RampType ramp), PositionedTexture> Frames { get; set; }
+        public Dictionary<(byte facing, RampType ramp), PositionedTexture> RemapFrames { get; set; }
+    }
+
+    public class ObjectImage : IDisposable
+    {
+        public ObjectImage(GraphicsDevice graphicsDevice, ShpFile shp, byte[] shpFileData, Palette palette,
+            List<int> framesToLoad = null, bool remapable = false, PositionedTexture pngTexture = null)
         {
             if (pngTexture != null && !remapable)
             {
@@ -159,6 +213,8 @@ namespace TSMapEditor.Rendering
     public class TheaterGraphics : ITheater
     {
         private const string SHP_FILE_EXTENSION = ".SHP";
+        private const string VXL_FILE_EXTENSION = ".VXL";
+        private const string HVA_FILE_EXTENSION = ".HVA";
         private const string PNG_FILE_EXTENSION = ".PNG";
 
         public TheaterGraphics(GraphicsDevice graphicsDevice, Theater theater, CCFileManager fileManager, Rules rules)

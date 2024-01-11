@@ -256,6 +256,32 @@ namespace TSMapEditor
             return new Vector2(length * (float)Math.Cos(angle), length * (float)Math.Sin(angle));
         }
 
+        public static Matrix MatrixFromEulerZYX(Vector3 angles)
+        {
+            (float Sin, float Cos) alpha = ((float)Math.Sin(angles.Z), (float)Math.Cos(angles.Z));
+            (float Sin, float Cos) beta = ((float)Math.Sin(angles.Y), (float)Math.Cos(angles.Y));
+            (float Sin, float Cos) gamma = ((float)Math.Sin(angles.X), (float)Math.Cos(angles.X));
+
+            return new Matrix(
+                alpha.Cos * beta.Cos, alpha.Cos * beta.Sin * gamma.Sin - alpha.Sin * gamma.Cos, alpha.Cos * beta.Sin * gamma.Cos + alpha.Sin * gamma.Sin, 0,
+                alpha.Sin * beta.Cos, alpha.Sin * beta.Sin * gamma.Sin + alpha.Cos * gamma.Cos, alpha.Sin * beta.Sin * gamma.Cos - alpha.Cos * gamma.Sin, 0,
+                -beta.Sin, beta.Cos * gamma.Sin, beta.Cos * gamma.Cos, 0,
+                0, 0, 0, 1);
+        }
+
+        public static Matrix MatrixFromEulerXYZ(Vector3 angles)
+        {
+            (float Sin, float Cos) alpha = ((float)Math.Sin(angles.X), (float)Math.Cos(angles.X));
+            (float Sin, float Cos) beta = ((float)Math.Sin(angles.Y), (float)Math.Cos(angles.Y));
+            (float Sin, float Cos) gamma = ((float)Math.Sin(angles.Z), (float)Math.Cos(angles.Z));
+
+            return new Matrix(
+                beta.Cos * gamma.Cos, alpha.Sin * beta.Sin * gamma.Cos - alpha.Cos * gamma.Sin, alpha.Cos * beta.Sin * gamma.Cos + alpha.Sin * gamma.Sin, 0,
+                beta.Cos * gamma.Sin, alpha.Sin * beta.Sin * gamma.Sin + alpha.Cos * gamma.Cos, alpha.Cos * beta.Sin * gamma.Sin - alpha.Sin * gamma.Cos, 0,
+                -beta.Sin, alpha.Sin * beta.Cos, alpha.Cos * beta.Cos, 0,
+                0, 0, 0, 1);
+        }
+
         public static Color ColorFromString(string str)
         {
             string[] parts = str.Split(',');

@@ -5,6 +5,7 @@ using Rampastring.XNAUI.XNAControls;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text;
 using TSMapEditor.CCEngine;
@@ -496,8 +497,22 @@ namespace TSMapEditor.Rendering
             Renderer.PushSettings(colorDrawSettings);
             DoForVisibleCells(DrawTerrainTileAndRegisterObjects);
 
-            VxlRenderer vl = new() { GraphicsDevice = GraphicsDevice };
-            var tex = vl.TestDraw();
+            VxlFile vxlFile;
+            using (Stream stream = File.OpenRead(@"C:\Users\Parasite03\Desktop\flata.vxl"))
+            {
+                vxlFile = new VxlFile(stream);
+            }
+
+            HvaFile hvaFile;
+            using (Stream stream = File.OpenRead(@"C:\Users\Parasite03\Desktop\flata.hva"))
+            {
+                hvaFile = new HvaFile(stream);
+            }
+
+            byte[] paletteData = File.ReadAllBytes(@"C:\Users\Parasite03\Desktop\unittem.pal");
+            Palette unittem = new(paletteData);
+
+            var tex = VxlRenderer.Render(GraphicsDevice, 64, 0, vxlFile, hvaFile, unittem);
 
             Renderer.PushRenderTarget(objectRenderTarget, colorDrawSettings);
             GraphicsDevice.Clear(Color.Transparent);
