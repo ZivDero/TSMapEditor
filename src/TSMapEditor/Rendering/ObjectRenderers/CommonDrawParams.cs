@@ -19,10 +19,10 @@
 
     public class ShapeDrawParams : CommonDrawParams
     {
-        public ObjectImage Graphics;
+        public ShapeImage Graphics;
         public string IniName;
 
-        public ShapeDrawParams(ObjectImage graphics, string iniName)
+        public ShapeDrawParams(ShapeImage graphics, string iniName)
         {
             Graphics = graphics;
             IniName = iniName;

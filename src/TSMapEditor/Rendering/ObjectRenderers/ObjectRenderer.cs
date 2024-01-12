@@ -243,7 +243,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             }
         }
 
-        protected void DrawObjectImage(T gameObject, CommonDrawParams drawParams, ObjectImage image,
+        protected void DrawObjectImage(T gameObject, CommonDrawParams drawParams, ShapeImage image,
             int frameIndex, Color color, bool drawRemap, Color remapColor, Point2D drawPoint, int initialYDrawPointWithoutCellHeight)
         {
             PositionedTexture frame = image.Frames[frameIndex];

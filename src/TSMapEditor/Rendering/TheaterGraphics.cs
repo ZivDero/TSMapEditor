@@ -137,9 +137,9 @@ namespace TSMapEditor.Rendering
         public Dictionary<(byte facing, RampType ramp), PositionedTexture> RemapFrames { get; set; } = new();
     }
 
-    public class ObjectImage : IDisposable
+    public class ShapeImage : IDisposable
     {
-        public ObjectImage(GraphicsDevice graphicsDevice, ShpFile shp, byte[] shpFileData, Palette palette,
+        public ShapeImage(GraphicsDevice graphicsDevice, ShpFile shp, byte[] shpFileData, Palette palette,
             List<int> framesToLoad = null, bool remapable = false, PositionedTexture pngTexture = null)
         {
             if (pngTexture != null && !remapable)
@@ -352,7 +352,7 @@ namespace TSMapEditor.Rendering
 
             var shpFile = new ShpFile();
             shpFile.ParseFromBuffer(buildingZData);
-            BuildingZ = new ObjectImage(graphicsDevice, shpFile, buildingZData, palette);
+            BuildingZ = new ShapeImage(graphicsDevice, shpFile, buildingZData, palette);
         }
 
         private void ReadTileTextures()
@@ -456,7 +456,7 @@ namespace TSMapEditor.Rendering
 
             var unitPalette = GetPaletteOrFail(Theater.UnitPaletteName);
 
-            TerrainObjectTextures = new ObjectImage[terrainTypes.Count];
+            TerrainObjectTextures = new ShapeImage[terrainTypes.Count];
             for (int i = 0; i < terrainTypes.Count; i++)
             {
                 string shpFileName = terrainTypes[i].Image != null ? terrainTypes[i].Image : terrainTypes[i].ININame;
@@ -473,7 +473,7 @@ namespace TSMapEditor.Rendering
                 {
                     // Load graphics as PNG
 
-                    TerrainObjectTextures[i] = new ObjectImage(graphicsDevice, null, null, null, null, false, PositionedTextureFromBytes(data));
+                    TerrainObjectTextures[i] = new ShapeImage(graphicsDevice, null, null, null, null, false, PositionedTextureFromBytes(data));
                 }
                 else
                 {
@@ -486,7 +486,7 @@ namespace TSMapEditor.Rendering
 
                     var shpFile = new ShpFile(shpFileName);
                     shpFile.ParseFromBuffer(data);
-                    TerrainObjectTextures[i] = new ObjectImage(graphicsDevice, shpFile, data,
+                    TerrainObjectTextures[i] = new ShapeImage(graphicsDevice, shpFile, data,
                         terrainTypes[i].SpawnsTiberium ? unitPalette : theaterPalette);
                 }
             }
@@ -498,8 +498,8 @@ namespace TSMapEditor.Rendering
         {
             Logger.Log("Loading building textures.");
 
-            BuildingTextures = new ObjectImage[buildingTypes.Count];
-            BuildingBibTextures = new ObjectImage[buildingTypes.Count];
+            BuildingTextures = new ShapeImage[buildingTypes.Count];
+            BuildingBibTextures = new ShapeImage[buildingTypes.Count];
 
             for (int i = 0; i < buildingTypes.Count; i++)
             {
@@ -558,7 +558,7 @@ namespace TSMapEditor.Rendering
 
                 var shpFile = new ShpFile(loadedShpName);
                 shpFile.ParseFromBuffer(shpData);
-                BuildingTextures[i] = new ObjectImage(graphicsDevice, shpFile, shpData, palette, null, buildingType.ArtConfig.Remapable);
+                BuildingTextures[i] = new ShapeImage(graphicsDevice, shpFile, shpData, palette, null, buildingType.ArtConfig.Remapable);
 
                 // If this building has a bib, attempt to load it
                 if (!string.IsNullOrWhiteSpace(buildingType.ArtConfig.BibShape))
@@ -599,7 +599,7 @@ namespace TSMapEditor.Rendering
 
                     var bibShpFile = new ShpFile(loadedShpName);
                     bibShpFile.ParseFromBuffer(shpData);
-                    BuildingBibTextures[i] = new ObjectImage(graphicsDevice, bibShpFile, shpData, palette, null, buildingType.ArtConfig.Remapable);
+                    BuildingBibTextures[i] = new ShapeImage(graphicsDevice, bibShpFile, shpData, palette, null, buildingType.ArtConfig.Remapable);
                 }
             }
 
@@ -658,7 +658,7 @@ namespace TSMapEditor.Rendering
         {
             Logger.Log("Loading animation textures.");
 
-            AnimTextures = new ObjectImage[animTypes.Count];
+            AnimTextures = new ShapeImage[animTypes.Count];
 
             for (int i = 0; i < animTypes.Count; i++)
             {
@@ -716,7 +716,7 @@ namespace TSMapEditor.Rendering
 
                 var shpFile = new ShpFile(loadedShpName);
                 shpFile.ParseFromBuffer(shpData);
-                AnimTextures[i] = new ObjectImage(graphicsDevice, shpFile, shpData, palette, null,
+                AnimTextures[i] = new ShapeImage(graphicsDevice, shpFile, shpData, palette, null,
                     animType.ArtConfig.Remapable || animType.ArtConfig.IsBuildingAnim);
             }
 
@@ -727,8 +727,8 @@ namespace TSMapEditor.Rendering
         {
             Logger.Log("Loading unit textures.");
 
-            var loadedTextures = new Dictionary<string, ObjectImage>();
-            UnitTextures = new ObjectImage[unitTypes.Count];
+            var loadedTextures = new Dictionary<string, ShapeImage>();
+            UnitTextures = new ShapeImage[unitTypes.Count];
 
             for (int i = 0; i < unitTypes.Count; i++)
             {
@@ -739,7 +739,7 @@ namespace TSMapEditor.Rendering
 
                 string shpFileName = string.IsNullOrWhiteSpace(unitType.Image) ? unitType.ININame : unitType.Image;
                 shpFileName += SHP_FILE_EXTENSION;
-                if (loadedTextures.TryGetValue(shpFileName, out ObjectImage loadedImage))
+                if (loadedTextures.TryGetValue(shpFileName, out ShapeImage loadedImage))
                 {
                     UnitTextures[i] = loadedImage;
                     continue;
@@ -768,7 +768,7 @@ namespace TSMapEditor.Rendering
                 for (int j = 0; j < regularFrameCount; j++)
                     framesToLoad.Add(framesToLoad[j] + (shpFile.FrameCount / 2));
 
-                UnitTextures[i] = new ObjectImage(graphicsDevice, shpFile, shpData, unitPalette, framesToLoad, unitType.ArtConfig.Remapable);
+                UnitTextures[i] = new ShapeImage(graphicsDevice, shpFile, shpData, unitPalette, framesToLoad, unitType.ArtConfig.Remapable);
                 loadedTextures[shpFileName] = UnitTextures[i];
             }
 
@@ -866,8 +866,8 @@ namespace TSMapEditor.Rendering
         {
             Logger.Log("Loading infantry textures.");
 
-            var loadedTextures = new Dictionary<string, ObjectImage>();
-            InfantryTextures = new ObjectImage[infantryTypes.Count];
+            var loadedTextures = new Dictionary<string, ShapeImage>();
+            InfantryTextures = new ShapeImage[infantryTypes.Count];
 
             for (int i = 0; i < infantryTypes.Count; i++)
             {
@@ -876,7 +876,7 @@ namespace TSMapEditor.Rendering
                 string image = string.IsNullOrWhiteSpace(infantryType.Image) ? infantryType.ININame : infantryType.Image;
                 string shpFileName = string.IsNullOrWhiteSpace(infantryType.ArtConfig.Image) ? image : infantryType.ArtConfig.Image;
                 shpFileName += SHP_FILE_EXTENSION;
-                if (loadedTextures.TryGetValue(shpFileName, out ObjectImage loadedImage))
+                if (loadedTextures.TryGetValue(shpFileName, out ShapeImage loadedImage))
                 {
                     InfantryTextures[i] = loadedImage;
                     continue;
@@ -908,7 +908,7 @@ namespace TSMapEditor.Rendering
                 for (int j = 0; j < regularFrameCount; j++)
                     framesToLoad.Add(framesToLoad[j] + (shpFile.FrameCount / 2));
 
-                InfantryTextures[i] = new ObjectImage(graphicsDevice, shpFile, shpData, unitPalette, null, infantryType.ArtConfig.Remapable);
+                InfantryTextures[i] = new ShapeImage(graphicsDevice, shpFile, shpData, unitPalette, null, infantryType.ArtConfig.Remapable);
                 loadedTextures[shpFileName] = InfantryTextures[i];
             }
 
@@ -919,7 +919,7 @@ namespace TSMapEditor.Rendering
         {
             Logger.Log("Loading overlay textures.");
 
-            OverlayTextures = new ObjectImage[overlayTypes.Count];
+            OverlayTextures = new ShapeImage[overlayTypes.Count];
             for (int i = 0; i < overlayTypes.Count; i++)
             {
                 var overlayType = overlayTypes[i];
@@ -938,7 +938,7 @@ namespace TSMapEditor.Rendering
                 {
                     // Load graphics as PNG
 
-                    OverlayTextures[i] = new ObjectImage(graphicsDevice, null, null, null, null, false, PositionedTextureFromBytes(pngData));
+                    OverlayTextures[i] = new ShapeImage(graphicsDevice, null, null, null, null, false, PositionedTextureFromBytes(pngData));
                 }
                 else
                 {
@@ -990,7 +990,7 @@ namespace TSMapEditor.Rendering
 
                     bool isRemapable = overlayType.Tiberium && !Constants.TheaterPaletteForTiberium;
 
-                    OverlayTextures[i] = new ObjectImage(graphicsDevice, shpFile, shpData, palette, null, isRemapable, null);
+                    OverlayTextures[i] = new ShapeImage(graphicsDevice, shpFile, shpData, palette, null, isRemapable, null);
                 }
             }
 
@@ -1001,7 +1001,7 @@ namespace TSMapEditor.Rendering
         {
             Logger.Log("Loading smudge textures.");
 
-            SmudgeTextures = new ObjectImage[smudgeTypes.Count];
+            SmudgeTextures = new ShapeImage[smudgeTypes.Count];
             for (int i = 0; i < smudgeTypes.Count; i++)
             {
                 var smudgeType = smudgeTypes[i];
@@ -1017,7 +1017,7 @@ namespace TSMapEditor.Rendering
                 var shpFile = new ShpFile(finalShpName);
                 shpFile.ParseFromBuffer(shpData);
                 Palette palette = theaterPalette;
-                SmudgeTextures[i] = new ObjectImage(graphicsDevice, shpFile, shpData, palette);
+                SmudgeTextures[i] = new ShapeImage(graphicsDevice, shpFile, shpData, palette);
             }
 
             Logger.Log("Finished loading smudge textures.");
@@ -1065,20 +1065,20 @@ namespace TSMapEditor.Rendering
             return OverlayTextures[overlayType.Index].Frames.Length / 2;
         }
 
-        public ObjectImage[] TerrainObjectTextures { get; set; }
-        public ObjectImage[] BuildingTextures { get; set; }
+        public ShapeImage[] TerrainObjectTextures { get; set; }
+        public ShapeImage[] BuildingTextures { get; set; }
         public VoxelModel[] BuildingTurretModels { get; set; }
-        public ObjectImage[] BuildingBibTextures { get; set; }
-        public ObjectImage[] UnitTextures { get; set; }
+        public ShapeImage[] BuildingBibTextures { get; set; }
+        public ShapeImage[] UnitTextures { get; set; }
         public VoxelModel[] UnitModels { get; set; }
         public VoxelModel[] UnitTurretModels { get; set; }
-        public ObjectImage[] InfantryTextures { get; set; }
-        public ObjectImage[] OverlayTextures { get; set; }
-        public ObjectImage[] SmudgeTextures { get; set; }
-        public ObjectImage[] AnimTextures { get; set; }
+        public ShapeImage[] InfantryTextures { get; set; }
+        public ShapeImage[] OverlayTextures { get; set; }
+        public ShapeImage[] SmudgeTextures { get; set; }
+        public ShapeImage[] AnimTextures { get; set; }
 
 
-        public ObjectImage BuildingZ { get; set; }
+        public ShapeImage BuildingZ { get; set; }
 
         /// <summary>
         /// Frees up all memory used by the theater graphics textures

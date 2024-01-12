@@ -67,7 +67,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             return base.ShouldRenderReplacementText(gameObject);
         }
 
-        private void DrawBibGraphics(Structure gameObject, ObjectImage bibGraphics, int yDrawPointWithoutCellHeight, Point2D drawPoint, CommonDrawParams drawParams)
+        private void DrawBibGraphics(Structure gameObject, ShapeImage bibGraphics, int yDrawPointWithoutCellHeight, Point2D drawPoint, CommonDrawParams drawParams)
         {
             DrawObjectImage(gameObject, drawParams, bibGraphics, 0, Color.White, true, gameObject.GetRemapColor(), drawPoint, yDrawPointWithoutCellHeight);
         }
