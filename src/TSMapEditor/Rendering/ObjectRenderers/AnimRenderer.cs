@@ -25,7 +25,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
 
         protected override void Render(Animation gameObject, int yDrawPointWithoutCellHeight, Point2D drawPoint, CommonDrawParams commonDrawParams)
         {
-            if (commonDrawParams.Graphics == null)
+            if (commonDrawParams.Graphics is not ObjectImage graphics)
                 return;
 
             int frameIndex = gameObject.AnimType.ArtConfig.Start;
@@ -33,7 +33,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             {
                 // Turret anims have their facing frames reversed
                 byte facing = (byte)(255 - gameObject.Facing - 31);
-                frameIndex = facing / (512 / commonDrawParams.Graphics.Frames.Length);
+                frameIndex = facing / (512 / graphics.Frames.Length);
             }
 
             float alpha = 1.0f;
@@ -55,7 +55,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
 
             DrawShadow(gameObject, commonDrawParams, drawPoint, yDrawPointWithoutCellHeight);
 
-            DrawObjectImage(gameObject, commonDrawParams, commonDrawParams.Graphics,
+            DrawObjectImage(gameObject, commonDrawParams, graphics,
                 frameIndex, Color.White * alpha,
                 gameObject.IsBuildingAnim, gameObject.GetRemapColor() * alpha,
                 drawPoint, yDrawPointWithoutCellHeight);
@@ -66,17 +66,20 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             if (!Constants.DrawBuildingAnimationShadows && gameObject.IsBuildingAnim)
                 return;
 
-            int shadowFrameIndex = gameObject.GetShadowFrameIndex(drawParams.Graphics.Frames.Length);
+            if (drawParams.Graphics is not ObjectImage graphics)
+                return;
+
+            int shadowFrameIndex = gameObject.GetShadowFrameIndex(graphics.Frames.Length);
             if (gameObject.IsTurretAnim)
             {
                 // Turret anims have their facing frames reversed
                 byte facing = (byte)(255 - gameObject.Facing - 31);
-                shadowFrameIndex += facing / (512 / drawParams.Graphics.Frames.Length);
+                shadowFrameIndex += facing / (512 / graphics.Frames.Length);
             }
 
-            if (shadowFrameIndex > 0 && shadowFrameIndex < drawParams.Graphics.Frames.Length)
+            if (shadowFrameIndex > 0 && shadowFrameIndex < graphics.Frames.Length)
             {
-                DrawObjectImage(gameObject, drawParams, drawParams.Graphics, shadowFrameIndex,
+                DrawObjectImage(gameObject, drawParams, graphics, shadowFrameIndex,
                     new Color(0, 0, 0, 128), false, Color.White, drawPoint, initialYDrawPointWithoutCellHeight);
             }
         }

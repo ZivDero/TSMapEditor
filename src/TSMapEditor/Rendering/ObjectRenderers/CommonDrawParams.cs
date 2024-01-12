@@ -2,10 +2,10 @@
 {
     public struct CommonDrawParams
     {
-        public ObjectImage Graphics;
+        public IDrawableObject Graphics;
         public string IniName;
 
-        public CommonDrawParams(ObjectImage graphics, string iniName)
+        public CommonDrawParams(IDrawableObject graphics, string iniName)
         {
             Graphics = graphics;
             IniName = iniName;

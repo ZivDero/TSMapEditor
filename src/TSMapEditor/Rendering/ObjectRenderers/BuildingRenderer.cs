@@ -81,13 +81,13 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             if (bibGraphics != null)
                 DrawBibGraphics(gameObject, bibGraphics, yDrawPointWithoutCellHeight, drawPoint, commonDrawParams);
 
-            if (commonDrawParams.Graphics != null)
+            if (commonDrawParams.Graphics is ObjectImage graphics)
             {
                 if (!gameObject.ObjectType.NoShadow)
                     DrawShadow(gameObject, commonDrawParams, drawPoint, yDrawPointWithoutCellHeight);
 
-                DrawObjectImage(gameObject, commonDrawParams, commonDrawParams.Graphics,
-                    gameObject.GetFrameIndex(commonDrawParams.Graphics.Frames.Length),
+                DrawObjectImage(gameObject, commonDrawParams, graphics,
+                    gameObject.GetFrameIndex(graphics.Frames.Length),
                     Color.White, true, gameObject.GetRemapColor(), drawPoint, yDrawPointWithoutCellHeight);
             }
 

@@ -497,30 +497,8 @@ namespace TSMapEditor.Rendering
             Renderer.PushSettings(colorDrawSettings);
             DoForVisibleCells(DrawTerrainTileAndRegisterObjects);
 
-            VxlFile vxlFile;
-            using (Stream stream = File.OpenRead(@"C:\Users\Parasite03\Desktop\flata.vxl"))
-            {
-                vxlFile = new VxlFile(stream);
-            }
-
-            HvaFile hvaFile;
-            using (Stream stream = File.OpenRead(@"C:\Users\Parasite03\Desktop\flata.hva"))
-            {
-                hvaFile = new HvaFile(stream);
-            }
-
-            byte[] paletteData = File.ReadAllBytes(@"C:\Users\Parasite03\Desktop\unittem.pal");
-            Palette unittem = new(paletteData);
-
-            var tex = VxlRenderer.Render(GraphicsDevice, 64, 0, vxlFile, hvaFile, unittem);
-
             Renderer.PushRenderTarget(objectRenderTarget, colorDrawSettings);
             GraphicsDevice.Clear(Color.Transparent);
-
-            DrawTexture(tex,
-                new Rectangle(0, 0, 400, 400),
-                new Rectangle(100, 100, 400, 400),
-                Color.White);
 
             DrawSmudges();
             DrawObjects();

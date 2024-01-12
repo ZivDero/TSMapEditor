@@ -41,11 +41,14 @@ namespace TSMapEditor.Rendering.ObjectRenderers
                     break;
             }
 
+            if (commonDrawParams.Graphics is not ObjectImage graphics)
+                return;
+
             if (!gameObject.ObjectType.NoShadow)
                 DrawShadow(gameObject, commonDrawParams, drawPoint, yDrawPointWithoutCellHeight);
 
-            DrawObjectImage(gameObject, commonDrawParams, commonDrawParams.Graphics, 
-                gameObject.GetFrameIndex(commonDrawParams.Graphics.Frames.Length), 
+            DrawObjectImage(gameObject, commonDrawParams, graphics, 
+                gameObject.GetFrameIndex(graphics.Frames.Length), 
                 Color.White, true, gameObject.GetRemapColor(), drawPoint, yDrawPointWithoutCellHeight);
         }
     }

@@ -19,6 +19,9 @@ namespace TSMapEditor.Rendering.ObjectRenderers
 
         protected override void Render(Overlay gameObject, int yDrawPointWithoutCellHeight, Point2D drawPoint, CommonDrawParams commonDrawParams)
         {
+            if (commonDrawParams.Graphics is not ObjectImage graphics)
+                return;
+
             int tiberiumIndex = gameObject.OverlayType.GetTiberiumIndex();
 
             Color remapColor = Color.White;
@@ -49,7 +52,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             }
 
             DrawShadow(gameObject, commonDrawParams, drawPoint, yDrawPointWithoutCellHeight);
-            DrawObjectImage(gameObject, commonDrawParams, commonDrawParams.Graphics, gameObject.FrameIndex, Color.White, true, remapColor, drawPoint, yDrawPointWithoutCellHeight);
+            DrawObjectImage(gameObject, commonDrawParams, graphics, gameObject.FrameIndex, Color.White, true, remapColor, drawPoint, yDrawPointWithoutCellHeight);
         }
     }
 }

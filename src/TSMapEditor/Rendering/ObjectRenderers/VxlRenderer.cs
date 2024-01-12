@@ -1,16 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Numerics;
 using CNCMaps.FileFormats;
 using Microsoft.Xna.Framework;
 using Color = Microsoft.Xna.Framework.Color;
 using Microsoft.Xna.Framework.Graphics;
+using Rampastring.XNAUI;
 using TSMapEditor.CCEngine;
+using Vector2 = Microsoft.Xna.Framework.Vector2;
+using Vector3 = Microsoft.Xna.Framework.Vector3;
 
 namespace TSMapEditor.Rendering.ObjectRenderers
 {
     public class VxlRenderer
     {
-        private const float ModelScale = 0.028f;
+        private const float ModelScale = 0.025f;
         private static readonly Vector3 CameraPosition = new (0.0f, 0.0f, -20.0f);
         private static readonly Vector3 CameraTarget = Vector3.Zero;
         private static readonly Matrix View = Matrix.CreateLookAt(CameraPosition, CameraTarget, Vector3.Up);
@@ -19,16 +23,21 @@ namespace TSMapEditor.Rendering.ObjectRenderers
         private const float FarClip = 100f; // the far clipping plane distance
         private static readonly Matrix Projection = Matrix.CreateOrthographic(10, 10, NearClip, FarClip);
 
-        public static Texture2D Render(GraphicsDevice graphicsDevice, byte rotation, RampType ramp, VxlFile vxl, HvaFile hva, CCEngine.Palette palette, VplFile vpl = null)
+        public static Texture2D Render(GraphicsDevice graphicsDevice, byte facing, RampType ramp, VxlFile vxl, HvaFile hva, Palette palette, VplFile vpl = null)
         {
             var renderTarget = new RenderTarget2D(graphicsDevice, 400, 400, false, SurfaceFormat.Color, DepthFormat.Depth24);
-            graphicsDevice.SetRenderTarget(renderTarget, 0);
+            Renderer.PushRenderTarget(renderTarget);
+            
+            //graphicsDevice.SetRenderTarget(renderTarget, 0);
             graphicsDevice.Clear(Color.Transparent);
             graphicsDevice.DepthStencilState = DepthStencilState.Default;
 
-            Matrix world = Matrix.CreateRotationZ(-(MathHelper.ToRadians(135) + 2 * (float)Math.PI * ((float)rotation / Constants.FacingMax)));
-            world *= Matrix.CreateRotationX(MathHelper.ToRadians(-120));
-            world *= Matrix.CreateScale(ModelScale, ModelScale, ModelScale);
+            float rotationFromFacing = 2 * (float)Math.PI * ((float)facing / Constants.FacingMax);
+
+            // Rotates to the game's north
+            Matrix rotateToWorld = Matrix.CreateRotationZ(-(MathHelper.ToRadians(135) + rotationFromFacing));
+            rotateToWorld *= Matrix.CreateRotationX(MathHelper.ToRadians(-120));
+            Matrix scale = Matrix.CreateScale(ModelScale, ModelScale, ModelScale);
 
             BasicEffect basicEffect = new BasicEffect(graphicsDevice);
             basicEffect.VertexColorEnabled = true;
@@ -36,28 +45,16 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             basicEffect.Projection = Projection;
 
             Matrix tilt = Matrix.Identity;
-            int tiltPitch, tiltYaw;
-            
-            if (ramp is RampType.None or >= RampType.DoubleUpSWNE)
+
+            if (ramp is > RampType.None and < RampType.DoubleUpSWNE)
             {
-                tiltPitch = tiltYaw = 0;
-            }
-            else if (ramp <= RampType.South)
-            {
-                // screen-diagonal facings (perpendicular to axes)
-                tiltPitch = 25;
-                tiltYaw = -90 * (byte)ramp;
-            }
-            else
-            {
-                // world-diagonal facings (perpendicular to screen)
-                tiltPitch = 25;
-                tiltYaw = 225 - 90 * (((byte)ramp - 1) % 4);
+                Matrix rotateTiltAxis = Matrix.CreateRotationZ(-(MathHelper.ToRadians(SlopeAxisZAngles[(int)ramp - 1]) + rotationFromFacing));
+                rotateTiltAxis *= Matrix.CreateRotationX(MathHelper.ToRadians(-120));
+
+                Vector3 tiltAxis = Vector3.Transform(Vector3.UnitX, rotateTiltAxis);
+                tilt = Matrix.CreateFromAxisAngle(tiltAxis, MathHelper.ToRadians(30));
             }
 
-            tilt *= Matrix.CreateRotationX(MathHelper.ToRadians(tiltPitch));
-            tilt *= Matrix.CreateRotationZ(MathHelper.ToRadians(tiltYaw));
-            
             foreach (var section in vxl.Sections)
             {
                 var vertexData = new List<VertexPositionColorNormal>();
@@ -99,7 +96,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
                 var modelTranslation = Matrix.CreateTranslation(section.MinBounds);
                 var modelTransform = modelTranslation * modelRotation;
 
-                Matrix sectionWorld = modelTransform * tilt * world;
+                Matrix sectionWorld = modelTransform * rotateToWorld * tilt * scale;
                 basicEffect.World = sectionWorld;
 
                 foreach (EffectPass pass in basicEffect.CurrentTechnique.Passes)
@@ -114,9 +111,31 @@ namespace TSMapEditor.Rendering.ObjectRenderers
 
             Texture2D tex = new Texture2D(graphicsDevice, renderTarget.Width, renderTarget.Height);
             tex.SetData(colorData);
+            
+            Renderer.PopRenderTarget();
 
             return tex;
         }
+
+        private static readonly Vector2[] TiltRotations =
+        {
+            new(0, 0),
+            new(-30, 0), new(0, 30), new(30, 0), new(0, -30),
+            new(30, 30), new(30, -30), new(-30, -30), new(-30, 30),
+            new(30, 30), new(30, -30), new(-30, -30), new(-30, 30),
+            new(30, 30), new(30, -30), new(-30, -30), new(-30, 30),
+            new(0, 0), new(0, 0), new(0, 0), new(0, 0)
+        };
+
+        private static readonly int[] SlopeAxisZAngles =
+        {
+            -45, 45, 135, -135,
+            0, 90, 180, -90,
+            0, 90, 180, -90,
+            0, 90, 180, -90,
+            0, 90, 180, -90
+        };
+
 
         private static List<VertexPositionColorNormal> RenderVoxel(VxlFile.Voxel voxel, Vector3 normal, CCEngine.Palette palette, Vector3 scale)
         {

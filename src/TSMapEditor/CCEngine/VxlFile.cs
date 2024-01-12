@@ -30,7 +30,7 @@ namespace TSMapEditor.CCEngine
             Initialize();
         }
 
-        public VxlFile(byte[] buffer) : base(new MemoryStream(buffer), "", true)
+        public VxlFile(byte[] buffer, string filename = "") : base(new MemoryStream(buffer), filename, true)
         {
             Initialize();
         }

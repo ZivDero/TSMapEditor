@@ -39,7 +39,7 @@ namespace TSMapEditor.CCEngine
             Initialize();
         }
 
-        public HvaFile(byte[] buffer) : base(new MemoryStream(buffer), "", true)
+        public HvaFile(byte[] buffer, string filename = "") : base(new MemoryStream(buffer), filename, true)
         {
             Initialize();
         }
