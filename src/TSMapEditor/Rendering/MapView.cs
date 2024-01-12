@@ -499,7 +499,6 @@ namespace TSMapEditor.Rendering
 
             Renderer.PushRenderTarget(objectRenderTarget, colorDrawSettings);
             GraphicsDevice.Clear(Color.Transparent);
-
             DrawSmudges();
             DrawObjects();
             Renderer.PopRenderTarget();

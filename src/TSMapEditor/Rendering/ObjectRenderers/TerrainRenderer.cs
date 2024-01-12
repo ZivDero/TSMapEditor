@@ -22,9 +22,9 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             if (drawParams is not ShapeDrawParams shapeDrawParams)
                 return;
 
-            DrawShadow(gameObject, drawParams, drawPoint, yDrawPointWithoutCellHeight);
+            DrawShadow(gameObject, shapeDrawParams, drawPoint, yDrawPointWithoutCellHeight);
 
-            DrawObjectImage(gameObject, drawParams, shapeDrawParams.Graphics, 0, 
+            DrawObjectImage(gameObject, shapeDrawParams, shapeDrawParams.Graphics, 0, 
                 Color.White, false, Color.White, drawPoint, yDrawPointWithoutCellHeight);
         }
     }

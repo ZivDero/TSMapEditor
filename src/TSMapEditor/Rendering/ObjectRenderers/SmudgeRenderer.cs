@@ -22,7 +22,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             if (drawParams is not ShapeDrawParams shapeDrawParams)
                 return;
 
-            DrawObjectImage(gameObject, drawParams, shapeDrawParams.Graphics, 0, Color.White, false, Color.White, drawPoint, yDrawPointWithoutCellHeight);
+            DrawObjectImage(gameObject, shapeDrawParams, shapeDrawParams.Graphics, 0, Color.White, false, Color.White, drawPoint, yDrawPointWithoutCellHeight);
         }
     }
 }

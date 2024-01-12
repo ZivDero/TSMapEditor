@@ -3,7 +3,6 @@ using Rampastring.Tools;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using TSMapEditor.Extensions;
 using TSMapEditor.Initialization;
 using TSMapEditor.Models.ArtConfig;
 using TSMapEditor.UI;

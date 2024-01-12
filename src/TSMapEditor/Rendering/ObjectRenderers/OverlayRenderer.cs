@@ -51,8 +51,8 @@ namespace TSMapEditor.Rendering.ObjectRenderers
                 }
             }
 
-            DrawShadow(gameObject, drawParams, drawPoint, yDrawPointWithoutCellHeight);
-            DrawObjectImage(gameObject, drawParams, shapeDrawParams.Graphics, gameObject.FrameIndex, Color.White, true, remapColor, drawPoint, yDrawPointWithoutCellHeight);
+            DrawShadow(gameObject, shapeDrawParams, drawPoint, yDrawPointWithoutCellHeight);
+            DrawObjectImage(gameObject, shapeDrawParams, shapeDrawParams.Graphics, gameObject.FrameIndex, Color.White, true, remapColor, drawPoint, yDrawPointWithoutCellHeight);
         }
     }
 }
