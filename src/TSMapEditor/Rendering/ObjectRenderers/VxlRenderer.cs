@@ -23,11 +23,13 @@ namespace TSMapEditor.Rendering.ObjectRenderers
 
         private const float NearClip = 0.01f; // the near clipping plane distance
         private const float FarClip = 100f; // the far clipping plane distance
-        private static readonly Matrix Projection = Matrix.CreateOrthographic(10, 10, NearClip, FarClip);
+        private const int ImageWidth = 100;
+        private const int ImageHeight = 100;
+        private static readonly Matrix Projection = Matrix.CreateOrthographic(ImageWidth * ModelScale, ImageHeight * ModelScale, NearClip, FarClip);
 
         public static Texture2D Render(GraphicsDevice graphicsDevice, byte facing, RampType ramp, VxlFile vxl, HvaFile hva, Palette palette, VplFile vpl = null, bool forRemap = false)
         {
-            var renderTarget = new RenderTarget2D(graphicsDevice, 400, 400, false, SurfaceFormat.Color, DepthFormat.Depth24);
+            var renderTarget = new RenderTarget2D(graphicsDevice, ImageWidth, ImageHeight, false, SurfaceFormat.Color, DepthFormat.Depth24);
             Renderer.PushRenderTarget(renderTarget);
             
             graphicsDevice.Clear(Color.Transparent);

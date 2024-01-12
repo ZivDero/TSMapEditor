@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
+using TSMapEditor.CCEngine;
 using TSMapEditor.GameMath;
 using TSMapEditor.Models;
 
@@ -15,13 +16,32 @@ namespace TSMapEditor.Rendering.ObjectRenderers
 
         protected override CommonDrawParams GetDrawParams(Aircraft gameObject)
         {
-            return new VoxelDrawParams(null, gameObject.ObjectType.ININame);
+            if (gameObject.AircraftType.ArtConfig.Voxel)
+            {
+                var graphics = TheaterGraphics.AircraftModels[gameObject.ObjectType.Index];
+                string iniName = gameObject.ObjectType.ININame;
+                return new VoxelDrawParams(graphics, iniName);
+            }
+            else
+            {
+                return new ShapeDrawParams(null, gameObject.ObjectType.ININame);
+            }
         }
 
         protected override void Render(Aircraft gameObject, int yDrawPointWithoutCellHeight, Point2D drawPoint, CommonDrawParams drawParams)
         {
-            // lol, this is an easy one
-            throw new NotImplementedException();
+            if (drawParams is VoxelDrawParams voxelDrawParams)
+                RenderVoxelModel(gameObject, yDrawPointWithoutCellHeight, drawPoint, voxelDrawParams);
+            else
+                throw new NotImplementedException();
+        }
+
+        private void RenderVoxelModel(Aircraft gameObject, int yDrawPointWithoutCellHeight, Point2D drawPoint,
+            VoxelDrawParams drawParams)
+        {
+            DrawVoxelModel(gameObject, drawParams, drawParams.Graphics,
+                gameObject.Facing, RampType.None, Color.White, true, gameObject.GetRemapColor(),
+                drawPoint, yDrawPointWithoutCellHeight);
         }
     }
 }

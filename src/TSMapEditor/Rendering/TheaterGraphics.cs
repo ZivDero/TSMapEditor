@@ -297,11 +297,12 @@ namespace TSMapEditor.Rendering
                 var task5 = Task.Factory.StartNew(() => ReadUnitTextures(rules.UnitTypes));
                 var task6 = Task.Factory.StartNew(() => ReadUnitModels(rules.UnitTypes));
                 var task7 = Task.Factory.StartNew(() => ReadUnitTurretModels(rules.UnitTypes));
-                var task8 = Task.Factory.StartNew(() => ReadInfantryTextures(rules.InfantryTypes));
-                var task9 = Task.Factory.StartNew(() => ReadOverlayTextures(rules.OverlayTypes));
-                var task10 = Task.Factory.StartNew(() => ReadSmudgeTextures(rules.SmudgeTypes));
-                var task11 = Task.Factory.StartNew(() => ReadAnimTextures(rules.AnimTypes));
-                Task.WaitAll(task1, task2, task3, task4, task5, task6, task7, task8, task9, task10, task11);
+                var task8 = Task.Factory.StartNew(() => ReadAircraftModels(rules.AircraftTypes));
+                var task9 = Task.Factory.StartNew(() => ReadInfantryTextures(rules.InfantryTypes));
+                var task10 = Task.Factory.StartNew(() => ReadOverlayTextures(rules.OverlayTypes));
+                var task11 = Task.Factory.StartNew(() => ReadSmudgeTextures(rules.SmudgeTypes));
+                var task12 = Task.Factory.StartNew(() => ReadAnimTextures(rules.AnimTypes));
+                Task.WaitAll(task1, task2, task3, task4, task5, task6, task7, task8, task9, task10, task11, task12);
             }
             else
             {
@@ -312,6 +313,7 @@ namespace TSMapEditor.Rendering
                 ReadUnitTextures(rules.UnitTypes);
                 ReadUnitModels(rules.UnitTypes);
                 ReadUnitTurretModels(rules.UnitTypes);
+                ReadAircraftModels(rules.AircraftTypes);
                 ReadInfantryTextures(rules.InfantryTypes);
                 ReadOverlayTextures(rules.OverlayTypes);
                 ReadSmudgeTextures(rules.SmudgeTypes);
@@ -862,6 +864,49 @@ namespace TSMapEditor.Rendering
             Logger.Log("Finished loading unit turrets' voxel models.");
         }
 
+        public void ReadAircraftModels(List<AircraftType> aircraftTypes)
+        {
+            Logger.Log("Loading aircraft voxel models.");
+
+            var loadedModels = new Dictionary<string, VoxelModel>();
+            AircraftModels = new VoxelModel[aircraftTypes.Count];
+
+            for (int i = 0; i < aircraftTypes.Count; i++)
+            {
+                var aircraftType = aircraftTypes[i];
+
+                if (!aircraftType.ArtConfig.Voxel)
+                    continue;
+
+                string aircraftImage = string.IsNullOrWhiteSpace(aircraftType.Image) ? aircraftType.ININame : aircraftType.Image;
+                if (loadedModels.TryGetValue(aircraftImage, out VoxelModel loadedModel))
+                {
+                    AircraftModels[i] = loadedModel;
+                    continue;
+                }
+
+                byte[] vxlData = fileManager.LoadFile(aircraftImage + VXL_FILE_EXTENSION);
+                if (vxlData == null)
+                    continue;
+
+                byte[] hvaData = fileManager.LoadFile(aircraftImage + HVA_FILE_EXTENSION);
+
+                if (hvaData == null)
+                {
+                    Logger.Log($"WARNING: Aircraft {aircraftType.ININame} is missing its .hva file {aircraftImage + HVA_FILE_EXTENSION}! This will cause the game to crash!");
+                    continue;
+                }
+
+                var vxlFile = new VxlFile(vxlData, aircraftImage);
+                var hvaFile = new HvaFile(hvaData, aircraftImage);
+
+                AircraftModels[i] = new VoxelModel(graphicsDevice, vxlFile, hvaFile, unitPalette, aircraftType.ArtConfig.Remapable, GetVplFile());
+                loadedModels[aircraftImage] = AircraftModels[i];
+            }
+
+            Logger.Log("Finished loading aircraft voxel models.");
+        }
+
         public void ReadInfantryTextures(List<InfantryType> infantryTypes)
         {
             Logger.Log("Loading infantry textures.");
@@ -1072,6 +1117,7 @@ namespace TSMapEditor.Rendering
         public ShapeImage[] UnitTextures { get; set; }
         public VoxelModel[] UnitModels { get; set; }
         public VoxelModel[] UnitTurretModels { get; set; }
+        public VoxelModel[] AircraftModels { get; set; }
         public ShapeImage[] InfantryTextures { get; set; }
         public ShapeImage[] OverlayTextures { get; set; }
         public ShapeImage[] SmudgeTextures { get; set; }
@@ -1093,13 +1139,14 @@ namespace TSMapEditor.Rendering
             var task4 = Task.Factory.StartNew(() => DisposeObjectImagesFromArray(UnitTextures));
             var task5 = Task.Factory.StartNew(() => DisposeObjectImagesFromArray(UnitModels));
             var task6 = Task.Factory.StartNew(() => DisposeObjectImagesFromArray(UnitTurretModels));
-            var task7 = Task.Factory.StartNew(() => DisposeObjectImagesFromArray(InfantryTextures));
-            var task8 = Task.Factory.StartNew(() => DisposeObjectImagesFromArray(OverlayTextures));
-            var task9 = Task.Factory.StartNew(() => DisposeObjectImagesFromArray(SmudgeTextures));
-            var task10 = Task.Factory.StartNew(() => { terrainGraphicsList.ForEach(tileImageArray => Array.ForEach(tileImageArray, tileImage => tileImage.Dispose())); terrainGraphicsList.Clear(); });
-            var task11 = Task.Factory.StartNew(() => { mmTerrainGraphicsList.ForEach(tileImageArray => Array.ForEach(tileImageArray, tileImage => tileImage.Dispose())); mmTerrainGraphicsList.Clear(); });
-            var task12 = Task.Factory.StartNew(() => DisposeObjectImagesFromArray(AnimTextures));
-            Task.WaitAll(task1, task2, task3, task4, task5, task6, task7, task8, task9, task10, task11, task12);
+            var task7 = Task.Factory.StartNew(() => DisposeObjectImagesFromArray(AircraftModels));
+            var task8 = Task.Factory.StartNew(() => DisposeObjectImagesFromArray(InfantryTextures));
+            var task9 = Task.Factory.StartNew(() => DisposeObjectImagesFromArray(OverlayTextures));
+            var task10 = Task.Factory.StartNew(() => DisposeObjectImagesFromArray(SmudgeTextures));
+            var task11 = Task.Factory.StartNew(() => { terrainGraphicsList.ForEach(tileImageArray => Array.ForEach(tileImageArray, tileImage => tileImage.Dispose())); terrainGraphicsList.Clear(); });
+            var task12 = Task.Factory.StartNew(() => { mmTerrainGraphicsList.ForEach(tileImageArray => Array.ForEach(tileImageArray, tileImage => tileImage.Dispose())); mmTerrainGraphicsList.Clear(); });
+            var task13 = Task.Factory.StartNew(() => DisposeObjectImagesFromArray(AnimTextures));
+            Task.WaitAll(task1, task2, task3, task4, task5, task6, task7, task8, task9, task10, task11, task12, task13);
 
             TerrainObjectTextures = null;
             BuildingTextures = null;
