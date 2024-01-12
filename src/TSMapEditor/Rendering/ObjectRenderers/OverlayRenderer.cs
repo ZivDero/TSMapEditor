@@ -12,12 +12,12 @@ namespace TSMapEditor.Rendering.ObjectRenderers
 
         protected override Color ReplacementColor => new Color(255, 0, 255);
 
-        protected override CommonDrawParams GetDrawParams(Overlay gameObject)
+        protected override ICommonDrawParams GetDrawParams(Overlay gameObject)
         {
             return new ShapeDrawParams(TheaterGraphics.OverlayTextures[gameObject.OverlayType.Index], gameObject.OverlayType.ININame);
         }
 
-        protected override void Render(Overlay gameObject, int yDrawPointWithoutCellHeight, Point2D drawPoint, CommonDrawParams drawParams)
+        protected override void Render(Overlay gameObject, int yDrawPointWithoutCellHeight, Point2D drawPoint, ICommonDrawParams drawParams)
         {
             if (drawParams is not ShapeDrawParams shapeDrawParams)
                 return;

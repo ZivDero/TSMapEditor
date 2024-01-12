@@ -12,12 +12,12 @@ namespace TSMapEditor.Rendering.ObjectRenderers
 
         protected override Color ReplacementColor => Color.Green;
 
-        protected override CommonDrawParams GetDrawParams(TerrainObject gameObject)
+        protected override ICommonDrawParams GetDrawParams(TerrainObject gameObject)
         {
             return new ShapeDrawParams(TheaterGraphics.TerrainObjectTextures[gameObject.TerrainType.Index], gameObject.TerrainType.ININame);
         }
 
-        protected override void Render(TerrainObject gameObject, int yDrawPointWithoutCellHeight, Point2D drawPoint, CommonDrawParams drawParams)
+        protected override void Render(TerrainObject gameObject, int yDrawPointWithoutCellHeight, Point2D drawPoint, ICommonDrawParams drawParams)
         {
             if (drawParams is not ShapeDrawParams shapeDrawParams)
                 return;

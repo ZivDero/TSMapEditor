@@ -12,7 +12,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
 
         protected override Color ReplacementColor => Color.Teal;
 
-        protected override CommonDrawParams GetDrawParams(Infantry gameObject)
+        protected override ICommonDrawParams GetDrawParams(Infantry gameObject)
         {
             var graphics = TheaterGraphics.InfantryTextures[gameObject.ObjectType.Index];
             string iniName = gameObject.ObjectType.ININame;
@@ -20,7 +20,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             return new ShapeDrawParams(graphics, iniName);
         }
 
-        protected override void Render(Infantry gameObject, int yDrawPointWithoutCellHeight, Point2D drawPoint, CommonDrawParams drawParams)
+        protected override void Render(Infantry gameObject, int yDrawPointWithoutCellHeight, Point2D drawPoint, ICommonDrawParams drawParams)
         {
             switch (gameObject.SubCell)
             {

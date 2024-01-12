@@ -12,7 +12,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
 
         protected override Color ReplacementColor => Color.Orange;
 
-        protected override CommonDrawParams GetDrawParams(Animation gameObject)
+        protected override ICommonDrawParams GetDrawParams(Animation gameObject)
         {
             return new ShapeDrawParams(TheaterGraphics.AnimTextures[gameObject.AnimType.Index], gameObject.AnimType.ININame);
         }
@@ -23,7 +23,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             return false;
         }
 
-        protected override void Render(Animation gameObject, int yDrawPointWithoutCellHeight, Point2D drawPoint, CommonDrawParams drawParams)
+        protected override void Render(Animation gameObject, int yDrawPointWithoutCellHeight, Point2D drawPoint, ICommonDrawParams drawParams)
         {
             if (drawParams is not ShapeDrawParams shapeDrawParams || shapeDrawParams.Graphics == null)
                 return;
@@ -61,7 +61,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
                 drawPoint, yDrawPointWithoutCellHeight);
         }
 
-        protected override void DrawShadow(Animation gameObject, CommonDrawParams drawParams, Point2D drawPoint, int initialYDrawPointWithoutCellHeight)
+        protected override void DrawShadow(Animation gameObject, ICommonDrawParams drawParams, Point2D drawPoint, int initialYDrawPointWithoutCellHeight)
         {
             if (!Constants.DrawBuildingAnimationShadows && gameObject.IsBuildingAnim)
                 return;

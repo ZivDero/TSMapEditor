@@ -13,7 +13,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
 
         protected override Color ReplacementColor => Color.Red;
 
-        protected override CommonDrawParams GetDrawParams(Unit gameObject)
+        protected override ICommonDrawParams GetDrawParams(Unit gameObject)
         {
             if (gameObject.UnitType.ArtConfig.Voxel)
             {
@@ -30,7 +30,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
         }
 
         protected override void Render(Unit gameObject, int yDrawPointWithoutCellHeight, Point2D drawPoint,
-            CommonDrawParams drawParams)
+            ICommonDrawParams drawParams)
         {
             if (drawParams is ShapeDrawParams shapeDrawParams)
                 RenderShape(gameObject, yDrawPointWithoutCellHeight, drawPoint, shapeDrawParams);

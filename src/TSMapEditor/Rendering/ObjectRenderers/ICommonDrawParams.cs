@@ -1,12 +1,13 @@
 ﻿namespace TSMapEditor.Rendering.ObjectRenderers
 {
-    public abstract class CommonDrawParams
+    public interface ICommonDrawParams
     {
-        public string IniName;
+        public string IniName { get; }
     }
 
-    public class VoxelDrawParams : CommonDrawParams
+    public struct VoxelDrawParams : ICommonDrawParams
     {
+        public string IniName { get; }
         public VoxelModel Graphics;
 
         public VoxelDrawParams(VoxelModel graphics, string iniName)
@@ -16,8 +17,9 @@
         }
     }
 
-    public class ShapeDrawParams : CommonDrawParams
+    public struct ShapeDrawParams : ICommonDrawParams
     {
+        public string IniName { get; }
         public ShapeImage Graphics;
 
         public ShapeDrawParams(ShapeImage graphics, string iniName)

@@ -7,12 +7,10 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using CNCMaps.FileFormats;
 using TSMapEditor.CCEngine;
 using TSMapEditor.Models;
 using TSMapEditor.Rendering.ObjectRenderers;
 using TSMapEditor.Settings;
-using SharpDX.Direct2D1;
 
 namespace TSMapEditor.Rendering
 {
