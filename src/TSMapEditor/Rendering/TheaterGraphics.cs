@@ -12,6 +12,7 @@ using TSMapEditor.CCEngine;
 using TSMapEditor.Models;
 using TSMapEditor.Rendering.ObjectRenderers;
 using TSMapEditor.Settings;
+using SharpDX.Direct2D1;
 
 namespace TSMapEditor.Rendering
 {
@@ -69,19 +70,73 @@ namespace TSMapEditor.Rendering
             if (Frames.TryGetValue(key, out PositionedTexture value))
                 return value;
 
-            var texture = VxlRenderer.Render(graphicsDevice, facing, ramp, vxl, hva, palette, vpl);
+            var texture = VxlRenderer.Render(graphicsDevice, facing, ramp, vxl, hva, palette, vpl, forRemap: false);
             var positionedTexture = new PositionedTexture(texture.Width, texture.Height, 0, 0, texture);
             Frames[key] = positionedTexture;
-            return positionedTexture;
+            return Frames[key];
         }
 
         public PositionedTexture GetRemapFrame(byte facing, RampType ramp)
         {
+            if (!(remapable && Constants.HQRemap))
+                return null;
+
             var key = (facing, ramp);
             if (RemapFrames.TryGetValue(key, out PositionedTexture value))
                 return value;
 
-            return null;
+            var texture = VxlRenderer.Render(graphicsDevice, facing, ramp, vxl, hva, palette, vpl, forRemap: true);
+            var colorData = new Color[texture.Width * texture.Height];
+            texture.GetData(colorData);
+
+            // The renderer has rendered the rest of the unit as Magenta, now strip it out
+            for (int i = 0; i < colorData.Length; i++)
+            {
+                if (colorData[i] == Color.Magenta)
+                    colorData[i] = Color.Transparent;
+            }
+
+            if (Constants.HQRemap)
+            {
+                Color[] remapColorArray = colorData.Select(color =>
+                {
+                    // Convert the color to grayscale
+                    float remapColor = Math.Max(color.R / 255.0f, Math.Max(color.G / 255.0f, color.B / 255.0f));
+
+                    // Brighten it up a bit
+                    remapColor *= Constants.RemapBrightenFactor;
+                    return new Color(remapColor, remapColor, remapColor, color.A);
+
+                }).ToArray();
+
+                var remapTexture = new Texture2D(graphicsDevice, texture.Width, texture.Height, false, SurfaceFormat.Color);
+                remapTexture.SetData(remapColorArray);
+                RemapFrames[key] = new PositionedTexture(remapTexture.Width, remapTexture.Height, 0, 0, remapTexture);
+                return RemapFrames[key];
+            }
+            else
+            {
+                // Convert colors to grayscale
+                // Get HSV value, change S = 0, convert back to RGB and assign
+                // With S = 0, the formula for converting HSV to RGB can be reduced to a quite simple form :)
+
+                System.Drawing.Color[] sdColorArray = colorData.Select(c => System.Drawing.Color.FromArgb(c.A, c.R, c.G, c.B)).ToArray();
+                for (int j = 0; j < sdColorArray.Length; j++)
+                {
+                    if (colorData[j] == Color.Transparent)
+                        continue;
+
+                    float remapColor = sdColorArray[j].GetBrightness() * Constants.RemapBrightenFactor;
+                    if (remapColor > 1.0f)
+                        remapColor = 1.0f;
+                    colorData[j] = new Color(remapColor, remapColor, remapColor, colorData[j].A);
+                }
+
+                var remapTexture = new Texture2D(graphicsDevice, texture.Width, texture.Height, false, SurfaceFormat.Color);
+                remapTexture.SetData(colorData);
+                RemapFrames[key] = new PositionedTexture(remapTexture.Width, remapTexture.Height, 0, 0, remapTexture);
+                return RemapFrames[key];
+            }
         }
 
         public Dictionary<(byte facing, RampType ramp), PositionedTexture> Frames { get; set; } = new();

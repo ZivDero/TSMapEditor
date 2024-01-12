@@ -10,6 +10,7 @@ using Rampastring.XNAUI;
 using TSMapEditor.CCEngine;
 using Vector2 = Microsoft.Xna.Framework.Vector2;
 using Vector3 = Microsoft.Xna.Framework.Vector3;
+using static TSMapEditor.CCEngine.VxlFile;
 
 namespace TSMapEditor.Rendering.ObjectRenderers
 {
@@ -24,7 +25,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
         private const float FarClip = 100f; // the far clipping plane distance
         private static readonly Matrix Projection = Matrix.CreateOrthographic(10, 10, NearClip, FarClip);
 
-        public static Texture2D Render(GraphicsDevice graphicsDevice, byte facing, RampType ramp, VxlFile vxl, HvaFile hva, Palette palette, VplFile vpl = null)
+        public static Texture2D Render(GraphicsDevice graphicsDevice, byte facing, RampType ramp, VxlFile vxl, HvaFile hva, Palette palette, VplFile vpl = null, bool forRemap = false)
         {
             var renderTarget = new RenderTarget2D(graphicsDevice, 400, 400, false, SurfaceFormat.Color, DepthFormat.Depth24);
             Renderer.PushRenderTarget(renderTarget);
@@ -65,7 +66,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
                 {
                     for (int y = 0; y < section.SizeY; y++)
                     {
-                        foreach (VxlFile.Voxel voxel in section.Spans[x, y].Voxels)
+                        foreach (Voxel voxel in section.Spans[x, y].Voxels)
                         {
                             sectionVertexData.AddRange(RenderVoxel(voxel, section.GetNormals()[voxel.NormalIndex],
                                 palette, section.Scale));
@@ -93,7 +94,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             VertexBuffer vertexBuffer = new VertexBuffer(graphicsDevice,
                 typeof(VertexPositionColorNormal), vertexColorIndexedData.Count, BufferUsage.None);
 
-            var vertexData = vertexColorIndexedData.Select(v => v.ToVertexPositionColorNormal());
+            var vertexData = vertexColorIndexedData.Select(v => v.ToVertexPositionColorNormal(remapOnly: forRemap));
             vertexBuffer.SetData(vertexData.ToArray());
 
             var triangleListIndices = new int[vertexColorIndexedData.Count];
@@ -220,8 +221,16 @@ namespace TSMapEditor.Rendering.ObjectRenderers
                 Normal = normal;
             }
 
-            public VertexPositionColorNormal ToVertexPositionColorNormal()
+            public VertexPositionColorNormal ToVertexPositionColorNormal(bool remapOnly = false)
             {
+                if (remapOnly)
+                {
+                    if (ColorIndex is < 0x10 or > 0x1F)
+                    {
+                        return new VertexPositionColorNormal(Position, Color.Magenta, Normal);
+                    }
+                }
+
                 return new VertexPositionColorNormal(Position, Palette.Data[ColorIndex].ToXnaColor(), Normal);
             }
 
