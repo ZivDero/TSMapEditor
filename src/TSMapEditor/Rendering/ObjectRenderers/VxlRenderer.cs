@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using CNCMaps.FileFormats;
 using Microsoft.Xna.Framework;
@@ -55,55 +56,62 @@ namespace TSMapEditor.Rendering.ObjectRenderers
                 tilt = Matrix.CreateFromAxisAngle(tiltAxis, MathHelper.ToRadians(30));
             }
 
+            var vertexData = new List<VertexPositionColorNormal>();
+
             foreach (var section in vxl.Sections)
             {
-                var vertexData = new List<VertexPositionColorNormal>();
+                var sectionVertexData = new List<VertexPositionColorNormal>();
                 for (int x = 0; x < section.SizeX; x++)
                 {
                     for (int y = 0; y < section.SizeY; y++)
                     {
                         foreach (VxlFile.Voxel voxel in section.Spans[x, y].Voxels)
                         {
-                            vertexData.AddRange(RenderVoxel(voxel, section.GetNormals()[voxel.NormalIndex],
+                            sectionVertexData.AddRange(RenderVoxel(voxel, section.GetNormals()[voxel.NormalIndex],
                                 palette, section.Scale));
                         }
                     }
                 }
 
-                VertexBuffer vertexBuffer = new VertexBuffer(graphicsDevice,
-                    typeof(VertexPositionColorNormal), vertexData.Count, BufferUsage.None);
-                vertexBuffer.SetData(vertexData.ToArray());
+                var sectionRotation = hva.LoadMatrix(section.Index);
+                sectionRotation.M41 *= section.HvaMultiplier * section.ScaleX;
+                sectionRotation.M42 *= section.HvaMultiplier * section.ScaleY;
+                sectionRotation.M43 *= section.HvaMultiplier * section.ScaleZ;
 
-                var triangleListIndices = new int[vertexData.Count];
-                for (int i = 0; i < triangleListIndices.Length; i++)
-                    triangleListIndices[i] = i;
+                var sectionTranslation = Matrix.CreateTranslation(section.MinBounds);
+                var sectionTransform = sectionTranslation * sectionRotation;
 
-                IndexBuffer triangleListIndexBuffer = new IndexBuffer(
-                    graphicsDevice,
-                    IndexElementSize.ThirtyTwoBits,
-                    triangleListIndices.Length,
-                    BufferUsage.None);
-                triangleListIndexBuffer.SetData(triangleListIndices);
+                var transformedSectionVertexData = sectionVertexData.Select(vpcn => new VertexPositionColorNormal(
+                    Vector3.Transform(vpcn.Position, sectionTransform), vpcn.Color, vpcn.Normal));
 
-                graphicsDevice.Indices = triangleListIndexBuffer;
-                graphicsDevice.SetVertexBuffer(vertexBuffer);
+                vertexData.AddRange(transformedSectionVertexData);
+            }
 
-                var modelRotation = hva.LoadMatrix(section.Index);
-                modelRotation.M41 *= section.HvaMultiplier * section.ScaleX;
-                modelRotation.M42 *= section.HvaMultiplier * section.ScaleY;
-                modelRotation.M43 *= section.HvaMultiplier * section.ScaleZ;
+            VertexBuffer vertexBuffer = new VertexBuffer(graphicsDevice,
+                typeof(VertexPositionColorNormal), vertexData.Count, BufferUsage.None);
+            vertexBuffer.SetData(vertexData.ToArray());
 
-                var modelTranslation = Matrix.CreateTranslation(section.MinBounds);
-                var modelTransform = modelTranslation * modelRotation;
+            var triangleListIndices = new int[vertexData.Count];
+            for (int i = 0; i < triangleListIndices.Length; i++)
+                triangleListIndices[i] = i;
 
-                Matrix sectionWorld = modelTransform * rotateToWorld * tilt * scale;
-                basicEffect.World = sectionWorld;
+            IndexBuffer triangleListIndexBuffer = new IndexBuffer(
+                graphicsDevice,
+                IndexElementSize.ThirtyTwoBits,
+                triangleListIndices.Length,
+                BufferUsage.None);
+            triangleListIndexBuffer.SetData(triangleListIndices);
 
-                foreach (EffectPass pass in basicEffect.CurrentTechnique.Passes)
-                {
-                    pass.Apply();
-                    graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, vertexData.Count / 3);
-                }
+            graphicsDevice.Indices = triangleListIndexBuffer;
+            graphicsDevice.SetVertexBuffer(vertexBuffer);
+
+            Matrix sectionWorld = rotateToWorld * tilt * scale;
+            basicEffect.World = sectionWorld;
+
+            foreach (EffectPass pass in basicEffect.CurrentTechnique.Passes)
+            {
+                pass.Apply();
+                graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, vertexData.Count / 3);
             }
 
             var colorData = new Color[renderTarget.Width * renderTarget.Height];
