@@ -60,6 +60,9 @@ namespace TSMapEditor.Rendering
 
         public PositionedTexture GetFrame(byte facing, RampType ramp)
         {
+            // The game only renders 32 facings, so round it to the closest true facing
+            facing = Convert.ToByte(Math.Round((float)facing / 8, MidpointRounding.AwayFromZero) * 8);
+
             var key = (facing, ramp);
             if (Frames.TryGetValue(key, out PositionedTexture value))
                 return value;
@@ -74,6 +77,9 @@ namespace TSMapEditor.Rendering
         {
             if (!(remapable && Constants.HQRemap))
                 return null;
+
+            // The game only renders 32 facings, so round it to the closest true facing
+            facing = Convert.ToByte(Math.Round((float)facing / 8, MidpointRounding.AwayFromZero) * 8);
 
             var key = (facing, ramp);
             if (RemapFrames.TryGetValue(key, out PositionedTexture value))
