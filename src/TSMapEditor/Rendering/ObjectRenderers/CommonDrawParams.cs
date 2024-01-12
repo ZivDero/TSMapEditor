@@ -8,7 +8,6 @@
     public class VoxelDrawParams : CommonDrawParams
     {
         public VoxelModel Graphics;
-        public string IniName;
 
         public VoxelDrawParams(VoxelModel graphics, string iniName)
         {
@@ -20,7 +19,6 @@
     public class ShapeDrawParams : CommonDrawParams
     {
         public ShapeImage Graphics;
-        public string IniName;
 
         public ShapeDrawParams(ShapeImage graphics, string iniName)
         {

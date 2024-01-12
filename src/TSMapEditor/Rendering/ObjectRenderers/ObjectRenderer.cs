@@ -50,25 +50,19 @@ namespace TSMapEditor.Rendering.ObjectRenderers
 
             CommonDrawParams drawParams = GetDrawParams(gameObject);
 
-            bool noShapeImage = false;
-            if (drawParams is ShapeDrawParams)
-            {
-                PositionedTexture frame = GetFrameTexture(gameObject, drawParams);
+            PositionedTexture frame = GetFrameTexture(gameObject, drawParams);
 
-                GetTextureDrawCoords(gameObject, frame, drawPoint,
-                    drawPointWithoutCellHeight.Y,
-                    out int finalDrawPointX, out int finalDrawPointRight,
-                    out int finalDrawPointY, out int finalDrawPointBottom,
-                    out int objectYDrawPointWithoutCellHeight);
+            GetTextureDrawCoords(gameObject, frame, drawPoint,
+                drawPointWithoutCellHeight.Y,
+                out int finalDrawPointX, out int finalDrawPointRight,
+                out int finalDrawPointY, out int finalDrawPointBottom,
+                out int objectYDrawPointWithoutCellHeight);
 
-                // If the object is not in view, skip
-                if (checkInCamera && !IsObjectInCamera(finalDrawPointX, finalDrawPointRight, finalDrawPointY, finalDrawPointBottom))
-                    return;
+            // If the object is not in view, skip
+            if (checkInCamera && !IsObjectInCamera(finalDrawPointX, finalDrawPointRight, finalDrawPointY, finalDrawPointBottom))
+                return;
 
-                noShapeImage = frame == null;
-            }
-
-            if (noShapeImage && ShouldRenderReplacementText(gameObject))
+            if (frame == null && ShouldRenderReplacementText(gameObject))
             {
                 DrawObjectReplacementText(gameObject, drawParams, drawPoint);
             }
@@ -159,7 +153,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
         {
             if (drawParams is ShapeDrawParams shapeDrawParams)
             {
-                if (shapeDrawParams.Graphics.Frames != null && shapeDrawParams.Graphics.Frames.Length > 0)
+                if (shapeDrawParams.Graphics?.Frames != null && shapeDrawParams.Graphics.Frames.Length > 0)
                 {
                     int frameIndex = gameObject.GetFrameIndex(shapeDrawParams.Graphics.Frames.Length);
 
@@ -169,10 +163,9 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             }
             else if (drawParams is VoxelDrawParams voxelDrawParams)
             {
-
+                if (voxelDrawParams.Graphics?.Frames != null)
+                    return voxelDrawParams.Graphics.GetFrame(0, RampType.None);
             }
-
-            
 
             return null;
         }
