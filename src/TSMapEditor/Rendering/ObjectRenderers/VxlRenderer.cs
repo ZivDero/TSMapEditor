@@ -49,7 +49,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
 
             if (ramp is > RampType.None and < RampType.DoubleUpSWNE)
             {
-                Matrix rotateTiltAxis = Matrix.CreateRotationZ(-(MathHelper.ToRadians(SlopeAxisZAngles[(int)ramp - 1]) + rotationFromFacing));
+                Matrix rotateTiltAxis = Matrix.CreateRotationZ(-(MathHelper.ToRadians(SlopeAxisZAngles[(int)ramp - 1])));
                 rotateTiltAxis *= Matrix.CreateRotationX(MathHelper.ToRadians(-120));
 
                 Vector3 tiltAxis = Vector3.Transform(Vector3.UnitX, rotateTiltAxis);
@@ -145,7 +145,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
         };
 
 
-        private static List<VertexPositionColorNormal> RenderVoxel(VxlFile.Voxel voxel, Vector3 normal, CCEngine.Palette palette, Vector3 scale)
+        private static List<VertexPositionColorNormal> RenderVoxel(VxlFile.Voxel voxel, Vector3 normal, Palette palette, Vector3 scale)
         {
             const float radius = 0.5f;
             Vector3 voxelCoordinates = new Vector3(voxel.X, voxel.Y, voxel.Z);
