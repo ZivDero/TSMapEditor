@@ -171,7 +171,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             public Vector3 Normal;
         }
 
-        private static List<VertexData> RenderVoxel(VxlFile.Voxel voxel, Vector3 normal, Palette palette, Vector3 scale)
+        private static List<VertexData> RenderVoxel(Voxel voxel, Vector3 normal, Palette palette, Vector3 scale)
         {
             const float radius = 0.5f;
             Vector3 voxelCoordinates = new Vector3(voxel.X, voxel.Y, voxel.Z);
