@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using TSMapEditor.GameMath;
 using TSMapEditor.Models;
 
@@ -25,7 +25,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
 
         protected override void Render(Animation gameObject, int yDrawPointWithoutCellHeight, Point2D drawPoint, CommonDrawParams drawParams)
         {
-            if (drawParams is not ShapeDrawParams shapeDrawParams)
+            if (drawParams is not ShapeDrawParams shapeDrawParams || shapeDrawParams.Graphics == null)
                 return;
 
             int frameIndex = gameObject.AnimType.ArtConfig.Start;
