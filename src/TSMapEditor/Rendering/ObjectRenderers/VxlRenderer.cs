@@ -14,6 +14,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
     public class VxlRenderer
     {
         private const float ModelScale = 0.025f;
+        private static readonly Matrix Scale = Matrix.CreateScale(ModelScale, ModelScale, ModelScale);
         private static readonly Vector3 CameraPosition = new (0.0f, 0.0f, -20.0f);
         private static readonly Vector3 CameraTarget = Vector3.Zero;
         private static readonly Matrix View = Matrix.CreateLookAt(CameraPosition, CameraTarget, Vector3.Up);
@@ -42,8 +43,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             // Rotates to the game's north
             Matrix rotateToWorld = Matrix.CreateRotationZ(-(MathHelper.ToRadians(135) + rotationFromFacing));
             rotateToWorld *= Matrix.CreateRotationX(MathHelper.ToRadians(-120));
-            Matrix scale = Matrix.CreateScale(ModelScale, ModelScale, ModelScale);
-
+            
             var vertexColorIndexedData = new List<VertexData>();
 
             foreach (var section in vxl.Sections)
@@ -80,7 +80,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
 
             /********** Rendering *********/
 
-            Matrix world = rotateToWorld * tilt * scale;
+            Matrix world = rotateToWorld * tilt * Scale;
             Rectangle imageBounds = GetBounds(vxl, hva, world);
             Matrix projection = Matrix.CreateOrthographic(imageBounds.Width, imageBounds.Height, NearClip, FarClip);
 
