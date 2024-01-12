@@ -84,7 +84,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
                 foreach (var vertex in sectionVertexData)
                     vertex.Position = Vector3.Transform(vertex.Position, sectionTransform);
 
-                ApplyLighting(sectionVertexData, vpl, section.NormalsMode == 4 ? 31 : 15,
+                ApplyLighting(sectionVertexData, vpl, section.NormalsMode,
                     rotationFromFacing);
 
                 vertexColorIndexedData.AddRange(sectionVertexData);
@@ -191,16 +191,23 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             return newVertices;
         }
 
-        private static void ApplyLighting(List<VertexData> vertices, VplFile vpl, int maxPage, float rotation)
+        private static void ApplyLighting(List<VertexData> vertices, VplFile vpl, int normalsMode, float rotation)
         {
+            // Center the lighting around this page to make vehicles darker in RA2
+            const byte centerPage = 7;
+            // RA2 uses 32 pages (normals 4), for the rest use only 16 pages
+            int maxPage = normalsMode == 4 ? 31 : 16;
+
             Vector3 light = Vector3.Transform(-Vector3.UnitX, Matrix.CreateRotationZ(rotation));
             foreach (var vertex in vertices)
             {
-                float dot = Vector3.Dot(vertex.Normal, light);
-                byte page = Convert.ToByte((dot + 1) / 2 * maxPage);
+                float dot = (Vector3.Dot(vertex.Normal, light) + 1) / 2;
+
+                byte page = dot <= 0.5 ?
+                    Convert.ToByte(dot * 2 * centerPage) :
+                    Convert.ToByte(2 * (maxPage - centerPage) * (dot - 0.5f) + centerPage);
                 vertex.ColorIndex = vpl.GetPaletteIndex(page, vertex.ColorIndex);
             }
-
         }
 
         private class VertexData
