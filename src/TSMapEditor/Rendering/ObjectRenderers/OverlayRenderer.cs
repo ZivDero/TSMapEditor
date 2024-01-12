@@ -14,12 +14,12 @@ namespace TSMapEditor.Rendering.ObjectRenderers
 
         protected override CommonDrawParams GetDrawParams(Overlay gameObject)
         {
-            return new CommonDrawParams(TheaterGraphics.OverlayTextures[gameObject.OverlayType.Index], gameObject.OverlayType.ININame);
+            return new ShapeDrawParams(TheaterGraphics.OverlayTextures[gameObject.OverlayType.Index], gameObject.OverlayType.ININame);
         }
 
-        protected override void Render(Overlay gameObject, int yDrawPointWithoutCellHeight, Point2D drawPoint, CommonDrawParams commonDrawParams)
+        protected override void Render(Overlay gameObject, int yDrawPointWithoutCellHeight, Point2D drawPoint, CommonDrawParams drawParams)
         {
-            if (commonDrawParams.Graphics is not ObjectImage graphics)
+            if (drawParams is not ShapeDrawParams shapeDrawParams)
                 return;
 
             int tiberiumIndex = gameObject.OverlayType.GetTiberiumIndex();
@@ -51,8 +51,8 @@ namespace TSMapEditor.Rendering.ObjectRenderers
                 }
             }
 
-            DrawShadow(gameObject, commonDrawParams, drawPoint, yDrawPointWithoutCellHeight);
-            DrawObjectImage(gameObject, commonDrawParams, graphics, gameObject.FrameIndex, Color.White, true, remapColor, drawPoint, yDrawPointWithoutCellHeight);
+            DrawShadow(gameObject, drawParams, drawPoint, yDrawPointWithoutCellHeight);
+            DrawObjectImage(gameObject, drawParams, shapeDrawParams.Graphics, gameObject.FrameIndex, Color.White, true, remapColor, drawPoint, yDrawPointWithoutCellHeight);
         }
     }
 }

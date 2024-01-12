@@ -14,17 +14,17 @@ namespace TSMapEditor.Rendering.ObjectRenderers
 
         protected override CommonDrawParams GetDrawParams(TerrainObject gameObject)
         {
-            return new CommonDrawParams(TheaterGraphics.TerrainObjectTextures[gameObject.TerrainType.Index], gameObject.TerrainType.ININame);
+            return new ShapeDrawParams(TheaterGraphics.TerrainObjectTextures[gameObject.TerrainType.Index], gameObject.TerrainType.ININame);
         }
 
-        protected override void Render(TerrainObject gameObject, int yDrawPointWithoutCellHeight, Point2D drawPoint, CommonDrawParams commonDrawParams)
+        protected override void Render(TerrainObject gameObject, int yDrawPointWithoutCellHeight, Point2D drawPoint, CommonDrawParams drawParams)
         {
-            if (commonDrawParams.Graphics is not ObjectImage graphics)
+            if (drawParams is not ShapeDrawParams shapeDrawParams)
                 return;
 
-            DrawShadow(gameObject, commonDrawParams, drawPoint, yDrawPointWithoutCellHeight);
+            DrawShadow(gameObject, drawParams, drawPoint, yDrawPointWithoutCellHeight);
 
-            DrawObjectImage(gameObject, commonDrawParams, graphics, 0, 
+            DrawObjectImage(gameObject, drawParams, shapeDrawParams.Graphics, 0, 
                 Color.White, false, Color.White, drawPoint, yDrawPointWithoutCellHeight);
         }
     }

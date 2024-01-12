@@ -14,15 +14,15 @@ namespace TSMapEditor.Rendering.ObjectRenderers
 
         protected override CommonDrawParams GetDrawParams(Smudge gameObject)
         {
-            return new CommonDrawParams(TheaterGraphics.SmudgeTextures[gameObject.SmudgeType.Index], gameObject.SmudgeType.ININame);
+            return new ShapeDrawParams(TheaterGraphics.SmudgeTextures[gameObject.SmudgeType.Index], gameObject.SmudgeType.ININame);
         }
 
-        protected override void Render(Smudge gameObject, int yDrawPointWithoutCellHeight, Point2D drawPoint, CommonDrawParams commonDrawParams)
+        protected override void Render(Smudge gameObject, int yDrawPointWithoutCellHeight, Point2D drawPoint, CommonDrawParams drawParams)
         {
-            if (commonDrawParams.Graphics is not ObjectImage graphics)
+            if (drawParams is not ShapeDrawParams shapeDrawParams)
                 return;
 
-            DrawObjectImage(gameObject, commonDrawParams, graphics, 0, Color.White, false, Color.White, drawPoint, yDrawPointWithoutCellHeight);
+            DrawObjectImage(gameObject, drawParams, shapeDrawParams.Graphics, 0, Color.White, false, Color.White, drawPoint, yDrawPointWithoutCellHeight);
         }
     }
 }

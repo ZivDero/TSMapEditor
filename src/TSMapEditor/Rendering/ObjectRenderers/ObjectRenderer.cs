@@ -51,7 +51,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             CommonDrawParams drawParams = GetDrawParams(gameObject);
 
             bool noShapeImage = false;
-            if (drawParams.Graphics is ObjectImage)
+            if (drawParams is ShapeDrawParams)
             {
                 PositionedTexture frame = GetFrameTexture(gameObject, drawParams);
 
@@ -103,8 +103,8 @@ namespace TSMapEditor.Rendering.ObjectRenderers
         /// <param name="gameObject">The game object to draw.</param>
         /// <param name="yDrawPointWithoutCellHeight">The Y-axis draw coordinate of the object, prior to taking cell height into account.</param>
         /// <param name="drawPoint">The draw point of the object, with cell height taken into account.</param>
-        /// <param name="commonDrawParams">Draw parameters.</param>
-        protected abstract void Render(T gameObject, int yDrawPointWithoutCellHeight, Point2D drawPoint, CommonDrawParams commonDrawParams);
+        /// <param name="drawParams">Draw parameters.</param>
+        protected abstract void Render(T gameObject, int yDrawPointWithoutCellHeight, Point2D drawPoint, CommonDrawParams drawParams);
 
         /// <summary>
         /// Renders the replacement text of an object, displayed when no graphics for an object have been loaded.
@@ -157,17 +157,17 @@ namespace TSMapEditor.Rendering.ObjectRenderers
 
         private PositionedTexture GetFrameTexture(T gameObject, CommonDrawParams drawParams)
         {
-            if (drawParams.Graphics is ObjectImage shapeGraphics)
+            if (drawParams is ShapeDrawParams shapeDrawParams)
             {
-                if (shapeGraphics.Frames != null && shapeGraphics.Frames.Length > 0)
+                if (shapeDrawParams.Graphics.Frames != null && shapeDrawParams.Graphics.Frames.Length > 0)
                 {
-                    int frameIndex = gameObject.GetFrameIndex(shapeGraphics.Frames.Length);
+                    int frameIndex = gameObject.GetFrameIndex(shapeDrawParams.Graphics.Frames.Length);
 
-                    if (frameIndex > -1 && frameIndex < shapeGraphics.Frames.Length)
-                        return shapeGraphics.Frames[frameIndex];
+                    if (frameIndex > -1 && frameIndex < shapeDrawParams.Graphics.Frames.Length)
+                        return shapeDrawParams.Graphics.Frames[frameIndex];
                 }
             }
-            else if (drawParams.Graphics is VoxelModel voxelGraphics)
+            else if (drawParams is VoxelDrawParams voxelDrawParams)
             {
 
             }
@@ -232,18 +232,18 @@ namespace TSMapEditor.Rendering.ObjectRenderers
 
         protected virtual void DrawShadow(T gameObject, CommonDrawParams drawParams, Point2D drawPoint, int initialYDrawPointWithoutCellHeight)
         {
-            if (drawParams.Graphics is not ObjectImage graphics)
+            if (drawParams is not ShapeDrawParams shapeDrawParams)
                 return;
 
-            int shadowFrameIndex = gameObject.GetShadowFrameIndex(graphics.Frames.Length);
-            if (shadowFrameIndex > 0 && shadowFrameIndex < graphics.Frames.Length)
+            int shadowFrameIndex = gameObject.GetShadowFrameIndex(shapeDrawParams.Graphics.Frames.Length);
+            if (shadowFrameIndex > 0 && shadowFrameIndex < shapeDrawParams.Graphics.Frames.Length)
             {
-                DrawObjectImage(gameObject, drawParams, graphics, shadowFrameIndex,
+                DrawObjectImage(gameObject, drawParams, shapeDrawParams.Graphics, shadowFrameIndex,
                     new Color(0, 0, 0, 128), false, Color.White, drawPoint, initialYDrawPointWithoutCellHeight);
             }
         }
 
-        protected void DrawObjectImage(T gameObject, CommonDrawParams commonDrawParams, ObjectImage image,
+        protected void DrawObjectImage(T gameObject, CommonDrawParams drawParams, ObjectImage image,
             int frameIndex, Color color, bool drawRemap, Color remapColor, Point2D drawPoint, int initialYDrawPointWithoutCellHeight)
         {
             PositionedTexture frame = image.Frames[frameIndex];
@@ -261,7 +261,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
                 finalDrawPointX, finalDrawPointY, finalYDrawPointWithoutCellHeight);
         }
 
-        protected void DrawVoxelModel(T gameObject, CommonDrawParams commonDrawParams, VoxelModel model,
+        protected void DrawVoxelModel(T gameObject, CommonDrawParams drawParams, VoxelModel model,
             byte facing, RampType ramp, Color color, bool drawRemap, Color remapColor, Point2D drawPoint, int initialYDrawPointWithoutCellHeight)
         {
             PositionedTexture frame = model.GetFrame(facing, ramp);

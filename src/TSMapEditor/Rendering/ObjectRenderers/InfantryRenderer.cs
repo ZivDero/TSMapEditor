@@ -17,10 +17,10 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             var graphics = TheaterGraphics.InfantryTextures[gameObject.ObjectType.Index];
             string iniName = gameObject.ObjectType.ININame;
 
-            return new CommonDrawParams(graphics, iniName);
+            return new ShapeDrawParams(graphics, iniName);
         }
 
-        protected override void Render(Infantry gameObject, int yDrawPointWithoutCellHeight, Point2D drawPoint, CommonDrawParams commonDrawParams)
+        protected override void Render(Infantry gameObject, int yDrawPointWithoutCellHeight, Point2D drawPoint, CommonDrawParams drawParams)
         {
             switch (gameObject.SubCell)
             {
@@ -41,14 +41,14 @@ namespace TSMapEditor.Rendering.ObjectRenderers
                     break;
             }
 
-            if (commonDrawParams.Graphics is not ObjectImage graphics)
+            if (drawParams is not ShapeDrawParams shapeDrawParams)
                 return;
 
             if (!gameObject.ObjectType.NoShadow)
-                DrawShadow(gameObject, commonDrawParams, drawPoint, yDrawPointWithoutCellHeight);
+                DrawShadow(gameObject, drawParams, drawPoint, yDrawPointWithoutCellHeight);
 
-            DrawObjectImage(gameObject, commonDrawParams, graphics, 
-                gameObject.GetFrameIndex(graphics.Frames.Length), 
+            DrawObjectImage(gameObject, drawParams, shapeDrawParams.Graphics, 
+                gameObject.GetFrameIndex(shapeDrawParams.Graphics.Frames.Length), 
                 Color.White, true, gameObject.GetRemapColor(), drawPoint, yDrawPointWithoutCellHeight);
         }
     }

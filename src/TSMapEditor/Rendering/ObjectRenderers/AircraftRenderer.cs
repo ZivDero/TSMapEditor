@@ -15,10 +15,10 @@ namespace TSMapEditor.Rendering.ObjectRenderers
 
         protected override CommonDrawParams GetDrawParams(Aircraft gameObject)
         {
-            return new CommonDrawParams(null, gameObject.ObjectType.ININame);
+            return new VoxelDrawParams(null, gameObject.ObjectType.ININame);
         }
 
-        protected override void Render(Aircraft gameObject, int yDrawPointWithoutCellHeight, Point2D drawPoint, CommonDrawParams commonDrawParams)
+        protected override void Render(Aircraft gameObject, int yDrawPointWithoutCellHeight, Point2D drawPoint, CommonDrawParams drawParams)
         {
             // lol, this is an easy one
             throw new NotImplementedException();

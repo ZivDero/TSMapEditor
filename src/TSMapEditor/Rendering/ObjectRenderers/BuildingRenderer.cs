@@ -51,7 +51,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             var graphics = RenderDependencies.TheaterGraphics.BuildingTextures[gameObject.ObjectType.Index];
             string iniName = gameObject.ObjectType.ININame;
 
-            return new CommonDrawParams(graphics, iniName);
+            return new ShapeDrawParams(graphics, iniName);
         }
 
         protected override bool ShouldRenderReplacementText(Structure gameObject)
@@ -67,27 +67,27 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             return base.ShouldRenderReplacementText(gameObject);
         }
 
-        private void DrawBibGraphics(Structure gameObject, ObjectImage bibGraphics, int yDrawPointWithoutCellHeight, Point2D drawPoint, CommonDrawParams commonDrawParams)
+        private void DrawBibGraphics(Structure gameObject, ObjectImage bibGraphics, int yDrawPointWithoutCellHeight, Point2D drawPoint, CommonDrawParams drawParams)
         {
-            DrawObjectImage(gameObject, commonDrawParams, bibGraphics, 0, Color.White, true, gameObject.GetRemapColor(), drawPoint, yDrawPointWithoutCellHeight);
+            DrawObjectImage(gameObject, drawParams, bibGraphics, 0, Color.White, true, gameObject.GetRemapColor(), drawPoint, yDrawPointWithoutCellHeight);
         }
 
-        protected override void Render(Structure gameObject, int yDrawPointWithoutCellHeight, Point2D drawPoint, CommonDrawParams commonDrawParams)
+        protected override void Render(Structure gameObject, int yDrawPointWithoutCellHeight, Point2D drawPoint, CommonDrawParams drawParams)
         {
             DrawFoundationLines(gameObject);
 
             var bibGraphics = RenderDependencies.TheaterGraphics.BuildingBibTextures[gameObject.ObjectType.Index];
             
             if (bibGraphics != null)
-                DrawBibGraphics(gameObject, bibGraphics, yDrawPointWithoutCellHeight, drawPoint, commonDrawParams);
+                DrawBibGraphics(gameObject, bibGraphics, yDrawPointWithoutCellHeight, drawPoint, drawParams);
 
-            if (commonDrawParams.Graphics is ObjectImage graphics)
+            if (drawParams is ShapeDrawParams shapeDrawParams)
             {
                 if (!gameObject.ObjectType.NoShadow)
-                    DrawShadow(gameObject, commonDrawParams, drawPoint, yDrawPointWithoutCellHeight);
+                    DrawShadow(gameObject, drawParams, drawPoint, yDrawPointWithoutCellHeight);
 
-                DrawObjectImage(gameObject, commonDrawParams, graphics,
-                    gameObject.GetFrameIndex(graphics.Frames.Length),
+                DrawObjectImage(gameObject, drawParams, shapeDrawParams.Graphics,
+                    gameObject.GetFrameIndex(shapeDrawParams.Graphics.Frames.Length),
                     Color.White, true, gameObject.GetRemapColor(), drawPoint, yDrawPointWithoutCellHeight);
             }
 

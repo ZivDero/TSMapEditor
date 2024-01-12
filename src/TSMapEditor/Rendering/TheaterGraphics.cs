@@ -29,13 +29,7 @@ namespace TSMapEditor.Rendering
         Theater Theater { get; }
     }
 
-    // If you've got a better naming scheme idea, I welcome suggestions
-    public interface IDrawableObject
-    {
-
-    }
-
-    public class VoxelModel : IDrawableObject, IDisposable
+    public class VoxelModel : IDisposable
     {
         public VoxelModel(GraphicsDevice graphicsDevice, VxlFile vxl, HvaFile hva, Palette palette,
             bool remapable = false, VplFile vpl = null)
@@ -143,7 +137,7 @@ namespace TSMapEditor.Rendering
         public Dictionary<(byte facing, RampType ramp), PositionedTexture> RemapFrames { get; set; } = new();
     }
 
-    public class ObjectImage : IDrawableObject, IDisposable
+    public class ObjectImage : IDisposable
     {
         public ObjectImage(GraphicsDevice graphicsDevice, ShpFile shp, byte[] shpFileData, Palette palette,
             List<int> framesToLoad = null, bool remapable = false, PositionedTexture pngTexture = null)
