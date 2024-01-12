@@ -52,7 +52,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             }
 
             DrawShadow(gameObject, shapeDrawParams, drawPoint, yDrawPointWithoutCellHeight);
-            DrawObjectImage(gameObject, shapeDrawParams, shapeDrawParams.Graphics, gameObject.FrameIndex, Color.White, true, remapColor, drawPoint, yDrawPointWithoutCellHeight);
+            DrawShapeImage(gameObject, shapeDrawParams, shapeDrawParams.Graphics, gameObject.FrameIndex, Color.White, true, remapColor, drawPoint, yDrawPointWithoutCellHeight);
         }
     }
 }

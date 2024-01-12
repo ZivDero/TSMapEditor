@@ -44,7 +44,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             if (!gameObject.ObjectType.NoShadow)
                 DrawShadow(gameObject, drawParams, drawPoint, yDrawPointWithoutCellHeight);
 
-            DrawObjectImage(gameObject, drawParams, drawParams.Graphics, 
+            DrawShapeImage(gameObject, drawParams, drawParams.Graphics, 
                 gameObject.GetFrameIndex(drawParams.Graphics.Frames.Length),
                 Color.White, true, gameObject.GetRemapColor(), drawPoint, yDrawPointWithoutCellHeight);
 
@@ -58,7 +58,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
                     if (frame == null)
                         return;
 
-                    DrawObjectImage(gameObject, drawParams, drawParams.Graphics, 
+                    DrawShapeImage(gameObject, drawParams, drawParams.Graphics, 
                         turretFrameIndex, Color.White, true, gameObject.GetRemapColor(),
                         drawPoint, yDrawPointWithoutCellHeight);
                 }

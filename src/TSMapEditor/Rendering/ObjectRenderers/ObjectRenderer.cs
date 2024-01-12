@@ -231,12 +231,12 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             int shadowFrameIndex = gameObject.GetShadowFrameIndex(shapeDrawParams.Graphics.Frames.Length);
             if (shadowFrameIndex > 0 && shadowFrameIndex < shapeDrawParams.Graphics.Frames.Length)
             {
-                DrawObjectImage(gameObject, shapeDrawParams, shapeDrawParams.Graphics, shadowFrameIndex,
+                DrawShapeImage(gameObject, shapeDrawParams, shapeDrawParams.Graphics, shadowFrameIndex,
                     new Color(0, 0, 0, 128), false, Color.White, drawPoint, initialYDrawPointWithoutCellHeight);
             }
         }
 
-        protected void DrawObjectImage(T gameObject, CommonDrawParams drawParams, ShapeImage image,
+        protected void DrawShapeImage(T gameObject, CommonDrawParams drawParams, ShapeImage image,
             int frameIndex, Color color, bool drawRemap, Color remapColor, Point2D drawPoint, int initialYDrawPointWithoutCellHeight)
         {
             PositionedTexture frame = image.Frames[frameIndex];

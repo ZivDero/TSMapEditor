@@ -69,7 +69,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
 
         private void DrawBibGraphics(Structure gameObject, ShapeImage bibGraphics, int yDrawPointWithoutCellHeight, Point2D drawPoint, CommonDrawParams drawParams)
         {
-            DrawObjectImage(gameObject, drawParams, bibGraphics, 0, Color.White, true, gameObject.GetRemapColor(), drawPoint, yDrawPointWithoutCellHeight);
+            DrawShapeImage(gameObject, drawParams, bibGraphics, 0, Color.White, true, gameObject.GetRemapColor(), drawPoint, yDrawPointWithoutCellHeight);
         }
 
         protected override void Render(Structure gameObject, int yDrawPointWithoutCellHeight, Point2D drawPoint, CommonDrawParams drawParams)
@@ -86,7 +86,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
                 if (!gameObject.ObjectType.NoShadow)
                     DrawShadow(gameObject, shapeDrawParams, drawPoint, yDrawPointWithoutCellHeight);
 
-                DrawObjectImage(gameObject, shapeDrawParams, shapeDrawParams.Graphics,
+                DrawShapeImage(gameObject, shapeDrawParams, shapeDrawParams.Graphics,
                     gameObject.GetFrameIndex(shapeDrawParams.Graphics.Frames.Length),
                     Color.White, true, gameObject.GetRemapColor(), drawPoint, yDrawPointWithoutCellHeight);
             }
