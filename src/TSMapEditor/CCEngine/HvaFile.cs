@@ -12,6 +12,12 @@ namespace TSMapEditor.CCEngine
         public HvaLoadException(string message) : base(message) { }
     }
 
+    /// <summary>
+    /// .hva file format
+    /// Based on the CNCMaps Renderer code
+    /// https://github.com/zzattack/ccmaps-net
+    /// </summary>
+
     public class HvaFile : VirtualFile
     {
         public int NumFrames { get; set; }

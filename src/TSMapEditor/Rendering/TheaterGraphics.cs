@@ -51,11 +51,11 @@ namespace TSMapEditor.Rendering
 
         public void Dispose()
         {
-            foreach (var f in Frames)
-                f.Value.Dispose();
+            foreach (var frame in Frames)
+                frame.Value.Dispose();
 
-            foreach (var f in RemapFrames)
-                f.Value.Dispose();
+            foreach (var frame in RemapFrames)
+                frame.Value.Dispose();
         }
 
         public PositionedTexture GetFrame(byte facing, RampType ramp)
@@ -227,18 +227,18 @@ namespace TSMapEditor.Rendering
 
         public void Dispose()
         {
-            Array.ForEach(Frames, f =>
+            Array.ForEach(Frames, frame =>
             {
-                if (f != null)
-                    f.Dispose();
+                if (frame != null)
+                    frame.Dispose();
             });
 
             if (RemapFrames != null)
             {
-                Array.ForEach(RemapFrames, f =>
+                Array.ForEach(RemapFrames, frame =>
                 {
-                    if (f != null)
-                        f.Dispose();
+                    if (frame != null)
+                        frame.Dispose();
                 });
             }
         }

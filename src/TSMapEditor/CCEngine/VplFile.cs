@@ -5,6 +5,11 @@ using CNCMaps.FileFormats.VirtualFileSystem;
 
 namespace TSMapEditor.CCEngine
 {
+    /// <summary>
+    /// .vpl file format
+    /// Based on the CNCMaps Renderer code
+    /// https://github.com/zzattack/ccmaps-net
+    /// </summary>
     public class VplFile : VirtualFile
     {
         public VplFile(Stream baseStream, string filename, int baseOffset, int fileSize, bool isBuffered = false)
