@@ -3,25 +3,36 @@ using System.Collections.Generic;
 using System.IO;
 using CNCMaps.FileFormats.VirtualFileSystem;
 
-namespace CNCMaps.FileFormats
+namespace TSMapEditor.CCEngine
 {
-
     public class VplFile : VirtualFile
     {
         public VplFile(Stream baseStream, string filename, int baseOffset, int fileSize, bool isBuffered = false)
-            : base(baseStream, filename, baseOffset, fileSize, isBuffered) { }
+            : base(baseStream, filename, baseOffset, fileSize, isBuffered)
+        {
+            Parse();
+        }
 
         public VplFile(Stream baseStream, string filename = "", bool isBuffered = true)
-            : base(baseStream, filename, isBuffered) { }
+            : base(baseStream, filename, isBuffered)
+        {
+            Parse();
+        }
+
+
+        public VplFile(byte[] buffer, string filename = "") : base(new MemoryStream(buffer), filename, true)
+        {
+            Parse();
+        }
+
 
         private uint firstRemap;
         private uint lastRemap;
         private uint numSections;
         private uint unknown;
         // private Palette _palette; // unused
-        private List<byte[]> lookupSections = new List<byte[]>();
+        private List<byte[]> lookupSections = new();
 
-        private bool parsed = false;
         private void Parse()
         {
             firstRemap = ReadUInt32();
@@ -32,15 +43,11 @@ namespace CNCMaps.FileFormats
             // palette = new Palette(pal, "voxels.vpl");
             for (uint i = 0; i < numSections; i++)
                 lookupSections.Add(Read(256));
-            parsed = true;
         }
 
-        public byte GetPaletteIndex(byte normal, byte maxNormal, byte color)
+        public byte GetPaletteIndex(byte page, byte color)
         {
-            if (!parsed) Parse();
-            int vplSection = (int)(Math.Min(normal, maxNormal - 1) * numSections / maxNormal);
-            return lookupSections[vplSection][color];
+            return lookupSections[page][color];
         }
-
     }
 }

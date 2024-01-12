@@ -29,7 +29,6 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             var renderTarget = new RenderTarget2D(graphicsDevice, 400, 400, false, SurfaceFormat.Color, DepthFormat.Depth24);
             Renderer.PushRenderTarget(renderTarget);
             
-            //graphicsDevice.SetRenderTarget(renderTarget, 0);
             graphicsDevice.Clear(Color.Transparent);
             graphicsDevice.DepthStencilState = DepthStencilState.Default;
 
@@ -47,6 +46,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
 
             Matrix tilt = Matrix.Identity;
 
+            // Rotate the X axis to be parallel to the tilt of the slope, then rotate around this axis
             if (ramp is > RampType.None and < RampType.DoubleUpSWNE)
             {
                 Matrix rotateTiltAxis = Matrix.CreateRotationZ(-(MathHelper.ToRadians(SlopeAxisZAngles[(int)ramp - 1])));
@@ -56,11 +56,11 @@ namespace TSMapEditor.Rendering.ObjectRenderers
                 tilt = Matrix.CreateFromAxisAngle(tiltAxis, MathHelper.ToRadians(30));
             }
 
-            var vertexData = new List<VertexPositionColorNormal>();
+            var vertexColorIndexedData = new List<VertexData>();
 
             foreach (var section in vxl.Sections)
             {
-                var sectionVertexData = new List<VertexPositionColorNormal>();
+                var sectionVertexData = new List<VertexData>();
                 for (int x = 0; x < section.SizeX; x++)
                 {
                     for (int y = 0; y < section.SizeY; y++)
@@ -81,17 +81,22 @@ namespace TSMapEditor.Rendering.ObjectRenderers
                 var sectionTranslation = Matrix.CreateTranslation(section.MinBounds);
                 var sectionTransform = sectionTranslation * sectionRotation;
 
-                var transformedSectionVertexData = sectionVertexData.Select(vpcn => new VertexPositionColorNormal(
-                    Vector3.Transform(vpcn.Position, sectionTransform), vpcn.Color, vpcn.Normal));
+                foreach (var vertex in sectionVertexData)
+                    vertex.Position = Vector3.Transform(vertex.Position, sectionTransform);
 
-                vertexData.AddRange(transformedSectionVertexData);
+                ApplyLighting(sectionVertexData, vpl, section.NormalsMode == 4 ? 31 : 15,
+                    rotationFromFacing);
+
+                vertexColorIndexedData.AddRange(sectionVertexData);
             }
 
             VertexBuffer vertexBuffer = new VertexBuffer(graphicsDevice,
-                typeof(VertexPositionColorNormal), vertexData.Count, BufferUsage.None);
+                typeof(VertexPositionColorNormal), vertexColorIndexedData.Count, BufferUsage.None);
+
+            var vertexData = vertexColorIndexedData.Select(v => v.ToVertexPositionColorNormal());
             vertexBuffer.SetData(vertexData.ToArray());
 
-            var triangleListIndices = new int[vertexData.Count];
+            var triangleListIndices = new int[vertexColorIndexedData.Count];
             for (int i = 0; i < triangleListIndices.Length; i++)
                 triangleListIndices[i] = i;
 
@@ -111,7 +116,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             foreach (EffectPass pass in basicEffect.CurrentTechnique.Passes)
             {
                 pass.Apply();
-                graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, vertexData.Count / 3);
+                graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, vertexColorIndexedData.Count / 3);
             }
 
             var colorData = new Color[renderTarget.Width * renderTarget.Height];
@@ -125,16 +130,6 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             return tex;
         }
 
-        private static readonly Vector2[] TiltRotations =
-        {
-            new(0, 0),
-            new(-30, 0), new(0, 30), new(30, 0), new(0, -30),
-            new(30, 30), new(30, -30), new(-30, -30), new(-30, 30),
-            new(30, 30), new(30, -30), new(-30, -30), new(-30, 30),
-            new(30, 30), new(30, -30), new(-30, -30), new(-30, 30),
-            new(0, 0), new(0, 0), new(0, 0), new(0, 0)
-        };
-
         private static readonly int[] SlopeAxisZAngles =
         {
             -45, 45, 135, -135,
@@ -145,7 +140,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
         };
 
 
-        private static List<VertexPositionColorNormal> RenderVoxel(VxlFile.Voxel voxel, Vector3 normal, Palette palette, Vector3 scale)
+        private static List<VertexData> RenderVoxel(VxlFile.Voxel voxel, Vector3 normal, Palette palette, Vector3 scale)
         {
             const float radius = 0.5f;
             Vector3 voxelCoordinates = new Vector3(voxel.X, voxel.Y, voxel.Z);
@@ -179,7 +174,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
                 new [] { 4, 0, 3 }, new [] { 3, 7, 4 }, // left
             };
 
-            List<VertexPositionColorNormal> newVertices = new();
+            List<VertexData> newVertices = new();
 
             foreach (var triangle in triangles)
             {
@@ -188,12 +183,45 @@ namespace TSMapEditor.Rendering.ObjectRenderers
 
             void AddTriangle(Vector3 v1, Vector3 v2, Vector3 v3)
             {
-                newVertices.Add(new VertexPositionColorNormal(v1 * scale, palette.Data[voxel.ColorIndex].ToXnaColor(), normal));
-                newVertices.Add(new VertexPositionColorNormal(v2 * scale, palette.Data[voxel.ColorIndex].ToXnaColor(), normal));
-                newVertices.Add(new VertexPositionColorNormal(v3 * scale, palette.Data[voxel.ColorIndex].ToXnaColor(), normal));
+                newVertices.Add(new VertexData(v1 * scale, palette, voxel.ColorIndex, normal));
+                newVertices.Add(new VertexData(v2 * scale, palette, voxel.ColorIndex, normal));
+                newVertices.Add(new VertexData(v3 * scale, palette, voxel.ColorIndex, normal));
             }
 
             return newVertices;
+        }
+
+        private static void ApplyLighting(List<VertexData> vertices, VplFile vpl, int maxPage, float rotation)
+        {
+            Vector3 light = Vector3.Transform(-Vector3.UnitX, Matrix.CreateRotationZ(rotation));
+            foreach (var vertex in vertices)
+            {
+                float dot = Vector3.Dot(vertex.Normal, light);
+                byte page = Convert.ToByte((dot + 1) / 2 * maxPage);
+                vertex.ColorIndex = vpl.GetPaletteIndex(page, vertex.ColorIndex);
+            }
+
+        }
+
+        private class VertexData
+        {
+            public VertexData(Vector3 position, Palette palette, byte colorIndex, Vector3 normal)
+            {
+                Position = position;
+                Palette = palette;
+                ColorIndex = colorIndex;
+                Normal = normal;
+            }
+
+            public VertexPositionColorNormal ToVertexPositionColorNormal()
+            {
+                return new VertexPositionColorNormal(Position, Palette.Data[ColorIndex].ToXnaColor(), Normal);
+            }
+
+            public Vector3 Position;
+            public Palette Palette;
+            public byte ColorIndex;
+            public Vector3 Normal;
         }
     }
 }

@@ -1,10 +1,9 @@
-﻿using System;
+﻿using CNCMaps.FileFormats.VirtualFileSystem;
+using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using CNCMaps.FileFormats.VirtualFileSystem;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace TSMapEditor.CCEngine
 {

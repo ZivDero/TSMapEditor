@@ -7,6 +7,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using CNCMaps.FileFormats;
 using TSMapEditor.CCEngine;
 using TSMapEditor.Models;
 using TSMapEditor.Rendering.ObjectRenderers;
@@ -36,11 +37,12 @@ namespace TSMapEditor.Rendering
     public class VoxelModel : IDrawableObject, IDisposable
     {
         public VoxelModel(GraphicsDevice graphicsDevice, VxlFile vxl, HvaFile hva, Palette palette,
-            bool remapable = false)
+            bool remapable = false, VplFile vpl = null)
         {
             this.graphicsDevice = graphicsDevice;
             this.vxl = vxl;
             this.hva = hva;
+            this.vpl = vpl;
             this.palette = palette;
             this.remapable = remapable;
         }
@@ -48,6 +50,7 @@ namespace TSMapEditor.Rendering
         private readonly GraphicsDevice graphicsDevice;
         private readonly VxlFile vxl;
         private readonly HvaFile hva;
+        private readonly VplFile vpl;
         private readonly Palette palette;
         private readonly bool remapable;
 
@@ -66,7 +69,7 @@ namespace TSMapEditor.Rendering
             if (Frames.TryGetValue(key, out PositionedTexture value))
                 return value;
 
-            var texture = VxlRenderer.Render(graphicsDevice, facing, ramp, vxl, hva, palette);
+            var texture = VxlRenderer.Render(graphicsDevice, facing, ramp, vxl, hva, palette, vpl);
             var positionedTexture = new PositionedTexture(texture.Width, texture.Height, 0, 0, texture);
             Frames[key] = positionedTexture;
             return positionedTexture;
@@ -595,7 +598,7 @@ namespace TSMapEditor.Rendering
                 if (!string.IsNullOrWhiteSpace(buildingType.ArtConfig.Palette))
                     palette = GetPaletteOrFail(buildingType.ArtConfig.Palette + Theater.FileExtension[1..] + ".pal");
 
-                BuildingTurretModels[i] = new VoxelModel(graphicsDevice, vxlFile, hvaFile, palette, buildingType.ArtConfig.Remapable);
+                BuildingTurretModels[i] = new VoxelModel(graphicsDevice, vxlFile, hvaFile, palette, buildingType.ArtConfig.Remapable, GetVplFile());
                 loadedModels[turretImage] = BuildingTurretModels[i];
             }
 
@@ -759,7 +762,7 @@ namespace TSMapEditor.Rendering
                 var vxlFile = new VxlFile(vxlData, unitImage);
                 var hvaFile = new HvaFile(hvaData, unitImage);
 
-                UnitModels[i] = new VoxelModel(graphicsDevice, vxlFile, hvaFile, unitPalette, unitType.ArtConfig.Remapable);
+                UnitModels[i] = new VoxelModel(graphicsDevice, vxlFile, hvaFile, unitPalette, unitType.ArtConfig.Remapable, GetVplFile());
                 loadedModels[unitImage] = UnitModels[i];
             }
 
@@ -803,7 +806,7 @@ namespace TSMapEditor.Rendering
                 var vxlFile = new VxlFile(vxlData, turretImage);
                 var hvaFile = new HvaFile(hvaData, turretImage);
 
-                UnitTurretModels[i] = new VoxelModel(graphicsDevice, vxlFile, hvaFile, unitPalette, unitType.ArtConfig.Remapable);
+                UnitTurretModels[i] = new VoxelModel(graphicsDevice, vxlFile, hvaFile, unitPalette, unitType.ArtConfig.Remapable, GetVplFile());
                 loadedModels[turretImage] = UnitTurretModels[i];
             }
 
@@ -1078,6 +1081,15 @@ namespace TSMapEditor.Rendering
             if (paletteData == null)
                 return palette;
             return new Palette(paletteData);
+        }
+
+        private VplFile GetVplFile(string filename = "voxels.vpl")
+        {
+            byte[] vplData = fileManager.LoadFile(filename);
+            if (vplData == null)
+                throw new KeyNotFoundException(filename + " not found from loaded MIX files!");
+
+            return new VplFile(vplData);
         }
 
         private PositionedTexture PositionedTextureFromBytes(byte[] data)
