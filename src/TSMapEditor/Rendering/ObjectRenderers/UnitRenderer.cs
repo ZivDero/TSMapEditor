@@ -1,7 +1,4 @@
-﻿using Microsoft.CodeAnalysis.Operations;
-using Microsoft.Xna.Framework;
-using Rampastring.XNAUI;
-using SharpDX.Direct3D9;
+﻿using Microsoft.Xna.Framework;
 using TSMapEditor.CCEngine;
 using TSMapEditor.GameMath;
 using TSMapEditor.Models;
