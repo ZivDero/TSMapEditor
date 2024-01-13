@@ -17,6 +17,7 @@ namespace TSMapEditor.CCEngine
     /// Based on the CNCMaps Renderer code
     /// https://github.com/zzattack/ccmaps-net
     /// </summary>
+    
     public class VxlFile : VirtualFile
     {
         public FileHeader Header = new();
@@ -82,17 +83,17 @@ namespace TSMapEditor.CCEngine
             public byte PaletteRemapEnd;
             // public Palette Palette; // not actually used
 
-            public void Read(VxlFile file)
+            public void Read(VxlFile vxlFile)
             {
-                FileName = file.ReadCString(16);
-                PaletteCount = file.ReadUInt32();
-                HeaderCount = file.ReadUInt32();
-                TailerCount = file.ReadUInt32();
+                FileName = vxlFile.ReadCString(16);
+                PaletteCount = vxlFile.ReadUInt32();
+                HeaderCount = vxlFile.ReadUInt32();
+                TailerCount = vxlFile.ReadUInt32();
                 Debug.Assert(HeaderCount == TailerCount);
-                BodySize = file.ReadUInt32();
-                PaletteRemapStart = file.ReadByte();
-                PaletteRemapEnd = file.ReadByte();
-                var pal = file.Read(768);
+                BodySize = vxlFile.ReadUInt32();
+                PaletteRemapStart = vxlFile.ReadByte();
+                PaletteRemapEnd = vxlFile.ReadByte();
+                var pal = vxlFile.Read(768);
                 // Palette = new Palette(pal, "voxel palette");
             }
 
@@ -138,14 +139,14 @@ namespace TSMapEditor.CCEngine
         {
             public Vector4[] V = new Vector4[3];
 
-            public void Read(VxlFile file)
+            public void Read(VxlFile vxlFile)
             {
                 for (var i = 0; i < 3; ++i)
                 {
-                    V[i].X = file.ReadFloat();
-                    V[i].Y = file.ReadFloat();
-                    V[i].Z = file.ReadFloat();
-                    V[i].W = file.ReadFloat();
+                    V[i].X = vxlFile.ReadFloat();
+                    V[i].Y = vxlFile.ReadFloat();
+                    V[i].Z = vxlFile.ReadFloat();
+                    V[i].W = vxlFile.ReadFloat();
                 }
             }
         };
@@ -188,18 +189,18 @@ namespace TSMapEditor.CCEngine
             public float ScaleZ => SpanZ * 1.0f / SizeZ;
             public Vector3 Scale => new(ScaleX, ScaleY, ScaleZ);
             
-            public void ReadHeader(VxlFile file)
+            public void ReadHeader(VxlFile vxlFile)
             {
-                Name = file.ReadCString(16);
-                LimbNumber = file.ReadUInt32();
-                unknown1 = file.ReadUInt32();
-                unknown2 = file.ReadUInt32();
+                Name = vxlFile.ReadCString(16);
+                LimbNumber = vxlFile.ReadUInt32();
+                unknown1 = vxlFile.ReadUInt32();
+                unknown2 = vxlFile.ReadUInt32();
             }
 
-            public void ReadBodySpans(VxlFile file)
+            public void ReadBodySpans(VxlFile vxlFile)
             {
                 // need to have position at start of bodies
-                file.Seek(StartingSpanOffset, SeekOrigin.Current);
+                vxlFile.Seek(StartingSpanOffset, SeekOrigin.Current);
                 Spans = new SectionSpan[SizeX, SizeY];
 
                 for (byte y = 0; y < SizeY; ++y)
@@ -207,7 +208,7 @@ namespace TSMapEditor.CCEngine
                     for (byte x = 0; x < SizeX; ++x)
                     {
                         var s = new SectionSpan();
-                        s.StartIndex = file.ReadInt32();
+                        s.StartIndex = vxlFile.ReadInt32();
                         s.Height = SizeZ;
                         s.X = x;
                         s.Y = y;
@@ -219,7 +220,7 @@ namespace TSMapEditor.CCEngine
                 {
                     for (byte x = 0; x < SizeX; ++x)
                     {
-                        Spans[x, y].EndIndex = file.ReadInt32();
+                        Spans[x, y].EndIndex = vxlFile.ReadInt32();
                     }
                 }
 
@@ -227,29 +228,29 @@ namespace TSMapEditor.CCEngine
                 {
                     for (byte x = 0; x < SizeX; ++x)
                     {
-                        Spans[x, y].Read(file);
+                        Spans[x, y].Read(vxlFile);
                     }
                 }
             }
 
-            public void ReadTailer(VxlFile file)
+            public void ReadTailer(VxlFile vxlFile)
             {
-                StartingSpanOffset = file.ReadUInt32();
-                EndingSpanOffset = file.ReadUInt32();
-                DataSpanOffset = file.ReadUInt32();
-                HvaMultiplier = file.ReadFloat();
-                TransfMatrix.Read(file);
-                MinBounds.X = file.ReadFloat();
-                MinBounds.Y = file.ReadFloat();
-                MinBounds.Z = file.ReadFloat();
-                MaxBounds.X = file.ReadFloat();
-                MaxBounds.Y = file.ReadFloat();
-                MaxBounds.Z = file.ReadFloat();
+                StartingSpanOffset = vxlFile.ReadUInt32();
+                EndingSpanOffset = vxlFile.ReadUInt32();
+                DataSpanOffset = vxlFile.ReadUInt32();
+                HvaMultiplier = vxlFile.ReadFloat();
+                TransfMatrix.Read(vxlFile);
+                MinBounds.X = vxlFile.ReadFloat();
+                MinBounds.Y = vxlFile.ReadFloat();
+                MinBounds.Z = vxlFile.ReadFloat();
+                MaxBounds.X = vxlFile.ReadFloat();
+                MaxBounds.Y = vxlFile.ReadFloat();
+                MaxBounds.Z = vxlFile.ReadFloat();
 
-                SizeX = file.ReadByte();
-                SizeY = file.ReadByte();
-                SizeZ = file.ReadByte();
-                NormalsMode = file.ReadByte();
+                SizeX = vxlFile.ReadByte();
+                SizeY = vxlFile.ReadByte();
+                SizeZ = vxlFile.ReadByte();
+                NormalsMode = vxlFile.ReadByte();
             }
 
             public Vector3[] GetNormals()
