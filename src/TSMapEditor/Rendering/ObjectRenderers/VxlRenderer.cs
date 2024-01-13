@@ -129,6 +129,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             tex.SetData(colorData);
             
             Renderer.PopRenderTarget();
+            renderTarget.Dispose();
 
             return tex;
         }
