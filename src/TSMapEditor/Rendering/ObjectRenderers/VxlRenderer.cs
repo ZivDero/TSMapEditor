@@ -61,7 +61,6 @@ namespace TSMapEditor.Rendering.ObjectRenderers
                             if (voxel.NormalIndex >= section.GetNormals().Length)
                             {
                                 // If there are corrupted normals, mark them with a zero vector.
-                                // We will later replace it and render the voxel in true color
                                 sectionVertexData.AddRange(RenderVoxel(voxel, Vector3.Zero, palette));
                             }
                             else
@@ -245,15 +244,17 @@ namespace TSMapEditor.Rendering.ObjectRenderers
 
             // Center the lighting around this page to make vehicles darker in RA2
             const byte centerPage = 7;
-            // RA2 uses 32 pages (normals 4), for the rest use only 16 pages
-            int maxPage = normalsMode == 4 ? 31 : 15;
+            // Assume 8 pages per normals mode
+            int maxPage = normalsMode * 8 - 1;
 
             foreach (var vertex in vertices)
             {
                 if (vertex.Normal == Vector3.Zero)
                 {
-                    // Zero vector means corrupter normal, replace with Up and continue unshaded
+                    // Zero vector means corrupter normal, replace with Up
+                    // "Invalid" normals 253-255 are apparently mapped to page 16
                     vertex.Normal = Vector3.Up;
+                    vertex.ColorIndex = vpl.GetPaletteIndex(16, vertex.ColorIndex);
                     continue;
                 }
 
