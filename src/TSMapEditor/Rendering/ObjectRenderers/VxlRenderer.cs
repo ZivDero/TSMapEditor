@@ -15,7 +15,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
     {
         private const float ModelScale = 0.025f;
         private static readonly Matrix Scale = Matrix.CreateScale(ModelScale, ModelScale, ModelScale);
-        private static readonly Vector3 CameraPosition = new (0.0f, 0.0f, -20.0f);
+        private static readonly Vector3 CameraPosition = new(0.0f, 0.0f, -20.0f);
         private static readonly Vector3 CameraTarget = Vector3.Zero;
         private static readonly Matrix View = Matrix.CreateLookAt(CameraPosition, CameraTarget, Vector3.Up);
 
@@ -25,7 +25,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
         public static Texture2D Render(GraphicsDevice graphicsDevice, byte facing, RampType ramp, VxlFile vxl, HvaFile hva, Palette palette, VplFile vpl = null, bool forRemap = false)
         {
             /*********** Voxel space setup **********/
-            
+
             float rotationFromFacing = 2 * (float)Math.PI * ((float)facing / Constants.FacingMax);
 
             Matrix tilt = Matrix.Identity;
@@ -59,25 +59,27 @@ namespace TSMapEditor.Rendering.ObjectRenderers
                             {
                                 // If there are corrupted normals, mark them with a zero vector.
                                 // We will later replace it and render the voxel in true color
-                                sectionVertexData.AddRange(RenderVoxel(voxel, Vector3.Zero,
-                                    palette, section.Scale));
+                                sectionVertexData.AddRange(RenderVoxel(voxel, Vector3.Zero, palette));
                             }
                             else
                             {
-                                sectionVertexData.AddRange(RenderVoxel(voxel, section.GetNormals()[voxel.NormalIndex],
-                                    palette, section.Scale));
+                                sectionVertexData.AddRange(RenderVoxel(voxel, section.GetNormals()[voxel.NormalIndex], palette));
                             }
                         }
                     }
                 }
 
-                var sectionRotation = hva.LoadMatrix(section.Index);
-                sectionRotation.M41 *= section.HvaMultiplier * section.ScaleX;
-                sectionRotation.M42 *= section.HvaMultiplier * section.ScaleY;
-                sectionRotation.M43 *= section.HvaMultiplier * section.ScaleZ;
+                var sectionHvaTransform = hva.LoadMatrix(section.Index);
+                sectionHvaTransform.M41 *= section.HvaMatrixScaleFactor * section.ScaleX;
+                sectionHvaTransform.M42 *= section.HvaMatrixScaleFactor * section.ScaleY;
+                sectionHvaTransform.M43 *= section.HvaMatrixScaleFactor * section.ScaleZ;
 
                 var sectionTranslation = Matrix.CreateTranslation(section.MinBounds);
-                var sectionTransform = sectionTranslation * sectionRotation;
+                var sectionScale = Matrix.CreateScale(section.Scale);
+
+                // Move to the origin, scale, then transform however the .hva tells us
+                // Scale first because the translation is pre-scaled
+                var sectionTransform = sectionTranslation * sectionScale * sectionHvaTransform;
 
                 foreach (var vertex in sectionVertexData)
                     vertex.Position = Vector3.Transform(vertex.Position, sectionTransform);
@@ -138,7 +140,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
 
             Texture2D tex = new Texture2D(graphicsDevice, renderTarget.Width, renderTarget.Height);
             tex.SetData(colorData);
-            
+
             Renderer.PopRenderTarget();
             renderTarget.Dispose();
 
@@ -183,7 +185,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             public Vector3 Normal;
         }
 
-        private static List<VertexData> RenderVoxel(Voxel voxel, Vector3 normal, Palette palette, Vector3 scale)
+        private static List<VertexData> RenderVoxel(Voxel voxel, Vector3 normal, Palette palette)
         {
             const float radius = 0.5f;
             Vector3 voxelCoordinates = new Vector3(voxel.X, voxel.Y, voxel.Z);
@@ -226,9 +228,9 @@ namespace TSMapEditor.Rendering.ObjectRenderers
 
             void AddTriangle(Vector3 v1, Vector3 v2, Vector3 v3)
             {
-                newVertices.Add(new VertexData(v1 * scale, palette, voxel.ColorIndex, normal));
-                newVertices.Add(new VertexData(v2 * scale, palette, voxel.ColorIndex, normal));
-                newVertices.Add(new VertexData(v3 * scale, palette, voxel.ColorIndex, normal));
+                newVertices.Add(new VertexData(v1, palette, voxel.ColorIndex, normal));
+                newVertices.Add(new VertexData(v2, palette, voxel.ColorIndex, normal));
+                newVertices.Add(new VertexData(v3, palette, voxel.ColorIndex, normal));
             }
 
             return newVertices;
@@ -265,13 +267,17 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             Rectangle ret = Rectangle.Empty;
             foreach (var section in vxl.Sections)
             {
-                var sectionRotation = hva.LoadMatrix(section.Index);
-                sectionRotation.M41 *= section.HvaMultiplier * section.ScaleX;
-                sectionRotation.M42 *= section.HvaMultiplier * section.ScaleY;
-                sectionRotation.M43 *= section.HvaMultiplier * section.ScaleZ;
+                var sectionHvaTransform = hva.LoadMatrix(section.Index);
+                sectionHvaTransform.M41 *= section.HvaMatrixScaleFactor * section.ScaleX;
+                sectionHvaTransform.M42 *= section.HvaMatrixScaleFactor * section.ScaleY;
+                sectionHvaTransform.M43 *= section.HvaMatrixScaleFactor * section.ScaleZ;
 
                 var sectionTranslation = Matrix.CreateTranslation(section.MinBounds);
-                var sectionTransform = sectionTranslation * sectionRotation;
+                var sectionScale = Matrix.CreateScale(section.Scale);
+
+                // Move to the origin, scale, then transform however the .hva tells us
+                // Scale first because the translation is pre-scaled
+                var sectionTransform = sectionTranslation * sectionScale * sectionHvaTransform;
 
                 transform = sectionTransform * transform;
 
