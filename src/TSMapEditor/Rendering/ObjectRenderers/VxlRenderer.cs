@@ -22,6 +22,9 @@ namespace TSMapEditor.Rendering.ObjectRenderers
         private const float NearClip = 0.01f; // the near clipping plane distance
         private const float FarClip = 100f; // the far clipping plane distance
 
+        private static readonly Vector3 TSLight = -Vector3.UnitX;
+        private static readonly Vector3 YRLight = new(-0.70710599f, -0.70710599f, 0.0f);
+
         public static Texture2D Render(GraphicsDevice graphicsDevice, byte facing, RampType ramp, VxlFile vxl, HvaFile hva, Palette palette, VplFile vpl = null, bool forRemap = false)
         {
             /*********** Voxel space setup **********/
@@ -236,12 +239,15 @@ namespace TSMapEditor.Rendering.ObjectRenderers
 
         private static void ApplyLighting(List<VertexData> vertices, VplFile vpl, int normalsMode, float rotation)
         {
+            Vector3 light = Constants.UseCountries ?
+                Vector3.Transform(YRLight, Matrix.CreateRotationZ(rotation - MathHelper.ToRadians(45))) : 
+                Vector3.Transform(TSLight, Matrix.CreateRotationZ(rotation - MathHelper.ToRadians(45)));
+
             // Center the lighting around this page to make vehicles darker in RA2
             const byte centerPage = 7;
             // RA2 uses 32 pages (normals 4), for the rest use only 16 pages
             int maxPage = normalsMode == 4 ? 31 : 15;
 
-            Vector3 light = Vector3.Transform(-Vector3.UnitX, Matrix.CreateRotationZ(rotation));
             foreach (var vertex in vertices)
             {
                 if (vertex.Normal == Vector3.Zero)
