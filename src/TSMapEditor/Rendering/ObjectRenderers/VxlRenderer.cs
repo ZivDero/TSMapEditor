@@ -23,7 +23,8 @@ namespace TSMapEditor.Rendering.ObjectRenderers
         private const float FarClip = 100f; // the far clipping plane distance
 
         private static readonly Vector3 TSLight = -Vector3.UnitX;
-        private static readonly Vector3 YRLight = new(-0.70710599f, -0.70710599f, 0.0f);
+        private static readonly Vector3 YRLight = Vector3.Transform(-Vector3.UnitX,
+            Matrix.CreateRotationZ(MathHelper.ToRadians(45)));
 
         public static Texture2D Render(GraphicsDevice graphicsDevice, byte facing, RampType ramp, VxlFile vxl, HvaFile hva, Palette palette, VplFile vpl = null, bool forRemap = false)
         {
