@@ -84,8 +84,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
                     vertex.Position = Vector3.Transform(vertex.Position, sectionTransform);
 
                 if (vpl != null)
-                    ApplyLighting(sectionVertexData, vpl, section.NormalsMode,
-                        rotationFromFacing);
+                    ApplyLighting(sectionVertexData, vpl, section.NormalsMode, rotationFromFacing);
 
                 vertexColorIndexedData.AddRange(sectionVertexData);
             }
@@ -240,7 +239,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             // Center the lighting around this page to make vehicles darker in RA2
             const byte centerPage = 7;
             // RA2 uses 32 pages (normals 4), for the rest use only 16 pages
-            int maxPage = normalsMode == 4 ? 31 : 16;
+            int maxPage = normalsMode == 4 ? 31 : 15;
 
             Vector3 light = Vector3.Transform(-Vector3.UnitX, Matrix.CreateRotationZ(rotation));
             foreach (var vertex in vertices)
@@ -263,7 +262,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
 
         private static Rectangle GetBounds(VxlFile vxl, HvaFile hva, Matrix transform)
         {
-            Rectangle ret = Rectangle.Empty;
+            Rectangle bounds = Rectangle.Empty;
             foreach (var section in vxl.Sections)
             {
                 var sectionHvaTransform = hva.LoadMatrix(section.Index);
@@ -317,10 +316,10 @@ namespace TSMapEditor.Rendering.ObjectRenderers
                 int minY = Math.Min(FminY, TminY);
                 int maxY = Math.Max(FmaxY, TmaxY);
 
-                ret = Rectangle.Union(ret, new Rectangle(minX, minY, maxX - minX, maxY - minY));
+                bounds = Rectangle.Union(bounds, new Rectangle(minX, minY, maxX - minX, maxY - minY));
             }
 
-            return ret;
+            return bounds;
         }
     }
 }
