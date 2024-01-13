@@ -66,8 +66,10 @@ namespace TSMapEditor.CCEngine
                 });
 
             for (int frame = 0; frame < NumFrames; frame++)
+            {
                 for (int section = 0; section < Sections.Count; section++)
                     Sections[section].Matrices.Add(ReadMatrix());
+            }
             
             Logger.Log("Loaded HVA file {0} with {1} sections", FileName, Sections.Count);
         }
