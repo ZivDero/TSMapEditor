@@ -78,7 +78,6 @@ namespace TSMapEditor.Rendering.ObjectRenderers
                 var sectionScale = Matrix.CreateScale(section.Scale);
 
                 // Move to the origin, scale, then transform however the .hva tells us
-                // Scale first because the translation is pre-scaled
                 var sectionTransform = sectionTranslation * sectionScale * sectionHvaTransform;
 
                 foreach (var vertex in sectionVertexData)
@@ -276,7 +275,6 @@ namespace TSMapEditor.Rendering.ObjectRenderers
                 var sectionScale = Matrix.CreateScale(section.Scale);
 
                 // Move to the origin, scale, then transform however the .hva tells us
-                // Scale first because the translation is pre-scaled
                 var sectionTransform = sectionTranslation * sectionScale * sectionHvaTransform;
 
                 transform = sectionTransform * transform;
