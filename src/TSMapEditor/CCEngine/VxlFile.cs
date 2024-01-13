@@ -214,9 +214,14 @@ namespace TSMapEditor.CCEngine
                         Spans[x, y] = s;
                     }
                 }
+
                 for (byte y = 0; y < SizeY; ++y)
+                {
                     for (byte x = 0; x < SizeX; ++x)
+                    {
                         Spans[x, y].EndIndex = file.ReadInt32();
+                    }
+                }
 
                 for (byte y = 0; y < SizeY; ++y)
                 {

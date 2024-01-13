@@ -642,7 +642,7 @@ namespace TSMapEditor.Rendering
 
                 if (hvaData == null)
                 {
-                    Logger.Log($"WARNING: Unit {buildingType.ININame} is missing .hva file for its turret {turretImage + HVA_FILE_EXTENSION}! This will cause the game to crash!");
+                    Logger.Log($"WARNING: Building {buildingType.ININame} is missing .hva file for its turret {turretImage + HVA_FILE_EXTENSION}! This will cause the game to crash!");
                     continue;
                 }
 
@@ -878,9 +878,6 @@ namespace TSMapEditor.Rendering
             for (int i = 0; i < aircraftTypes.Count; i++)
             {
                 var aircraftType = aircraftTypes[i];
-
-                if (!aircraftType.ArtConfig.Voxel)
-                    continue;
 
                 string aircraftImage = string.IsNullOrWhiteSpace(aircraftType.Image) ? aircraftType.ININame : aircraftType.Image;
                 if (loadedModels.TryGetValue(aircraftImage, out VoxelModel loadedModel))

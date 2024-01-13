@@ -16,16 +16,9 @@ namespace TSMapEditor.Rendering.ObjectRenderers
 
         protected override ICommonDrawParams GetDrawParams(Aircraft gameObject)
         {
-            if (gameObject.AircraftType.ArtConfig.Voxel)
-            {
-                var graphics = TheaterGraphics.AircraftModels[gameObject.ObjectType.Index];
-                string iniName = gameObject.ObjectType.ININame;
-                return new VoxelDrawParams(graphics, iniName);
-            }
-            else
-            {
-                return new ShapeDrawParams(null, gameObject.ObjectType.ININame);
-            }
+            var graphics = TheaterGraphics.AircraftModels[gameObject.ObjectType.Index];
+            string iniName = gameObject.ObjectType.ININame;
+            return new VoxelDrawParams(graphics, iniName);
         }
 
         protected override void Render(Aircraft gameObject, int yDrawPointWithoutCellHeight, Point2D drawPoint, ICommonDrawParams drawParams)
