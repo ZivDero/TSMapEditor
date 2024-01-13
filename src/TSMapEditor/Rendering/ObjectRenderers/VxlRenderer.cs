@@ -55,8 +55,18 @@ namespace TSMapEditor.Rendering.ObjectRenderers
                     {
                         foreach (Voxel voxel in section.Spans[x, y].Voxels)
                         {
-                            sectionVertexData.AddRange(RenderVoxel(voxel, section.GetNormals()[voxel.NormalIndex],
-                                palette, section.Scale));
+                            if (voxel.NormalIndex >= section.GetNormals().Length)
+                            {
+                                // If there are corrupted normals, mark them with a zero vector.
+                                // We will later replace it and render the voxel in true color
+                                sectionVertexData.AddRange(RenderVoxel(voxel, Vector3.Zero,
+                                    palette, section.Scale));
+                            }
+                            else
+                            {
+                                sectionVertexData.AddRange(RenderVoxel(voxel, section.GetNormals()[voxel.NormalIndex],
+                                    palette, section.Scale));
+                            }
                         }
                     }
                 }
@@ -72,8 +82,9 @@ namespace TSMapEditor.Rendering.ObjectRenderers
                 foreach (var vertex in sectionVertexData)
                     vertex.Position = Vector3.Transform(vertex.Position, sectionTransform);
 
-                ApplyLighting(sectionVertexData, vpl, section.NormalsMode,
-                    rotationFromFacing);
+                if (vpl != null)
+                    ApplyLighting(sectionVertexData, vpl, section.NormalsMode,
+                        rotationFromFacing);
 
                 vertexColorIndexedData.AddRange(sectionVertexData);
             }
@@ -233,6 +244,13 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             Vector3 light = Vector3.Transform(-Vector3.UnitX, Matrix.CreateRotationZ(rotation));
             foreach (var vertex in vertices)
             {
+                if (vertex.Normal == Vector3.Zero)
+                {
+                    // Zero vector means corrupter normal, replace with Up and continue unshaded
+                    vertex.Normal = Vector3.Up;
+                    continue;
+                }
+
                 float dot = (Vector3.Dot(vertex.Normal, light) + 1) / 2;
 
                 byte page = dot <= 0.5 ?
