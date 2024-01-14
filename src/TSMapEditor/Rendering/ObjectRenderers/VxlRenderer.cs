@@ -3,7 +3,6 @@ using Microsoft.Xna.Framework.Graphics;
 using Rampastring.XNAUI;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using TSMapEditor.CCEngine;
 using static TSMapEditor.CCEngine.VxlFile;
 using Color = Microsoft.Xna.Framework.Color;
@@ -56,7 +55,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             foreach (var section in vxl.Sections)
             {
                 byte[] normalIndexToVplPage =
-                    PreCalculateLighting(section.GetNormals(), vpl, section.NormalsMode, rotationFromFacing);
+                    PreCalculateLighting(section.GetNormals(), section.NormalsMode, rotationFromFacing);
 
                 var sectionHvaTransform = hva.LoadMatrix(section.Index);
                 sectionHvaTransform.M41 *= section.HvaMatrixScaleFactor * section.ScaleX;
@@ -208,7 +207,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             return newVertices;
         }
 
-        private static byte[] PreCalculateLighting(Vector3[] normalsTable, VplFile vpl, int normalsMode, float rotation)
+        private static byte[] PreCalculateLighting(Vector3[] normalsTable, int normalsMode, float rotation)
         {
             Vector3 light = Constants.UseCountries ?
                 Vector3.Transform(YRLight, Matrix.CreateRotationZ(rotation - MathHelper.ToRadians(45))) : 
