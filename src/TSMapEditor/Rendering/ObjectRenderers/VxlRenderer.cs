@@ -47,8 +47,11 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             // Rotates to the game's north
             Matrix rotateToWorld = Matrix.CreateRotationZ(-(MathHelper.ToRadians(135) + rotationFromFacing));
             rotateToWorld *= Matrix.CreateRotationX(MathHelper.ToRadians(-120));
-            
+            Matrix world = rotateToWorld * tilt * Scale;
+
             var vertexColorIndexedData = new List<VertexData>();
+
+            Rectangle imageBounds = new Rectangle();
 
             foreach (var section in vxl.Sections)
             {
@@ -83,12 +86,13 @@ namespace TSMapEditor.Rendering.ObjectRenderers
                         }
                     }
                 }
+
+                Rectangle sectionImageBounds = GetSectionBounds(section, world, sectionTransform);
+                imageBounds = Rectangle.Union(imageBounds, sectionImageBounds);
             }
             
             /********** Rendering *********/
 
-            Matrix world = rotateToWorld * tilt * Scale;
-            Rectangle imageBounds = GetBounds(vxl, hva, world);
             Matrix projection = Matrix.CreateOrthographic(imageBounds.Width, imageBounds.Height, NearClip, FarClip);
 
             var renderTarget = new RenderTarget2D(graphicsDevice, Convert.ToInt32(imageBounds.Width / ModelScale), Convert.ToInt32(imageBounds.Height / ModelScale), false, SurfaceFormat.Color, DepthFormat.Depth24);
@@ -161,15 +165,11 @@ namespace TSMapEditor.Rendering.ObjectRenderers
 
             public VertexPositionColorNormal ToVertexPositionColorNormal(Palette palette, bool remapOnly = false)
             {
-                if (remapOnly)
-                {
-                    if (ColorIndex is < 0x10 or > 0x1F)
-                    {
-                        return new VertexPositionColorNormal(Position, Color.Magenta, Normal);
-                    }
-                }
+                Color color = remapOnly && ColorIndex is < 0x10 or > 0x1F
+                    ? Color.Magenta
+                    : palette.Data[ColorIndex].ToXnaColor();
 
-                return new VertexPositionColorNormal(Position, palette.Data[ColorIndex].ToXnaColor(), Normal);
+                return new VertexPositionColorNormal(Position, color, Normal);
             }
 
             public Vector3 Position;
@@ -258,66 +258,49 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             return normalIndexToVplPage;
         }
 
-        private static Rectangle GetBounds(VxlFile vxl, HvaFile hva, Matrix transform)
+        private static Rectangle GetSectionBounds(Section section, Matrix worldTransform, Matrix sectionTransform)
         {
-            Rectangle bounds = Rectangle.Empty;
-            foreach (var section in vxl.Sections)
-            {
-                var sectionHvaTransform = hva.LoadMatrix(section.Index);
-                sectionHvaTransform.M41 *= section.HvaMatrixScaleFactor * section.ScaleX;
-                sectionHvaTransform.M42 *= section.HvaMatrixScaleFactor * section.ScaleY;
-                sectionHvaTransform.M43 *= section.HvaMatrixScaleFactor * section.ScaleZ;
+            worldTransform = sectionTransform * worldTransform;
 
-                var sectionTranslation = Matrix.CreateTranslation(section.MinBounds);
-                var sectionScale = Matrix.CreateScale(section.Scale);
+            // floor rect of the bounding box
+            Vector3 floorTopLeft = new Vector3(0, 0, 0);
+            Vector3 floorTopRight = new Vector3(section.SpanX, 0, 0);
+            Vector3 floorBottomRight = new Vector3(section.SpanX, section.SpanY, 0);
+            Vector3 floorBottomLeft = new Vector3(0, section.SpanY, 0);
 
-                // Move to the origin, scale, then transform however the .hva tells us
-                var sectionTransform = sectionTranslation * sectionScale * sectionHvaTransform;
+            // ceil rect of the bounding box
+            Vector3 ceilTopLeft = new Vector3(0, 0, section.SpanZ);
+            Vector3 ceilTopRight = new Vector3(section.SpanX, 0, section.SpanZ);
+            Vector3 ceilBottomRight = new Vector3(section.SpanX, section.SpanY, section.SpanZ);
+            Vector3 ceilBottomLeft = new Vector3(0, section.SpanY, section.SpanZ);
 
-                transform = sectionTransform * transform;
+            // apply transformations
+            floorTopLeft = Vector3.Transform(floorTopLeft, worldTransform);
+            floorTopRight = Vector3.Transform(floorTopRight, worldTransform);
+            floorBottomRight = Vector3.Transform(floorBottomRight, worldTransform);
+            floorBottomLeft = Vector3.Transform(floorBottomLeft, worldTransform);
 
-                // floor rect of the bounding box
-                Vector3 floorTopLeft = new Vector3(0, 0, 0);
-                Vector3 floorTopRight = new Vector3(section.SpanX, 0, 0);
-                Vector3 floorBottomRight = new Vector3(section.SpanX, section.SpanY, 0);
-                Vector3 floorBottomLeft = new Vector3(0, section.SpanY, 0);
+            ceilTopLeft = Vector3.Transform(ceilTopLeft, worldTransform);
+            ceilTopRight = Vector3.Transform(ceilTopRight, worldTransform);
+            ceilBottomRight = Vector3.Transform(ceilBottomRight, worldTransform);
+            ceilBottomLeft = Vector3.Transform(ceilBottomLeft, worldTransform);
 
-                // ceil rect of the bounding box
-                Vector3 ceilTopLeft = new Vector3(0, 0, section.SpanZ);
-                Vector3 ceilTopRight = new Vector3(section.SpanX, 0, section.SpanZ);
-                Vector3 ceilBottomRight = new Vector3(section.SpanX, section.SpanY, section.SpanZ);
-                Vector3 ceilBottomLeft = new Vector3(0, section.SpanY, section.SpanZ);
+            int FminX = (int)Math.Floor(Math.Min(Math.Min(Math.Min(floorTopLeft.X, floorTopRight.X), floorBottomRight.X), floorBottomLeft.X));
+            int FmaxX = (int)Math.Ceiling(Math.Max(Math.Max(Math.Max(floorTopLeft.X, floorTopRight.X), floorBottomRight.X), floorBottomLeft.X));
+            int FminY = (int)Math.Floor(Math.Min(Math.Min(Math.Min(floorTopLeft.Y, floorTopRight.Y), floorBottomRight.Y), floorBottomLeft.Y));
+            int FmaxY = (int)Math.Ceiling(Math.Max(Math.Max(Math.Max(floorTopLeft.Y, floorTopRight.Y), floorBottomRight.Y), floorBottomLeft.Y));
 
-                // apply transformations
-                floorTopLeft = Vector3.Transform(floorTopLeft, transform);
-                floorTopRight = Vector3.Transform(floorTopRight, transform);
-                floorBottomRight = Vector3.Transform(floorBottomRight, transform);
-                floorBottomLeft = Vector3.Transform(floorBottomLeft, transform);
+            int TminX = (int)Math.Floor(Math.Min(Math.Min(Math.Min(ceilTopLeft.X, ceilTopRight.X), ceilBottomRight.X), ceilBottomLeft.X));
+            int TmaxX = (int)Math.Ceiling(Math.Max(Math.Max(Math.Max(ceilTopLeft.X, ceilTopRight.X), ceilBottomRight.X), ceilBottomLeft.X));
+            int TminY = (int)Math.Floor(Math.Min(Math.Min(Math.Min(ceilTopLeft.Y, ceilTopRight.Y), ceilBottomRight.Y), ceilBottomLeft.Y));
+            int TmaxY = (int)Math.Ceiling(Math.Max(Math.Max(Math.Max(ceilTopLeft.Y, ceilTopRight.Y), ceilBottomRight.Y), ceilBottomLeft.Y));
 
-                ceilTopLeft = Vector3.Transform(ceilTopLeft, transform);
-                ceilTopRight = Vector3.Transform(ceilTopRight, transform);
-                ceilBottomRight = Vector3.Transform(ceilBottomRight, transform);
-                ceilBottomLeft = Vector3.Transform(ceilBottomLeft, transform);
+            int minX = Math.Min(FminX, TminX);
+            int maxX = Math.Max(FmaxX, TmaxX);
+            int minY = Math.Min(FminY, TminY);
+            int maxY = Math.Max(FmaxY, TmaxY);
 
-                int FminX = (int)Math.Floor(Math.Min(Math.Min(Math.Min(floorTopLeft.X, floorTopRight.X), floorBottomRight.X), floorBottomLeft.X));
-                int FmaxX = (int)Math.Ceiling(Math.Max(Math.Max(Math.Max(floorTopLeft.X, floorTopRight.X), floorBottomRight.X), floorBottomLeft.X));
-                int FminY = (int)Math.Floor(Math.Min(Math.Min(Math.Min(floorTopLeft.Y, floorTopRight.Y), floorBottomRight.Y), floorBottomLeft.Y));
-                int FmaxY = (int)Math.Ceiling(Math.Max(Math.Max(Math.Max(floorTopLeft.Y, floorTopRight.Y), floorBottomRight.Y), floorBottomLeft.Y));
-
-                int TminX = (int)Math.Floor(Math.Min(Math.Min(Math.Min(ceilTopLeft.X, ceilTopRight.X), ceilBottomRight.X), ceilBottomLeft.X));
-                int TmaxX = (int)Math.Ceiling(Math.Max(Math.Max(Math.Max(ceilTopLeft.X, ceilTopRight.X), ceilBottomRight.X), ceilBottomLeft.X));
-                int TminY = (int)Math.Floor(Math.Min(Math.Min(Math.Min(ceilTopLeft.Y, ceilTopRight.Y), ceilBottomRight.Y), ceilBottomLeft.Y));
-                int TmaxY = (int)Math.Ceiling(Math.Max(Math.Max(Math.Max(ceilTopLeft.Y, ceilTopRight.Y), ceilBottomRight.Y), ceilBottomLeft.Y));
-
-                int minX = Math.Min(FminX, TminX);
-                int maxX = Math.Max(FmaxX, TmaxX);
-                int minY = Math.Min(FminY, TminY);
-                int maxY = Math.Max(FmaxY, TmaxY);
-
-                bounds = Rectangle.Union(bounds, new Rectangle(minX, minY, maxX - minX, maxY - minY));
-            }
-
-            return bounds;
+            return new Rectangle(minX, minY, maxX - minX, maxY - minY);
         }
     }
 }
