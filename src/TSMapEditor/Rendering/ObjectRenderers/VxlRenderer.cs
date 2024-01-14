@@ -49,7 +49,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             rotateToWorld *= Matrix.CreateRotationX(MathHelper.ToRadians(-120));
             Matrix world = rotateToWorld * tilt * Scale;
 
-            var vertexColorIndexedData = new List<VertexData>();
+            var vertexData = new List<VertexPositionColorNormal>();
 
             Rectangle imageBounds = new Rectangle();
 
@@ -82,7 +82,12 @@ namespace TSMapEditor.Rendering.ObjectRenderers
                                 vpl?.GetPaletteIndex(normalIndexToVplPage[voxel.NormalIndex], voxel.ColorIndex) ??
                                 voxel.ColorIndex;
 
-                            vertexColorIndexedData.AddRange(RenderVoxel(transformedPosition, colorIndex, Vector3.Up));
+                            // If we are drawing remap, draw all non-remap as magenta
+                            Color color = forRemap && colorIndex is < 0x10 or > 0x1F
+                                ? Color.Magenta
+                                : palette.Data[colorIndex].ToXnaColor();
+
+                            vertexData.AddRange(RenderVoxel(transformedPosition, color, Vector3.Up));
                         }
                     }
                 }
@@ -108,12 +113,11 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             basicEffect.World = world;
 
             VertexBuffer vertexBuffer = new VertexBuffer(graphicsDevice,
-                typeof(VertexPositionColorNormal), vertexColorIndexedData.Count, BufferUsage.None);
+                typeof(VertexPositionColorNormal), vertexData.Count, BufferUsage.None);
 
-            var vertexData = vertexColorIndexedData.Select(v => v.ToVertexPositionColorNormal(palette, remapOnly: forRemap));
             vertexBuffer.SetData(vertexData.ToArray());
 
-            var triangleListIndices = new int[vertexColorIndexedData.Count];
+            var triangleListIndices = new int[vertexData.Count];
             for (int i = 0; i < triangleListIndices.Length; i++)
                 triangleListIndices[i] = i;
 
@@ -130,7 +134,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             foreach (EffectPass pass in basicEffect.CurrentTechnique.Passes)
             {
                 pass.Apply();
-                graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, vertexColorIndexedData.Count / 3);
+                graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, vertexData.Count / 3);
             }
 
             var colorData = new Color[renderTarget.Width * renderTarget.Height];
@@ -154,30 +158,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             0, 90, 180, -90
         };
 
-        private struct VertexData
-        {
-            public VertexData(Vector3 position, byte colorIndex, Vector3 normal)
-            {
-                Position = position;
-                ColorIndex = colorIndex;
-                Normal = normal;
-            }
-
-            public VertexPositionColorNormal ToVertexPositionColorNormal(Palette palette, bool remapOnly = false)
-            {
-                Color color = remapOnly && ColorIndex is < 0x10 or > 0x1F
-                    ? Color.Magenta
-                    : palette.Data[ColorIndex].ToXnaColor();
-
-                return new VertexPositionColorNormal(Position, color, Normal);
-            }
-
-            public Vector3 Position;
-            public byte ColorIndex;
-            public Vector3 Normal;
-        }
-
-        private static List<VertexData> RenderVoxel(Vector3 position, byte colorIndex, Vector3 normal)
+        private static List<VertexPositionColorNormal> RenderVoxel(Vector3 position, Color color, Vector3 normal)
         {
             const float radius = 0.5f;
 
@@ -210,18 +191,18 @@ namespace TSMapEditor.Rendering.ObjectRenderers
                 new [] { 4, 0, 3 }, new [] { 3, 7, 4 }, // left
             };
 
-            List<VertexData> newVertices = new();
+            List<VertexPositionColorNormal> newVertices = new();
 
             foreach (var triangle in triangles)
             {
                 AddTriangle(vertices[triangle[0]], vertices[triangle[1]], vertices[triangle[2]]);
             }
 
-            void AddTriangle(Vector3 v1, Vector3 v2, Vector3 v3)
+            void AddTriangle(Vector3 vertex1, Vector3 vertex2, Vector3 vertex3)
             {
-                newVertices.Add(new VertexData(v1, colorIndex, normal));
-                newVertices.Add(new VertexData(v2, colorIndex, normal));
-                newVertices.Add(new VertexData(v3, colorIndex, normal));
+                newVertices.Add(new VertexPositionColorNormal(vertex1, color, normal));
+                newVertices.Add(new VertexPositionColorNormal(vertex2, color, normal));
+                newVertices.Add(new VertexPositionColorNormal(vertex3, color, normal));
             }
 
             return newVertices;
