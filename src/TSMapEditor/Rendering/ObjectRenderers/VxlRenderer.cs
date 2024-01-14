@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Rampastring.XNAUI;
 using System;
@@ -52,25 +52,8 @@ namespace TSMapEditor.Rendering.ObjectRenderers
 
             foreach (var section in vxl.Sections)
             {
-                var sectionVertexData = new List<VertexData>();
-                for (int x = 0; x < section.SizeX; x++)
-                {
-                    for (int y = 0; y < section.SizeY; y++)
-                    {
-                        foreach (Voxel voxel in section.Spans[x, y].Voxels)
-                        {
-                            if (voxel.NormalIndex >= section.GetNormals().Length)
-                            {
-                                // If there are corrupted normals, mark them with a zero vector.
-                                sectionVertexData.AddRange(RenderVoxel(voxel, Vector3.Zero, palette));
-                            }
-                            else
-                            {
-                                sectionVertexData.AddRange(RenderVoxel(voxel, section.GetNormals()[voxel.NormalIndex], palette));
-                            }
-                        }
-                    }
-                }
+                byte[] normalIndexToVplPage =
+                    PreCalculateLighting(section.GetNormals(), vpl, section.NormalsMode, rotationFromFacing);
 
                 var sectionHvaTransform = hva.LoadMatrix(section.Index);
                 sectionHvaTransform.M41 *= section.HvaMatrixScaleFactor * section.ScaleX;
@@ -83,15 +66,25 @@ namespace TSMapEditor.Rendering.ObjectRenderers
                 // Move to the origin, scale, then transform however the .hva tells us
                 var sectionTransform = sectionTranslation * sectionScale * sectionHvaTransform;
 
-                foreach (var vertex in sectionVertexData)
-                    vertex.Position = Vector3.Transform(vertex.Position, sectionTransform);
+                for (int x = 0; x < section.SizeX; x++)
+                {
+                    for (int y = 0; y < section.SizeY; y++)
+                    {
+                        foreach (Voxel voxel in section.Spans[x, y].Voxels)
+                        {
+                            Vector3 position = new Vector3(voxel.X, voxel.Y, voxel.Z);
+                            Vector3 transformedPosition = Vector3.Transform(position, sectionTransform);
 
-                if (vpl != null)
-                    ApplyLighting(sectionVertexData, vpl, section.NormalsMode, rotationFromFacing);
+                            byte colorIndex =
+                                vpl?.GetPaletteIndex(normalIndexToVplPage[voxel.NormalIndex], voxel.ColorIndex) ??
+                                voxel.ColorIndex;
 
-                vertexColorIndexedData.AddRange(sectionVertexData);
+                            vertexColorIndexedData.AddRange(RenderVoxel(transformedPosition, colorIndex, Vector3.Up));
+                        }
+                    }
+                }
             }
-
+            
             /********** Rendering *********/
 
             Matrix world = rotateToWorld * tilt * Scale;
@@ -113,7 +106,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             VertexBuffer vertexBuffer = new VertexBuffer(graphicsDevice,
                 typeof(VertexPositionColorNormal), vertexColorIndexedData.Count, BufferUsage.None);
 
-            var vertexData = vertexColorIndexedData.Select(v => v.ToVertexPositionColorNormal(remapOnly: forRemap));
+            var vertexData = vertexColorIndexedData.Select(v => v.ToVertexPositionColorNormal(palette, remapOnly: forRemap));
             vertexBuffer.SetData(vertexData.ToArray());
 
             var triangleListIndices = new int[vertexColorIndexedData.Count];
@@ -157,17 +150,16 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             0, 90, 180, -90
         };
 
-        private class VertexData
+        private struct VertexData
         {
-            public VertexData(Vector3 position, Palette palette, byte colorIndex, Vector3 normal)
+            public VertexData(Vector3 position, byte colorIndex, Vector3 normal)
             {
                 Position = position;
-                Palette = palette;
                 ColorIndex = colorIndex;
                 Normal = normal;
             }
 
-            public VertexPositionColorNormal ToVertexPositionColorNormal(bool remapOnly = false)
+            public VertexPositionColorNormal ToVertexPositionColorNormal(Palette palette, bool remapOnly = false)
             {
                 if (remapOnly)
                 {
@@ -177,19 +169,17 @@ namespace TSMapEditor.Rendering.ObjectRenderers
                     }
                 }
 
-                return new VertexPositionColorNormal(Position, Palette.Data[ColorIndex].ToXnaColor(), Normal);
+                return new VertexPositionColorNormal(Position, palette.Data[ColorIndex].ToXnaColor(), Normal);
             }
 
             public Vector3 Position;
-            public Palette Palette;
             public byte ColorIndex;
             public Vector3 Normal;
         }
 
-        private static List<VertexData> RenderVoxel(Voxel voxel, Vector3 normal, Palette palette)
+        private static List<VertexData> RenderVoxel(Vector3 position, byte colorIndex, Vector3 normal)
         {
             const float radius = 0.5f;
-            Vector3 voxelCoordinates = new Vector3(voxel.X, voxel.Y, voxel.Z);
 
             Vector3[] vertices =
             {
@@ -207,7 +197,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             for (int i = 0; i < vertices.Length; i++)
             {
                 vertices[i] *= radius;
-                vertices[i] += voxelCoordinates;
+                vertices[i] += position;
             }
 
             int[][] triangles =
@@ -229,15 +219,15 @@ namespace TSMapEditor.Rendering.ObjectRenderers
 
             void AddTriangle(Vector3 v1, Vector3 v2, Vector3 v3)
             {
-                newVertices.Add(new VertexData(v1, palette, voxel.ColorIndex, normal));
-                newVertices.Add(new VertexData(v2, palette, voxel.ColorIndex, normal));
-                newVertices.Add(new VertexData(v3, palette, voxel.ColorIndex, normal));
+                newVertices.Add(new VertexData(v1, colorIndex, normal));
+                newVertices.Add(new VertexData(v2, colorIndex, normal));
+                newVertices.Add(new VertexData(v3, colorIndex, normal));
             }
 
             return newVertices;
         }
 
-        private static void ApplyLighting(List<VertexData> vertices, VplFile vpl, int normalsMode, float rotation)
+        private static byte[] PreCalculateLighting(Vector3[] normalsTable, VplFile vpl, int normalsMode, float rotation)
         {
             Vector3 light = Constants.UseCountries ?
                 Vector3.Transform(YRLight, Matrix.CreateRotationZ(rotation - MathHelper.ToRadians(45))) : 
@@ -248,24 +238,24 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             // Assume 8 pages per normals mode
             int maxPage = normalsMode * 8 - 1;
 
-            foreach (var vertex in vertices)
-            {
-                if (vertex.Normal == Vector3.Zero)
-                {
-                    // Zero vector means corrupter normal, replace with Up
-                    // "Invalid" normals 253-255 are apparently mapped to page 16
-                    vertex.Normal = Vector3.Up;
-                    vertex.ColorIndex = vpl.GetPaletteIndex(16, vertex.ColorIndex);
-                    continue;
-                }
+            byte[] normalIndexToVplPage = new byte[256];
 
-                float dot = (Vector3.Dot(vertex.Normal, light) + 1) / 2;
+            for (int i = 0; i < normalsTable.Length; i++)
+            {
+                float dot = (Vector3.Dot(normalsTable[i], light) + 1) / 2;
 
                 byte page = dot <= 0.5 ?
                     Convert.ToByte(dot * 2 * centerPage) :
                     Convert.ToByte(2 * (maxPage - centerPage) * (dot - 0.5f) + centerPage);
-                vertex.ColorIndex = vpl.GetPaletteIndex(page, vertex.ColorIndex);
+
+                normalIndexToVplPage[i] = page;
             }
+
+            normalIndexToVplPage[253] = 16;
+            normalIndexToVplPage[254] = 16;
+            normalIndexToVplPage[255] = 16;
+
+            return normalIndexToVplPage;
         }
 
         private static Rectangle GetBounds(VxlFile vxl, HvaFile hva, Matrix transform)
