@@ -399,7 +399,7 @@ namespace TSMapEditor.Models
                 if (anim != null)
                 {
                     anim.ArtConfig.IsBuildingAnim = true;
-                    anim.ArtConfig.YSortAdjust = animEntry.Value.YSortAdjust;
+                    anim.ArtConfig.YSort = animEntry.Value.YSortAdjust;
                     anim.ArtConfig.ZAdjust = animEntry.Value.ZAdjust;
                     anims.Add(anim);
                 }
