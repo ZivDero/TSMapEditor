@@ -208,7 +208,7 @@ namespace TSMapEditor.Models.ArtConfig
         public bool Theater { get; set; }
         public string Image { get; set; }
         public string BibShape { get; set; }
-        public string[] AnimNames { get; set; } = Array.Empty<string>();
+        public Dictionary<string, (int YSortAdjust, int ZAdjust)> AnimNamesWithYAndZAdjust { get; set; } = new();
         public AnimType[] Anims { get; set; } = Array.Empty<AnimType>();
         public AnimType TurretAnim { get; set; }
 
@@ -231,16 +231,33 @@ namespace TSMapEditor.Models.ArtConfig
             BibShape = iniSection.GetStringValue(nameof(BibShape), BibShape);
             Palette = iniSection.GetStringValue(nameof(Palette), Palette);
 
-            var animNames = new List<string>();
-            foreach (var i in new string[] { "", "Two", "Three", "Four" })
-            {
-                string animTypeName = iniSection.GetStringValue("ActiveAnim" + i, null);
-                if (string.IsNullOrEmpty(animTypeName))
-                    break;
+            var anims = new Dictionary<string, (int, int)>();
 
-                animNames.Add(animTypeName);
+            var buildingAnimClasses = new Dictionary<string, string[]>
+            {
+                { "ActiveAnim", new [] { "", "Two", "Three", "Four" } },
+                { "IdleAnim", new [] { "", "Two" } },
+                { "SuperAnim", new [] { "" } }
+            };
+
+            foreach (var animClass in buildingAnimClasses)
+            {
+                string name = animClass.Key;
+                string[] suffixes = animClass.Value;
+
+                foreach (var suffix in suffixes)
+                {
+                    string animTypeName = iniSection.GetStringValue(name + suffix, null);
+                    if (string.IsNullOrEmpty(animTypeName))
+                        break;
+
+                    int animYSort = iniSection.GetIntValue(name + suffix + "YSort", 0);
+                    int animZAdjust = iniSection.GetIntValue(name + suffix + "ZAdjust", 0);
+                    anims.Add(animTypeName, (animYSort, animZAdjust));
+                }
             }
-            AnimNames = animNames.ToArray();
+
+            AnimNamesWithYAndZAdjust = anims;
         }
 
         public void DoForFoundationCoords(Action<Point2D> action)

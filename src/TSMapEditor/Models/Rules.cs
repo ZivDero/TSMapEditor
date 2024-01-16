@@ -392,15 +392,19 @@ namespace TSMapEditor.Models
         private void SolveBuildingTypeDependencies(BuildingType type)
         {
             var anims = new List<AnimType>();
-            foreach (var animName in type.ArtConfig.AnimNames)
+
+            foreach (var animEntry in type.ArtConfig.AnimNamesWithYAndZAdjust)
             {
-                AnimType anim = AnimTypes.Find(at => at.ININame == animName);
+                AnimType anim = AnimTypes.Find(at => at.ININame == animEntry.Key);
                 if (anim != null)
                 {
                     anim.ArtConfig.IsBuildingAnim = true;
+                    anim.ArtConfig.YSortAdjust = animEntry.Value.YSortAdjust;
+                    anim.ArtConfig.ZAdjust = animEntry.Value.ZAdjust;
                     anims.Add(anim);
                 }
             }
+
             type.ArtConfig.Anims = anims.ToArray();
 
             if (type.Turret && !type.TurretAnimIsVoxel)
