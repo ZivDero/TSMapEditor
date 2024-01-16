@@ -208,7 +208,7 @@ namespace TSMapEditor.Models.ArtConfig
         public bool Theater { get; set; }
         public string Image { get; set; }
         public string BibShape { get; set; }
-        public Dictionary<string, (int YSortAdjust, int ZAdjust)> AnimNamesWithYAndZAdjust { get; set; } = new();
+        public Dictionary<string, (int YSort, int ZAdjust)> AnimNames { get; set; } = new();
         public AnimType[] Anims { get; set; } = Array.Empty<AnimType>();
         public AnimType TurretAnim { get; set; }
 
@@ -257,7 +257,7 @@ namespace TSMapEditor.Models.ArtConfig
                 }
             }
 
-            AnimNamesWithYAndZAdjust = anims;
+            AnimNames = anims;
         }
 
         public void DoForFoundationCoords(Action<Point2D> action)
