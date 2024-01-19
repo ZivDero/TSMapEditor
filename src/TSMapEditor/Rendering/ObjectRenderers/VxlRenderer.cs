@@ -61,13 +61,13 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             rotateToWorld *= Matrix.CreateRotationX(MathHelper.ToRadians(-60f));
             Matrix world = rotateToWorld * tilt * Scale;
 
-            var vertexData = new List<VertexPositionColorNormal>();
+            var vertexData = new List<VertexPositionColor>();
             var vertexIndices = new List<int>();
 
             Rectangle imageBounds = new Rectangle();
 
             // Allocate memory for vertices to use in loop below
-            var verticesArray = new VertexPositionColorNormal[8];
+            var verticesArray = new VertexPositionColor[8];
 
             foreach (var section in vxl.Sections)
             {
@@ -103,7 +103,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
                                 ? Color.Magenta
                                 : palette.Data[colorIndex].ToXnaColor();
 
-                            RenderVoxel(transformedPosition, color, Vector3.Up, vertexData.Count, vertexIndices, verticesArray);
+                            RenderVoxel(transformedPosition, color, vertexData.Count, vertexIndices, verticesArray);
                             vertexData.AddRange(verticesArray);
                         }
                     }
@@ -130,7 +130,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             basicEffect.World = world;
 
             VertexBuffer vertexBuffer = new VertexBuffer(graphicsDevice,
-                typeof(VertexPositionColorNormal), vertexData.Count, BufferUsage.None);
+                typeof(VertexPositionColor), vertexData.Count, BufferUsage.None);
             vertexBuffer.SetData(vertexData.ToArray());
 
             IndexBuffer triangleListIndexBuffer = new IndexBuffer(
@@ -173,7 +173,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             180, -90, 0, 90
         };
 
-        private static void RenderVoxel(Vector3 position, Color color, Vector3 normal, int vertexIndexCount, List<int> vertexIndices, VertexPositionColorNormal[] verticesArray)
+        private static void RenderVoxel(Vector3 position, Color color, int vertexIndexCount, List<int> vertexIndices, VertexPositionColor[] verticesArray)
         {
             const float radius = 0.5f;
 
@@ -199,7 +199,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
 
             // Set up the vertices themselves
             for (int i = 0; i < verticesArray.Length; i++)
-                verticesArray[i] = new VertexPositionColorNormal(vertexCoordinates[i], color, normal);
+                verticesArray[i] = new VertexPositionColor(vertexCoordinates[i], color);
 
             for (int i = 0; i < VertexIndexTriangles.Length; i++)
             {
