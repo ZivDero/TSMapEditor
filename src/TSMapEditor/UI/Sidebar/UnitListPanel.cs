@@ -29,16 +29,16 @@ namespace TSMapEditor.UI.Sidebar
 
         protected override void InitObjects()
         {
-            Func<UnitType, bool> filterFunction = null;
-
-            if (isNaval)
-            {
-                filterFunction = u => u.SpeedType == "Float" || u.SpeedType == "Amphibious" || u.SpeedType == "Hover" || u.MovementZone == "Water";
-            }
-            else
-            {
-                filterFunction = u => u.SpeedType != "Float" && u.MovementZone != "Water";
-            }
+            Func<UnitType, bool> filterFunction = isNaval ?
+                    u => u.Naval || 
+                         u.MovementZone == "Amphibious" ||
+                         u.MovementZone == "AmphibiousCrusher" ||
+                         u.MovementZone == "AmphibiousDestroyer" ||
+                         u.MovementZone == "Water" : 
+                    u => !u.Naval ||
+                         u.MovementZone == "Amphibious" ||
+                         u.MovementZone == "AmphibiousCrusher" ||
+                         u.MovementZone == "AmphibiousDestroyer";
 
             InitObjectsBase(Map.Rules.UnitTypes, TheaterGraphics.UnitTextures, filterFunction);
         }
