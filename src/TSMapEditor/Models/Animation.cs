@@ -23,6 +23,7 @@ namespace TSMapEditor.Models
 
         public Point2D ExtraDrawOffset { get; set; } = new();
         public bool IsBuildingAnim { get; set; }
+        public Structure ParentBuilding { get; set; }
         public bool IsTurretAnim { get; set; }
 
         public override int GetYDrawOffset()
