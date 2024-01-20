@@ -36,6 +36,28 @@ namespace TSMapEditor.Models
             return AnimType.ArtConfig.XDrawOffset + ExtraDrawOffset.X;
         }
 
+        public override int GetFrameIndex(int frameCount)
+        {
+            if (IsBuildingAnim && ParentBuilding != null)
+            {
+                if (frameCount > 1 && ParentBuilding.HP < Constants.ConditionYellowHP)
+                    return frameCount / 4;
+            }
+
+            return 0;
+        }
+
+        public override int GetShadowFrameIndex(int frameCount)
+        {
+            if (IsBuildingAnim && ParentBuilding != null)
+            {
+                if (ParentBuilding.HP < Constants.ConditionYellowHP)
+                    return frameCount / 4 * 3;
+            }
+
+            return frameCount / 2;
+        }
+
         public override bool Remapable() => IsBuildingAnim;
         public override Color GetRemapColor() => Remapable() ? Owner.XNAColor : Color.White;
     }

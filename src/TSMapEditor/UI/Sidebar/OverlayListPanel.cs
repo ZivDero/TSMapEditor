@@ -169,7 +169,7 @@ namespace TSMapEditor.UI.Sidebar
                         int frameCount = textures.GetFrameCount();
                         int frameNumber = firstEntry.Frame;
                         if (firstEntry.OverlayType.Tiberium)
-                            frameNumber = (frameCount / 2) - 1;
+                            frameNumber = frameCount / 2 - 1;
 
                         if (frameCount > frameNumber)
                         {

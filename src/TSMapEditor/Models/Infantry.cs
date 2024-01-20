@@ -26,7 +26,7 @@
 
         public override int GetShadowFrameIndex(int frameCount)
         {
-            return GetFrameIndex(frameCount) + (frameCount / 2);
+            return GetFrameIndex(frameCount) + frameCount / 2;
         }
 
         public override bool Remapable() => ObjectType.ArtConfig.Remapable;
