@@ -75,15 +75,15 @@ namespace TSMapEditor.Rendering.ObjectRenderers
                     PreCalculateLighting(section.GetNormals(), section.NormalsMode, rotationFromFacing);
 
                 var sectionHvaTransform = hva.LoadMatrix(section.Index);
-                sectionHvaTransform.M41 *= section.HvaMatrixScaleFactor * section.ScaleX;
-                sectionHvaTransform.M42 *= section.HvaMatrixScaleFactor * section.ScaleY;
-                sectionHvaTransform.M43 *= section.HvaMatrixScaleFactor * section.ScaleZ;
+                sectionHvaTransform.M41 *= section.HvaMatrixScale;
+                sectionHvaTransform.M42 *= section.HvaMatrixScale;
+                sectionHvaTransform.M43 *= section.HvaMatrixScale;
 
                 var sectionTranslation = Matrix.CreateTranslation(section.MinBounds);
                 var sectionScale = Matrix.CreateScale(section.Scale);
 
-                // Move to the origin, scale, then transform however the .hva tells us
-                var sectionTransform = sectionTranslation * sectionScale * sectionHvaTransform;
+                // Move to the origin, transform however the .hva tells us, then scale
+                var sectionTransform = sectionScale * sectionHvaTransform * sectionTranslation;
 
                 for (int x = 0; x < section.SizeX; x++)
                 {
