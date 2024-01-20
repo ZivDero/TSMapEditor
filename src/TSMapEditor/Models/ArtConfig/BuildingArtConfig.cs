@@ -196,6 +196,13 @@ namespace TSMapEditor.Models.ArtConfig
         }
     }
 
+    public struct BuildingAnimType
+    {
+        public string ININame { get; set; }
+        public int YSort { get; set; }
+        public int ZAdjust { get; set; }
+    }
+
     public class BuildingArtConfig : IArtConfig
     {
         public BuildingArtConfig() { }
@@ -208,7 +215,7 @@ namespace TSMapEditor.Models.ArtConfig
         public bool Theater { get; set; }
         public string Image { get; set; }
         public string BibShape { get; set; }
-        public Dictionary<string, (int YSort, int ZAdjust)> AnimNames { get; set; } = new();
+        public List<BuildingAnimType> BuildingAnimTypes { get; set; } = new();
         public AnimType[] Anims { get; set; } = Array.Empty<AnimType>();
         public AnimType TurretAnim { get; set; }
 
@@ -216,6 +223,13 @@ namespace TSMapEditor.Models.ArtConfig
         /// Palette override introduced in Red Alert 2.
         /// </summary>
         public string Palette { get; set; }
+
+        private static readonly Dictionary<string, string[]> BuildingAnimClasses = new()
+        {
+            { "ActiveAnim", new [] { "", "Two", "Three", "Four" } },
+            { "IdleAnim", new [] { "", "Two" } },
+            { "SuperAnim", new [] { "" } }
+        };
 
         public void ReadFromIniSection(IniSection iniSection)
         {
@@ -231,16 +245,9 @@ namespace TSMapEditor.Models.ArtConfig
             BibShape = iniSection.GetStringValue(nameof(BibShape), BibShape);
             Palette = iniSection.GetStringValue(nameof(Palette), Palette);
 
-            var anims = new Dictionary<string, (int, int)>();
+            var anims = new List<BuildingAnimType>();
 
-            var buildingAnimClasses = new Dictionary<string, string[]>
-            {
-                { "ActiveAnim", new [] { "", "Two", "Three", "Four" } },
-                { "IdleAnim", new [] { "", "Two" } },
-                { "SuperAnim", new [] { "" } }
-            };
-
-            foreach (var animClass in buildingAnimClasses)
+            foreach (var animClass in BuildingAnimClasses)
             {
                 string name = animClass.Key;
                 string[] suffixes = animClass.Value;
@@ -253,11 +260,17 @@ namespace TSMapEditor.Models.ArtConfig
 
                     int animYSort = iniSection.GetIntValue(name + suffix + "YSort", 0);
                     int animZAdjust = iniSection.GetIntValue(name + suffix + "ZAdjust", 0);
-                    anims.Add(animTypeName, (animYSort, animZAdjust));
+
+                    anims.Add(new BuildingAnimType
+                    {
+                        ININame = animTypeName,
+                        YSort = animYSort,
+                        ZAdjust = animZAdjust
+                    });
                 }
             }
 
-            AnimNames = anims;
+            BuildingAnimTypes = anims;
         }
 
         public void DoForFoundationCoords(Action<Point2D> action)

@@ -393,14 +393,14 @@ namespace TSMapEditor.Models
         {
             var anims = new List<AnimType>();
 
-            foreach (var animEntry in type.ArtConfig.AnimNames)
+            foreach (var buildingAnimType in type.ArtConfig.BuildingAnimTypes)
             {
-                AnimType anim = AnimTypes.Find(at => at.ININame == animEntry.Key);
+                AnimType anim = AnimTypes.Find(at => at.ININame == buildingAnimType.ININame);
                 if (anim != null)
                 {
                     anim.ArtConfig.IsBuildingAnim = true;
-                    anim.ArtConfig.YSort = animEntry.Value.YSort;
-                    anim.ArtConfig.BuildingAnimZAdjust = animEntry.Value.ZAdjust;
+                    anim.ArtConfig.BuildingAnimYSort = buildingAnimType.YSort;
+                    anim.ArtConfig.BuildingAnimZAdjust = buildingAnimType.ZAdjust;
                     anims.Add(anim);
                 }
             }
