@@ -21,7 +21,7 @@ namespace CNCMaps.FileFormats.Encodings
         private static void ReplicatePrevious(byte[] dest, int destIndex, int srcIndex, int count)
         {
             if (srcIndex > destIndex)
-                throw new NotImplementedException(string.Format("srcIndex > destIndex  {0}  {1}", srcIndex, destIndex));
+                throw new NotImplementedException($"srcIndex > destIndex  {srcIndex}  {destIndex}");
 
             if (destIndex - srcIndex == 1)
             {
