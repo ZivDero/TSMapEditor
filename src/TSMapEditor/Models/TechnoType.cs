@@ -23,8 +23,8 @@ namespace TSMapEditor.Models
 
         public double GetWeaponRange()
         {
-            double primaryRange = Primary != null ? Primary.Range : 0.0;
-            double secondaryRange = Secondary != null ? Secondary.Range : 0.0;
+            double primaryRange = Primary?.Range ?? 0.0;
+            double secondaryRange = Secondary?.Range ?? 0.0;
 
             return Math.Max(primaryRange, secondaryRange);
         }
