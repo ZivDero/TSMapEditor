@@ -1080,13 +1080,13 @@ namespace TSMapEditor.Rendering
             range = TechnoUnderCursor.GetGapGeneratorRange();
             if (range > 0.0)
             {
-                DrawRangeIndicator(TechnoUnderCursor.Position, range, new Color(0, 0, 0, 192));
+                DrawRangeIndicator(TechnoUnderCursor.Position, range, Color.Black * 0.75f);
             }
 
             range = TechnoUnderCursor.GetCloakGeneratorRange();
             if (range > 0.0)
             {
-                DrawRangeIndicator(TechnoUnderCursor.Position, range, new Color(0, 0, 0, 128));
+                DrawRangeIndicator(TechnoUnderCursor.Position, range, Color.Black * 0.5f);
             }
         }
 
