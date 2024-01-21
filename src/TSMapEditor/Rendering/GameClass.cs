@@ -26,10 +26,11 @@ namespace TSMapEditor.Rendering
 
             Logger.WriteToConsole = true;
             Logger.WriteLogFile = true;
-            Logger.Initialize(Environment.CurrentDirectory + "/", "MapEditorLog.log");
-            File.Delete(Environment.CurrentDirectory + "/MapEditorLog.log");
+            Logger.Initialize($"{Environment.CurrentDirectory}/", "MapEditorLog.log");
+            File.Delete($"{Environment.CurrentDirectory}/MapEditorLog.log");
 
-            Logger.Log("C&C World-Altering Editor (WAE) version " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString());
+            Logger.Log(
+                $"C&C World-Altering Editor (WAE) version {System.Reflection.Assembly.GetExecutingAssembly().GetName().Version}");
 
             AutoLATType.InitArray();
 
@@ -50,29 +51,28 @@ namespace TSMapEditor.Rendering
 
         private void HandleUnhandledException(Exception ex)
         {
-            string exceptLogPath = Environment.CurrentDirectory + DSC + "except.txt";
+            string exceptLogPath = $"{Environment.CurrentDirectory}{DSC}except.txt";
             File.Delete(exceptLogPath);
 
             StringBuilder sb = new StringBuilder();
 
-            LogLineGenerate("Unhandled exception! @ " + DateTime.Now.ToLongTimeString(), sb, exceptLogPath);
-            LogLineGenerate("Message: " + ex.Message, sb, exceptLogPath);
-            LogLineGenerate("Stack trace: " + ex.StackTrace, sb, exceptLogPath);
+            LogLineGenerate($"Unhandled exception! @ {DateTime.Now.ToLongTimeString()}", sb, exceptLogPath);
+            LogLineGenerate($"Message: {ex.Message}", sb, exceptLogPath);
+            LogLineGenerate($"Stack trace: {ex.StackTrace}", sb, exceptLogPath);
 
             if (ex.InnerException != null)
             {
                 LogLineGenerate("***************************", sb, exceptLogPath);
                 LogLineGenerate("InnerException information:", sb, exceptLogPath);
-                LogLineGenerate("Message: " + ex.InnerException.Message, sb, exceptLogPath);
-                LogLineGenerate("Stack trace: " + ex.InnerException.StackTrace, sb, exceptLogPath);
+                LogLineGenerate($"Message: {ex.InnerException.Message}", sb, exceptLogPath);
+                LogLineGenerate($"Stack trace: {ex.InnerException.StackTrace}", sb, exceptLogPath);
             }
 
             Logger.Log("Exiting.");
 
             windowManager?.HideWindow();
-            System.Windows.Forms.MessageBox.Show("The map editor has crashed." + Environment.NewLine + Environment.NewLine +
-                "Exception information logged into except.txt:" + Environment.NewLine + Environment.NewLine +
-                sb.ToString());
+            System.Windows.Forms.MessageBox.Show(
+                $"The map editor has crashed.{Environment.NewLine}{Environment.NewLine}Exception information logged into except.txt:{Environment.NewLine}{Environment.NewLine}{sb}");
 
             Environment.Exit(255);
         }
@@ -95,10 +95,10 @@ namespace TSMapEditor.Rendering
             Thread.CurrentThread.CurrentUICulture = CultureInfo.InvariantCulture;
 
             AssetLoader.Initialize(GraphicsDevice, Content);
-            AssetLoader.AssetSearchPaths.Add(Environment.CurrentDirectory + DSC + "Content" + DSC);
+            AssetLoader.AssetSearchPaths.Add($"{Environment.CurrentDirectory}{DSC}Content{DSC}");
 
             windowManager = new WindowManager(this, graphics);
-            windowManager.Initialize(Content, Environment.CurrentDirectory + DSC + "Content" + DSC);
+            windowManager.Initialize(Content, $"{Environment.CurrentDirectory}{DSC}Content{DSC}");
 
             new Parser(windowManager);
 
@@ -118,7 +118,7 @@ namespace TSMapEditor.Rendering
 
             windowManager.SetRenderResolution(menuRenderWidth, menuRenderHeight);
             windowManager.CenterOnScreen();
-            windowManager.Cursor.LoadNativeCursor(Environment.CurrentDirectory + DSC + "Content" + DSC + "cursor.cur");
+            windowManager.Cursor.LoadNativeCursor($"{Environment.CurrentDirectory}{DSC}Content{DSC}cursor.cur");
             windowManager.SetBorderlessMode(false);
 
             Components.Add(windowManager);

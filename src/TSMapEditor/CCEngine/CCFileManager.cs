@@ -29,7 +29,7 @@ namespace TSMapEditor.CCEngine
 
         public void ReadConfig()
         {
-            var iniFile = new IniFile(Environment.CurrentDirectory + "/Config/FileManagerConfig.ini");
+            var iniFile = new IniFile($"{Environment.CurrentDirectory}/Config/FileManagerConfig.ini");
 
             AddSearchDirectory(Environment.CurrentDirectory);
             iniFile.DoForEveryValueInSection("SearchDirectories", v => AddSearchDirectory(Path.Combine(GameDirectory, v)));
@@ -47,7 +47,7 @@ namespace TSMapEditor.CCEngine
         {
             char lastChar = path[path.Length - 1];
             if (lastChar != '/' && lastChar != '\\')
-                path = path + "/";
+                path = $"{path}/";
             searchDirectories.Add(path);
         }
 
@@ -132,7 +132,7 @@ namespace TSMapEditor.CCEngine
         {
             if (!LoadMIXFile(name))
             {
-                throw new FileNotFoundException("Primary MIX file not found: " + name);
+                throw new FileNotFoundException($"Primary MIX file not found: {name}");
             }
         }
 
@@ -145,7 +145,7 @@ namespace TSMapEditor.CCEngine
         {
             if (!LoadMIXFile(name))
             {
-                Logger.Log("Secondary MIX file not found: " + name);
+                Logger.Log($"Secondary MIX file not found: {name}");
             }
         }
 
@@ -158,7 +158,7 @@ namespace TSMapEditor.CCEngine
         {
             var data = LoadFile(name);
             if (data == null)
-                throw new FileNotFoundException("CSF file not found: " + name);
+                throw new FileNotFoundException($"CSF file not found: {name}");
             var file = new CsfFile(name);
             file.ParseFromBuffer(data);
             CsfFiles.Add(file);

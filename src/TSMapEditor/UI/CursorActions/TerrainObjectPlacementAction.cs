@@ -68,7 +68,7 @@ namespace TSMapEditor.UI.CursorActions
         public override void LeftDown(Point2D cellCoords)
         {
             if (_terrainType == null)
-                throw new InvalidOperationException(nameof(TerrainType) + " cannot be null");
+                throw new InvalidOperationException($"{nameof(TerrainType)} cannot be null");
 
             var cell = CursorActionTarget.Map.GetTile(cellCoords);
             if (cell.TerrainObject != null)

@@ -63,7 +63,7 @@ namespace TSMapEditor.Models
         public Script Clone(string iniName)
         {
             var script = new Script(iniName);
-            script.Name = "Clone of " + Name;
+            script.Name = $"Clone of {Name}";
             foreach (var action in Actions)
             {
                 script.Actions.Add(new ScriptActionEntry() 

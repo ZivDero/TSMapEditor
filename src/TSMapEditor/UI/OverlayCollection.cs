@@ -35,7 +35,7 @@ namespace TSMapEditor.UI
             int i = 0;
             while (true)
             {
-                string value = iniSection.GetStringValue("OverlayType" + i, null);
+                string value = iniSection.GetStringValue($"OverlayType{i}", null);
                 if (string.IsNullOrWhiteSpace(value))
                     break;
 

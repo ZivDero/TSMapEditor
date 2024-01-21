@@ -32,7 +32,7 @@ namespace TSMapEditor.Models
             string[] parts = iniString.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
             if (parts.Length != 3)
             {
-                Logger.Log($"{nameof(BaseNode)}.{nameof(FromIniString)}: invalid string " + iniString);
+                Logger.Log($"{nameof(BaseNode)}.{nameof(FromIniString)}: invalid string {iniString}");
                 return null;
             }
 
@@ -40,7 +40,8 @@ namespace TSMapEditor.Models
             int y = Conversions.IntFromString(parts[2], -1);
             if (x < 0 || y < 0)
             {
-                Logger.Log($"{nameof(BaseNode)}.{nameof(FromIniString)}: invalid coordinates given in string " + iniString);
+                Logger.Log(
+                    $"{nameof(BaseNode)}.{nameof(FromIniString)}: invalid coordinates given in string {iniString}");
                 return null;
             }
 

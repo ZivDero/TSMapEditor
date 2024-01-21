@@ -444,7 +444,7 @@ namespace TSMapEditor.Mutations.Classes
                             break;
                         default:
                         case CopiedEntryType.Invalid:
-                            throw new CopiedMapDataSerializationException("Invalid map data entry type " + entryType);
+                            throw new CopiedMapDataSerializationException($"Invalid map data entry type {entryType}");
                     }
 
                     entry.ReadData(memoryStream);

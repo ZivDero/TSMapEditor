@@ -22,8 +22,8 @@ namespace TSMapEditor.Mutations.Classes.HeightMutations
 
             if (comparisonTypesForDirections.Count != (int)Direction.Count)
             {
-                throw new ArgumentException($"The length of {nameof(comparisonTypesForDirections)} must match " +
-                    $"the number of primary directions in the game ({Direction.Count})");
+                throw new ArgumentException(
+                    $"The length of {nameof(comparisonTypesForDirections)} must match the number of primary directions in the game ({Direction.Count})");
             }
         }
 

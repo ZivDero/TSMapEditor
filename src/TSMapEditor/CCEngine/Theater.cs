@@ -93,7 +93,7 @@ namespace TSMapEditor.CCEngine
 
             if (!theaterIni.SectionExists(REQUIRED_SECTION))
             {
-                throw new FileNotFoundException("Theater config INI not found or invalid: " + ConfigINIPath);
+                throw new FileNotFoundException($"Theater config INI not found or invalid: {ConfigINIPath}");
             }
 
             int i;

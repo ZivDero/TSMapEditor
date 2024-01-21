@@ -18,7 +18,7 @@ namespace TSMapEditor.CCEngine
 
         public string GetOptionText()
         {
-            return Value + " - " + Text;
+            return $"{Value} - {Text}";
         }
     }
 
@@ -49,7 +49,7 @@ namespace TSMapEditor.CCEngine
             int i = 0;
             while (true)
             {
-                string key = "Option" + i;
+                string key = $"Option{i}";
 
                 if (!iniSection.KeyExists(key))
                     break;
@@ -57,14 +57,14 @@ namespace TSMapEditor.CCEngine
                 string value = iniSection.GetStringValue(key, null);
                 if (string.IsNullOrWhiteSpace(value))
                 {
-                    Logger.Log($"Invalid {key}= in ScriptAction " + iniSection.SectionName);
+                    Logger.Log($"Invalid {key}= in ScriptAction {iniSection.SectionName}");
                     break;
                 }
 
                 int commaIndex = value.IndexOf(',');
                 if (commaIndex < 0)
                 {
-                    Logger.Log($"Invalid {key}= in ScriptAction " + iniSection.SectionName);
+                    Logger.Log($"Invalid {key}= in ScriptAction {iniSection.SectionName}");
                     break;
                 }
 

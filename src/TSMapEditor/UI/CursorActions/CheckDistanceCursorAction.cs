@@ -79,7 +79,8 @@ namespace TSMapEditor.UI.CursorActions
                 Renderer.FillRectangle(GetDrawRectangleForMarker(pathCellCenterPoint), Color.Yellow);
             }
 
-            string text = "Path Length In Cells: " + pathLength + "\r\n\r\nClick to select new source coordinate, or right-click to exit";
+            string text =
+                $"Path Length In Cells: {pathLength}\r\n\r\nClick to select new source coordinate, or right-click to exit";
             DrawText(cellCoords, cameraTopLeftPoint, text, pathColor);
         }
 

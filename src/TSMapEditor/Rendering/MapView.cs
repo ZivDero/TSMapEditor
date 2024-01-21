@@ -511,7 +511,7 @@ namespace TSMapEditor.Rendering
             Renderer.PopRenderTarget();
 
             refreshStopwatch.Stop();
-            Console.WriteLine("Map render time: " + refreshStopwatch.Elapsed.TotalMilliseconds);
+            Console.WriteLine($"Map render time: {refreshStopwatch.Elapsed.TotalMilliseconds}");
         }
 
         private void DrawMapUIElements()
@@ -912,7 +912,7 @@ namespace TSMapEditor.Rendering
                     unitRenderer.Draw(gameObject as Unit, !minimapNeedsRefresh);
                     return;
                 default:
-                    throw new NotImplementedException("No renderer implemented for type " + gameObject.WhatAmI());
+                    throw new NotImplementedException($"No renderer implemented for type {gameObject.WhatAmI()}");
             }
         }
 
@@ -1338,7 +1338,7 @@ namespace TSMapEditor.Rendering
 
                 foreach (KeyboardCommand command in KeyboardCommands.Instance.Commands)
                 {
-                    text.Append(command.UIName + ": " + command.GetKeyDisplayString());
+                    text.Append($"{command.UIName}: {command.GetKeyDisplayString()}");
                     text.Append(Environment.NewLine);
                 }
 

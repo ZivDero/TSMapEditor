@@ -32,7 +32,7 @@ namespace TSMapEditor.UI
             int i = 0;
             while (true)
             {
-                string smudgeTypeName = iniSection.GetStringValue("SmudgeType" + i, null);
+                string smudgeTypeName = iniSection.GetStringValue($"SmudgeType{i}", null);
                 if (string.IsNullOrWhiteSpace(smudgeTypeName))
                     break;
 

@@ -36,7 +36,7 @@
             }
 
             if (ININame.StartsWith("AI") && !name.StartsWith("AI "))
-                return "AI " + name;
+                return $"AI {name}";
 
             return name;
         }

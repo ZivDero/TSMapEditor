@@ -44,11 +44,12 @@ namespace TSMapEditor.CCEngine
         private void Initialize()
         {
             if (Length < FileHeader.Size)
-                throw new VxlLoadException(nameof(VxlFile) + " .vxl is shorter than specified in its header!");
+                throw new VxlLoadException($"{nameof(VxlFile)} .vxl is shorter than specified in its header!");
 
             Header.Read(this);
             if (Header.HeaderCount == 0 || Header.TailerCount == 0 || Header.TailerCount != Header.HeaderCount)
-                throw new VxlLoadException(nameof(VxlFile) + " .vxl has no header or tailer sections, or their count doesn't match!");
+                throw new VxlLoadException(
+                    $"{nameof(VxlFile)} .vxl has no header or tailer sections, or their count doesn't match!");
 
             // start with headers
             for (int i = 0; i < Header.HeaderCount; ++i)

@@ -344,7 +344,7 @@ namespace TSMapEditor.UI.Windows
             SetParameterEntryText(entry, action);
             tbParameterValue.TextChanged += TbParameterValue_TextChanged;
 
-            lblParameterDescription.Text = action == null ? "Parameter:" : action.ParamDescription + ":";
+            lblParameterDescription.Text = action == null ? "Parameter:" : $"{action.ParamDescription}:";
             lblActionDescriptionValue.Text = GetActionDescriptionFromIndex(entry.Action);
 
             FillPresetContextMenu(entry, action);
@@ -401,9 +401,9 @@ namespace TSMapEditor.UI.Windows
             }
 
             if (buildingType == null)
-                return argument + " - invalid value";
+                return $"{argument} - invalid value";
 
-            return argument + " - " + buildingType.GetEditorDisplayName() + " (" + description + ")";
+            return $"{argument} - {buildingType.GetEditorDisplayName()} ({description})";
         }
 
         private void FillPresetContextMenu(ScriptActionEntry entry, ScriptAction action)
@@ -416,7 +416,9 @@ namespace TSMapEditor.UI.Windows
             {
                 for (int i = 0; i < map.LocalVariables.Count; i++)
                 {
-                    btnEditorPresetValues.ContextMenu.AddItem(new XNAContextMenuItem() { Text = i + " - " + map.LocalVariables[i].Name });
+                    btnEditorPresetValues.ContextMenu.AddItem(new XNAContextMenuItem() { Text =
+                        $"{i} - {map.LocalVariables[i].Name}"
+                    });
                 }
             }
             else if (action.ParamType == TriggerParamType.Waypoint)
@@ -430,14 +432,16 @@ namespace TSMapEditor.UI.Windows
             {
                 foreach (var houseType in map.GetHouseTypes())
                 {
-                    btnEditorPresetValues.ContextMenu.AddItem(new XNAContextMenuItem() { Text = houseType.Index + " " + houseType.ININame, TextColor = Helpers.GetHouseTypeUITextColor(houseType) });
+                    btnEditorPresetValues.ContextMenu.AddItem(new XNAContextMenuItem() { Text =
+                        $"{houseType.Index} {houseType.ININame}", TextColor = Helpers.GetHouseTypeUITextColor(houseType) });
                 }
             }
             else if (action.ParamType == TriggerParamType.House)
             {
                 foreach (var house in map.GetHouses())
                 {
-                    btnEditorPresetValues.ContextMenu.AddItem(new XNAContextMenuItem() { Text = house.ID + " " + house.ININame, TextColor = Helpers.GetHouseUITextColor(house) });
+                    btnEditorPresetValues.ContextMenu.AddItem(new XNAContextMenuItem() { Text =
+                        $"{house.ID} {house.ININame}", TextColor = Helpers.GetHouseUITextColor(house) });
                 }
             }
 
@@ -519,18 +523,18 @@ namespace TSMapEditor.UI.Windows
         {
             ScriptAction action = GetScriptAction(entry.Action);
             if (action == null)
-                return "#" + index + " - Unknown (" +  entry.Argument.ToString(CultureInfo.InvariantCulture) + ")";
+                return $"#{index} - Unknown ({entry.Argument.ToString(CultureInfo.InvariantCulture)})";
 
-            return "#" + index + " - " + action.Name + " (" + entry.Argument.ToString(CultureInfo.InvariantCulture) + ")";
+            return $"#{index} - {action.Name} ({entry.Argument.ToString(CultureInfo.InvariantCulture)})";
         }
 
         private string GetActionNameFromIndex(int index)
         {
             ScriptAction action = GetScriptAction(index);
             if (action == null)
-                return index + " Unknown";
+                return $"{index} Unknown";
 
-            return index + " " + action.Name;
+            return $"{index} {action.Name}";
         }
 
         private string GetActionDescriptionFromIndex(int index)

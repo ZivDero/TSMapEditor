@@ -116,11 +116,11 @@ namespace TSMapEditor.Models
 
             if (!File.Exists(iniPath))
             {
-                Logger.Log("File for tutorial lines does not exist! Tried to read from: " + iniPath);
+                Logger.Log($"File for tutorial lines does not exist! Tried to read from: {iniPath}");
                 return;
             }
 
-            Logger.Log("Reading tutorial lines from " + iniPath);
+            Logger.Log($"Reading tutorial lines from {iniPath}");
 
             IniFile tutorialIni;
 
@@ -130,7 +130,7 @@ namespace TSMapEditor.Models
             }
             catch (IOException ex)
             {
-                Logger.Log(nameof(TutorialLines) + ": failed to read tutorial lines: " + ex.Message + ". Re-adding callback.");
+                Logger.Log($"{nameof(TutorialLines)}: failed to read tutorial lines: {ex.Message}. Re-adding callback.");
                 AddCallback();
                 return;
             }

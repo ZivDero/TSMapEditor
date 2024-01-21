@@ -196,7 +196,7 @@ namespace TSMapEditor.Mutations.Classes
 
         public string GetConfigString()
         {
-            return $"{OpenChance},{OverlapChance}," + string.Join(",", TerrainTypes.Select(tt => tt.ININame));
+            return $"{OpenChance},{OverlapChance},{string.Join(",", TerrainTypes.Select(tt => tt.ININame))}";
         }
 
         public static TerrainGeneratorTerrainTypeGroup FromConfigString(List<TerrainType> allTerrainTypes, string config)
@@ -242,7 +242,7 @@ namespace TSMapEditor.Mutations.Classes
             string config = $"{OpenChance},{OverlapChance},{TileSet.SetName}";
             if (TileIndicesInSet != null && TileIndicesInSet.Count > 0)
             {
-                config += "," + string.Join(",", TileIndicesInSet);
+                config += $",{string.Join(",", TileIndicesInSet)}";
             }
 
             return config;
@@ -296,7 +296,7 @@ namespace TSMapEditor.Mutations.Classes
             string config = $"{OpenChance},{OverlapChance},{OverlayType.ININame}";
             if (FrameIndices != null && FrameIndices.Count > 0)
             {
-                config += "," + string.Join(",", FrameIndices);
+                config += $",{string.Join(",", FrameIndices)}";
             }
 
             return config;
@@ -342,7 +342,7 @@ namespace TSMapEditor.Mutations.Classes
 
         public string GetConfigString()
         {
-            return $",{OpenChance},{OverlapChance}," + string.Join(",", SmudgeTypes.Select(tt => tt.ININame));
+            return $",{OpenChance},{OverlapChance},{string.Join(",", SmudgeTypes.Select(tt => tt.ININame))}";
         }
 
         public static TerrainGeneratorSmudgeGroup FromConfigString(List<SmudgeType> allSmudgeTypes, string config)

@@ -105,8 +105,8 @@ namespace TSMapEditor.CCEngine
             long expectedLength = stream.Position + IMAGE_HEADER_SIZE + Constants.TileColorBufferSize;
             if (stream.Length < expectedLength)
             {
-                throw new ArgumentException($"TMP file buffer ran out unexpectedly: " +
-                    $"expected length of at least {expectedLength}, actual length: {stream.Length}");
+                throw new ArgumentException(
+                    $"TMP file buffer ran out unexpectedly: expected length of at least {expectedLength}, actual length: {stream.Length}");
             }
 
             X = ReadIntFromStream(stream);

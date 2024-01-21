@@ -204,7 +204,7 @@ namespace TSMapEditor.UI.Windows
                 {
                     if (string.IsNullOrEmpty(lblCurrentlyAssignedTo.Text))
                     {
-                        lblCurrentlyAssignedTo.Text = "Also assigned to: " + otherHotkey.UIName;
+                        lblCurrentlyAssignedTo.Text = $"Also assigned to: {otherHotkey.UIName}";
                     }
                     else
                     {

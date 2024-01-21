@@ -340,17 +340,17 @@ namespace TSMapEditor.UI.Windows
             }
             
             if (editedTeamType.TaskForce != null)
-                selTaskForce.Text = editedTeamType.TaskForce.Name + " (" + editedTeamType.TaskForce.ININame + ")";
+                selTaskForce.Text = $"{editedTeamType.TaskForce.Name} ({editedTeamType.TaskForce.ININame})";
             else
                 selTaskForce.Text = string.Empty;
 
             if (editedTeamType.Script != null)
-                selScript.Text = editedTeamType.Script.Name + " (" + editedTeamType.Script.ININame + ")";
+                selScript.Text = $"{editedTeamType.Script.Name} ({editedTeamType.Script.ININame})";
             else
                 selScript.Text = string.Empty;
 
             if (editedTeamType.Tag != null)
-                selTag.Text = editedTeamType.Tag.Name + " (" + editedTeamType.Tag.ID + ")";
+                selTag.Text = $"{editedTeamType.Tag.Name} ({editedTeamType.Tag.ID})";
             else
                 selTag.Text = string.Empty;
 

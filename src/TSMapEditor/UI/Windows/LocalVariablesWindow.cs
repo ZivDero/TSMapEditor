@@ -159,8 +159,7 @@ namespace TSMapEditor.UI.Windows
             {
                 EditorMessageBox.Show(WindowManager,
                     "Local Variable Usages",
-                    $"The following usages were found for the selected local variable '{editedLocalVariable.Name}':" + Environment.NewLine + Environment.NewLine +
-                    string.Join(Environment.NewLine, list.Select(e => "- " + e)),
+                    $"The following usages were found for the selected local variable '{editedLocalVariable.Name}':{Environment.NewLine}{Environment.NewLine}{string.Join(Environment.NewLine, list.Select(e => $"- {e}"))}",
                     MessageBoxButtons.OK);
             }
         }
@@ -216,7 +215,7 @@ namespace TSMapEditor.UI.Windows
 
             foreach (var localVariable in map.LocalVariables)
             {
-                lbLocalVariables.AddItem(new XNAListBoxItem() { Text = localVariable.Index + " " + localVariable.Name, Tag = localVariable });
+                lbLocalVariables.AddItem(new XNAListBoxItem() { Text = $"{localVariable.Index} {localVariable.Name}", Tag = localVariable });
             }
         }
     }

@@ -105,7 +105,7 @@ namespace TSMapEditor.Models
         {
             Trigger clone = (Trigger)MemberwiseClone();
             clone.ID = uniqueId;
-            clone.Name = "Clone of " + Name;
+            clone.Name = $"Clone of {Name}";
 
             // Deep clone the events and actions
 
@@ -129,9 +129,7 @@ namespace TSMapEditor.Models
             // Write entry to [Triggers]
             string linkedTriggerId = LinkedTrigger == null ? Constants.NoneValue1 : LinkedTrigger.ID;
             iniFile.SetStringValue("Triggers", ID,
-                $"{HouseType},{linkedTriggerId},{Name}," +
-                $"{Helpers.BoolToIntString(Disabled)}," +
-                $"{Helpers.BoolToIntString(Easy)},{Helpers.BoolToIntString(Normal)},{Helpers.BoolToIntString(Hard)},0");
+                $"{HouseType},{linkedTriggerId},{Name},{Helpers.BoolToIntString(Disabled)},{Helpers.BoolToIntString(Easy)},{Helpers.BoolToIntString(Normal)},{Helpers.BoolToIntString(Hard)},0");
 
             // Write entry to [Events]
             var conditionDataString = new ExtendedStringBuilder(true, ',');

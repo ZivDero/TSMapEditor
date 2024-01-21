@@ -271,7 +271,7 @@ namespace TSMapEditor.Scripts
 
                     if (transition == null)
                     {
-                        Logger.Log("No valid ice transition info found for cell at " + mapCell.CoordsToPoint().ToString());
+                        Logger.Log($"No valid ice transition info found for cell at {mapCell.CoordsToPoint()}");
                         return;
                     }
 

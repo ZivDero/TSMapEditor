@@ -80,7 +80,7 @@ namespace TSMapEditor.UI.CursorActions
         public override void LeftDown(Point2D cellCoords)
         {
             if (UnitType == null)
-                throw new InvalidOperationException(nameof(UnitType) + " cannot be null");
+                throw new InvalidOperationException($"{nameof(UnitType)} cannot be null");
 
             bool overlapObjects = KeyboardCommands.Instance.OverlapObjects.AreKeysOrModifiersDown(keyboard);
 

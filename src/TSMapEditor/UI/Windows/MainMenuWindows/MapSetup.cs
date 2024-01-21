@@ -63,11 +63,12 @@ namespace TSMapEditor.UI.Windows.MainMenuWindows
                 }
                 catch (IniParseException ex)
                 {
-                    return "The selected file does not appear to be a proper map file (INI file). Maybe it's corrupted?\r\n\r\nReturned error: " + ex.Message;
+                    return
+                        $"The selected file does not appear to be a proper map file (INI file). Maybe it's corrupted?\r\n\r\nReturned error: {ex.Message}";
                 }
                 catch (MapLoadException ex)
                 {
-                    return "Failed to load the selected map file.\r\n\r\nReturned error: " + ex.Message;
+                    return $"Failed to load the selected map file.\r\n\r\nReturned error: {ex.Message}";
                 }
             }
 
@@ -92,7 +93,7 @@ namespace TSMapEditor.UI.Windows.MainMenuWindows
             Theater theater = LoadedMap.EditorConfig.Theaters.Find(t => t.UIName.Equals(LoadedMap.TheaterName, StringComparison.InvariantCultureIgnoreCase));
             if (theater == null)
             {
-                throw new InvalidOperationException("Theater of map not found: " + LoadedMap.TheaterName);
+                throw new InvalidOperationException($"Theater of map not found: {LoadedMap.TheaterName}");
             }
             theater.ReadConfigINI(gameDirectory, ccFileManager);
 
@@ -120,7 +121,7 @@ namespace TSMapEditor.UI.Windows.MainMenuWindows
             else if (MapLoader.MapLoadErrors.Count > 0)
             {
                 EditorMessageBox.Show(windowManager, "Errors while loading map",
-                    "One or more errors were encountered while loading the map:\r\n\r\n" + errorList, MessageBoxButtons.OK);
+                    $"One or more errors were encountered while loading the map:\r\n\r\n{errorList}", MessageBoxButtons.OK);
             }
         }
     }

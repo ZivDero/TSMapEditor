@@ -395,7 +395,7 @@ namespace TSMapEditor.Rendering
                 tileSet.StartTileIndex = currentTileIndex;
                 tileSet.LoadedTileCount = 0;
 
-                Console.WriteLine("Loading " + tileSet.SetName);
+                Console.WriteLine($"Loading {tileSet.SetName}");
 
                 for (int i = 0; i < tileSet.TilesInSet; i++)
                 {
@@ -582,7 +582,7 @@ namespace TSMapEditor.Rendering
                 // Palette override in RA2/YR
                 Palette palette = buildingType.ArtConfig.TerrainPalette ? theaterPalette : unitPalette;
                 if (!string.IsNullOrWhiteSpace(buildingType.ArtConfig.Palette))
-                    palette = GetPaletteOrFail(buildingType.ArtConfig.Palette + Theater.FileExtension[1..] + ".pal");
+                    palette = GetPaletteOrFail($"{buildingType.ArtConfig.Palette}{Theater.FileExtension[1..]}.pal");
 
                 var shpFile = new ShpFile(loadedShpName);
                 shpFile.ParseFromBuffer(shpData);
@@ -674,7 +674,7 @@ namespace TSMapEditor.Rendering
 
                 Palette palette = buildingType.ArtConfig.TerrainPalette ? theaterPalette : unitPalette;
                 if (!string.IsNullOrWhiteSpace(buildingType.ArtConfig.Palette))
-                    palette = GetPaletteOrFail(buildingType.ArtConfig.Palette + Theater.FileExtension[1..] + ".pal");
+                    palette = GetPaletteOrFail($"{buildingType.ArtConfig.Palette}{Theater.FileExtension[1..]}.pal");
 
                 BuildingTurretModels[i] = new VoxelModel(graphicsDevice, vxlFile, hvaFile, palette, buildingType.ArtConfig.Remapable, vplFile);
                 loadedModels[turretImage] = BuildingTurretModels[i];
@@ -1178,7 +1178,7 @@ namespace TSMapEditor.Rendering
         {
             byte[] paletteData = fileManager.LoadFile(paletteFileName);
             if (paletteData == null)
-                throw new KeyNotFoundException(paletteFileName + " not found from loaded MIX files!");
+                throw new KeyNotFoundException($"{paletteFileName} not found from loaded MIX files!");
             return new Palette(paletteData);
         }
 
@@ -1194,7 +1194,7 @@ namespace TSMapEditor.Rendering
         {
             byte[] vplData = fileManager.LoadFile(filename);
             if (vplData == null)
-                throw new KeyNotFoundException(filename + " not found from loaded MIX files!");
+                throw new KeyNotFoundException($"{filename} not found from loaded MIX files!");
 
             return new VplFile(vplData);
         }

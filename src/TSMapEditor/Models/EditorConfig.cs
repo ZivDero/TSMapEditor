@@ -13,7 +13,7 @@ namespace TSMapEditor.Models
     {
         public EditorConfig() 
         {
-            EditorRulesIni = new IniFile(Environment.CurrentDirectory + "/Config/EditorRules.ini");
+            EditorRulesIni = new IniFile($"{Environment.CurrentDirectory}/Config/EditorRules.ini");
         }
         
         public IniFile EditorRulesIni { get; }
@@ -46,7 +46,7 @@ namespace TSMapEditor.Models
 
         private void ReadTheaters()
         {
-            var iniFile = new IniFile(Environment.CurrentDirectory + "/Config/Theaters.ini");
+            var iniFile = new IniFile($"{Environment.CurrentDirectory}/Config/Theaters.ini");
             var section = iniFile.GetSection("Theaters");
             if (section == null)
                 return;
@@ -68,7 +68,7 @@ namespace TSMapEditor.Models
         {
             OverlayCollections.Clear();
 
-            var iniFile = new IniFile(Environment.CurrentDirectory + "/Config/OverlayCollections.ini");
+            var iniFile = new IniFile($"{Environment.CurrentDirectory}/Config/OverlayCollections.ini");
 
             var keys = iniFile.GetSectionKeys("OverlayCollections");
             if (keys == null)
@@ -90,7 +90,7 @@ namespace TSMapEditor.Models
         {
             TerrainObjectCollections.Clear();
 
-            var iniFile = new IniFile(Environment.CurrentDirectory + "/Config/TerrainObjectCollections.ini");
+            var iniFile = new IniFile($"{Environment.CurrentDirectory}/Config/TerrainObjectCollections.ini");
 
             var keys = iniFile.GetSectionKeys("TerrainObjectCollections");
             if (keys == null)
@@ -112,7 +112,7 @@ namespace TSMapEditor.Models
         {
             SmudgeCollections.Clear();
 
-            var iniFile = new IniFile(Environment.CurrentDirectory + "/Config/SmudgeCollections.ini");
+            var iniFile = new IniFile($"{Environment.CurrentDirectory}/Config/SmudgeCollections.ini");
 
             var keys = iniFile.GetSectionKeys("SmudgeCollections");
             if (keys == null)
@@ -132,7 +132,7 @@ namespace TSMapEditor.Models
 
         private void ReadBrushSizes()
         {
-            var iniFile = new IniFile(Environment.CurrentDirectory + "/Config/BrushSizes.ini");
+            var iniFile = new IniFile($"{Environment.CurrentDirectory}/Config/BrushSizes.ini");
             var section = iniFile.GetSection("BrushSizes");
             if (section == null)
                 return;
@@ -155,7 +155,7 @@ namespace TSMapEditor.Models
 
         private void ReadScriptActions()
         {
-            var iniFile = new IniFile(Environment.CurrentDirectory + "/Config/ScriptActions.ini");
+            var iniFile = new IniFile($"{Environment.CurrentDirectory}/Config/ScriptActions.ini");
             List<string> sections = iniFile.GetSections();
 
             for (int i = 0; i < sections.Count; i++)
@@ -170,7 +170,7 @@ namespace TSMapEditor.Models
 
         private void ReadTriggerEventTypes()
         {
-            var iniFile = new IniFile(Environment.CurrentDirectory + "/Config/Events.ini");
+            var iniFile = new IniFile($"{Environment.CurrentDirectory}/Config/Events.ini");
             List<string> sections = iniFile.GetSections();
 
             for (int i = 0; i < sections.Count; i++)
@@ -185,7 +185,7 @@ namespace TSMapEditor.Models
 
         private void ReadTriggerActionTypes()
         {
-            var iniFile = new IniFile(Environment.CurrentDirectory + "/Config/Actions.ini");
+            var iniFile = new IniFile($"{Environment.CurrentDirectory}/Config/Actions.ini");
             List<string> sections = iniFile.GetSections();
 
             for (int i = 0; i < sections.Count; i++)
@@ -202,7 +202,7 @@ namespace TSMapEditor.Models
         {
             Bridges.Clear();
 
-            var iniFile = new IniFile(Environment.CurrentDirectory + "/Config/Bridges.ini");
+            var iniFile = new IniFile($"{Environment.CurrentDirectory}/Config/Bridges.ini");
             var section = iniFile.GetSection("Bridges");
             if (section == null)
                 return;
@@ -223,7 +223,7 @@ namespace TSMapEditor.Models
         {
             ConnectedOverlays.Clear();
 
-            var iniFile = new IniFile(Environment.CurrentDirectory + "/Config/ConnectedOverlays.ini");
+            var iniFile = new IniFile($"{Environment.CurrentDirectory}/Config/ConnectedOverlays.ini");
             var section = iniFile.GetSection("ConnectedOverlays");
             if (section == null)
                 return;
@@ -250,7 +250,7 @@ namespace TSMapEditor.Models
         {
             TeamTypeFlags.Clear();
 
-            var iniFile = new IniFile(Environment.CurrentDirectory + "/Config/TeamTypeFlags.ini");
+            var iniFile = new IniFile($"{Environment.CurrentDirectory}/Config/TeamTypeFlags.ini");
             const string sectionName = "TeamTypeFlags";
 
             var keys = iniFile.GetSectionKeys(sectionName);

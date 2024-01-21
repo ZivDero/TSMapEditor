@@ -72,7 +72,7 @@ namespace TSMapEditor.UI.Windows
             for (int i = 0; i < map.Rules.Sides.Count; i++)
             {
                 string sideName = map.Rules.Sides[i];
-                string sideString = i + " " + sideName;
+                string sideString = $"{i} {sideName}";
                 ddSide.AddItem(new XNADropDownItem() { Text = sideString, Tag = sideName });
             }
 
@@ -176,7 +176,8 @@ namespace TSMapEditor.UI.Windows
                         // We need to always delete the associated HouseType, if that fails for some reason then
                         // something has gone terribly wrong in our internal editor logic.
                         if (!map.DeleteHouseType(editedHouse.HouseType))
-                            throw new InvalidOperationException("Failed to delete HouseType associated with house " + editedHouse.ININame);
+                            throw new InvalidOperationException(
+                                $"Failed to delete HouseType associated with house {editedHouse.ININame}");
                     }
 
                     editedHouse = null;
@@ -192,8 +193,7 @@ namespace TSMapEditor.UI.Windows
             {
                 EditorMessageBox.Show(WindowManager,
                     "Houses already exist",
-                    "Cannot generate standard because the map already has one or more houses specified." + Environment.NewLine + Environment.NewLine +
-                    "If you want to generate standard houses, please delete the existing houses first.", MessageBoxButtons.OK);
+                    $"Cannot generate standard because the map already has one or more houses specified.{Environment.NewLine}{Environment.NewLine}If you want to generate standard houses, please delete the existing houses first.", MessageBoxButtons.OK);
 
                 return;
             }
@@ -219,8 +219,7 @@ namespace TSMapEditor.UI.Windows
 
             var dialog = EditorMessageBox.Show(WindowManager,
                 "Are you sure?",
-                "This enables the \"AI Repairs\" flag on all buildings of the house, which makes the AI repair them." + Environment.NewLine + Environment.NewLine +
-                "No un-do is available. Do you wish to continue?", MessageBoxButtons.YesNo);
+                $"This enables the \"AI Repairs\" flag on all buildings of the house, which makes the AI repair them.{Environment.NewLine}{Environment.NewLine}No un-do is available. Do you wish to continue?", MessageBoxButtons.YesNo);
             dialog.YesClickedAction = _ => map.Structures.FindAll(s => s.Owner == editedHouse).ForEach(b => b.AIRepairable = true);
         }
 
@@ -234,8 +233,7 @@ namespace TSMapEditor.UI.Windows
 
             var dialog = EditorMessageBox.Show(WindowManager,
                 "Are you sure?",
-                "This disables the \"AI Repairs\" flag on all buildings of the house, which makes the AI NOT repair them." + Environment.NewLine + Environment.NewLine +
-                "No un-do is available. Do you wish to continue?", MessageBoxButtons.YesNo);
+                $"This disables the \"AI Repairs\" flag on all buildings of the house, which makes the AI NOT repair them.{Environment.NewLine}{Environment.NewLine}No un-do is available. Do you wish to continue?", MessageBoxButtons.YesNo);
             dialog.YesClickedAction = _ => map.Structures.FindAll(s => s.Owner == editedHouse).ForEach(b => b.AIRepairable = false);
         }
 
@@ -434,7 +432,8 @@ namespace TSMapEditor.UI.Windows
                     }
                 );
 
-                ddActsLike.AddItem(new XNADropDownItem() { Text = house.ID.ToString(CultureInfo.InvariantCulture) + " " + house.ININame, Tag = house.ID });
+                ddActsLike.AddItem(new XNADropDownItem() { Text =
+                    $"{house.ID.ToString(CultureInfo.InvariantCulture)} {house.ININame}", Tag = house.ID });
 
                 ddHouseOfHumanPlayer.AddItem(house.ININame, house.XNAColor);
             }
@@ -442,7 +441,8 @@ namespace TSMapEditor.UI.Windows
             ddCountry.Items.Clear();
             foreach (var houseType in map.GetHouseTypes())
             {
-                ddCountry.AddItem(new XNADropDownItem() { Text = houseType.Index.ToString(CultureInfo.InvariantCulture) + " " + houseType.ININame, TextColor = houseType.XNAColor, Tag = houseType });
+                ddCountry.AddItem(new XNADropDownItem() { Text =
+                    $"{houseType.Index.ToString(CultureInfo.InvariantCulture)} {houseType.ININame}", TextColor = houseType.XNAColor, Tag = houseType });
             }
 
             ddHouseOfHumanPlayer.SelectedIndex = map.Houses.FindIndex(h => h.ININame == map.Basic.Player) + 1;
@@ -456,18 +456,18 @@ namespace TSMapEditor.UI.Windows
                 return;
             }
 
-            string stats = "Power: " + map.Structures.Aggregate<Structure, int>(0, (value, structure) => 
+            string stats = $"Power: {map.Structures.Aggregate<Structure, int>(0, (value, structure) =>
             {
                 if (structure.Owner == editedHouse)
                     return value + structure.ObjectType.Power;
 
                 return value;
-            }) + Environment.NewLine;
+            })}{Environment.NewLine}";
 
-            stats += Environment.NewLine + "Aircraft: " + map.Aircraft.Count(s => s.Owner == editedHouse);
-            stats += Environment.NewLine + "Infantry: " + map.Infantry.Count(s => s.Owner == editedHouse);
-            stats += Environment.NewLine + "Vehicles: " + map.Units.Count(s => s.Owner == editedHouse);
-            stats += Environment.NewLine + "Buildings: " + map.Structures.Count(s => s.Owner == editedHouse);
+            stats += $"{Environment.NewLine}Aircraft: {map.Aircraft.Count(s => s.Owner == editedHouse)}";
+            stats += $"{Environment.NewLine}Infantry: {map.Infantry.Count(s => s.Owner == editedHouse)}";
+            stats += $"{Environment.NewLine}Vehicles: {map.Units.Count(s => s.Owner == editedHouse)}";
+            stats += $"{Environment.NewLine}Buildings: {map.Structures.Count(s => s.Owner == editedHouse)}";
 
             lblStatsValue.Text = stats;
         }

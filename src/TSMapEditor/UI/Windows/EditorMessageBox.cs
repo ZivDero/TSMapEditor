@@ -84,7 +84,7 @@ namespace TSMapEditor.UI.Windows
                 case MessageBoxButtons.None:
                     break;
                 default:
-                    throw new NotImplementedException("Unknown message box button enum value of " + messageBoxButtons);
+                    throw new NotImplementedException($"Unknown message box button enum value of {messageBoxButtons}");
             }
 
             if (buttons.Count > 0)

@@ -318,8 +318,8 @@ namespace TSMapEditor.Models
                 var constructor = objectType.GetConstructor(new Type[] { typeof(string) });
                 if (constructor == null)
                 {
-                    throw new InvalidOperationException(typeof(T).FullName +
-                        " has no public constructor that takes a single string as an argument!");
+                    throw new InvalidOperationException(
+                        $"{typeof(T).FullName} has no public constructor that takes a single string as an argument!");
                 }
 
                 T objectInstance = (T)constructor.Invoke(new object[] { typeName });
@@ -342,7 +342,7 @@ namespace TSMapEditor.Models
                 existing = new InfantrySequence(infantrySequenceName);
                 var section = artIni.GetSection(infantrySequenceName);
                 if (section == null)
-                    throw new KeyNotFoundException("Infantry sequence not found: " + infantrySequenceName);
+                    throw new KeyNotFoundException($"Infantry sequence not found: {infantrySequenceName}");
 
                 existing.ParseFromINISection(section);
                 InfantrySequences.Add(existing);

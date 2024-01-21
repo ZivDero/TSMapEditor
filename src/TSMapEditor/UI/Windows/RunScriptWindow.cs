@@ -84,7 +84,8 @@ namespace TSMapEditor.UI.Windows
             if (!Directory.Exists(directoryPath))
             {
                 Logger.Log("WAE scipts directory not found!");
-                EditorMessageBox.Show(WindowManager, "Error", "Scripts directory not found!\r\n\r\nExpected path: " + directoryPath, MessageBoxButtons.OK);
+                EditorMessageBox.Show(WindowManager, "Error",
+                    $"Scripts directory not found!\r\n\r\nExpected path: {directoryPath}", MessageBoxButtons.OK);
                 return;
             }
 

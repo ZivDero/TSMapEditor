@@ -23,7 +23,7 @@ namespace TSMapEditor.Models.ArtConfig
         {
             int[] values = Array.ConvertAll(iniSection.GetStringValue("Ready", "0,1,1").Split(','), x => Conversions.IntFromString(x, 0));
             if (values.Length != 3)
-                throw new FormatException("Invalid Ready= in infantry sequence " + ININame);
+                throw new FormatException($"Invalid Ready= in infantry sequence {ININame}");
 
             Ready = new InfantrySequencePart(values[0], values[1], values[2]);
         }

@@ -153,7 +153,7 @@ namespace TSMapEditor.Models
         public TaskForce Clone(string iniName)
         {
             var newTaskForce = new TaskForce(iniName);
-            newTaskForce.Name = "Clone of " + Name;
+            newTaskForce.Name = $"Clone of {Name}";
             newTaskForce.Group = Group;
 
             for (int i = 0; i < TechnoTypes.Length; i++)

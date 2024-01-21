@@ -65,7 +65,7 @@ namespace TSMapEditor.UI.TopBar
             ddBrushSize = FindChild<XNADropDown>(nameof(ddBrushSize));
             foreach (var brushSize in editorConfig.BrushSizes)
             {
-                ddBrushSize.AddItem(brushSize.Width + "x" + brushSize.Height);
+                ddBrushSize.AddItem($"{brushSize.Width}x{brushSize.Height}");
             }
             ddBrushSize.SelectedIndexChanged += DdBrushSize_SelectedIndexChanged;
             ddBrushSize.SelectedIndex = 0;
@@ -191,7 +191,7 @@ namespace TSMapEditor.UI.TopBar
                     continue;
 
                 var btn = new EditorButton(WindowManager);
-                btn.Name = "btn" + autoLATGround.GroundTileSet.SetName;
+                btn.Name = $"btn{autoLATGround.GroundTileSet.SetName}";
                 btn.X = prevRight + Constants.UIHorizontalSpacing;
                 btn.Y = y;
                 btn.Width = btnClearTerrain.Width;

@@ -65,8 +65,8 @@ namespace TSMapEditor.UI.CursorActions
             Renderer.DrawLine(corner1.ToXNAVector(), endPoint.ToXNAVector(), lineColor, thickness);
             Renderer.DrawLine(corner2.ToXNAVector(), endPoint.ToXNAVector(), lineColor, thickness);
 
-            string text = "Click to select starting cell to calculate from." + Environment.NewLine + Environment.NewLine +
-                "Value in current area: " + GetTiberiumValue(startY, endY, startX, endX) + " credits";
+            string text =
+                $"Click to select starting cell to calculate from.{Environment.NewLine}{Environment.NewLine}Value in current area: {GetTiberiumValue(startY, endY, startX, endX)} credits";
             DrawText(cellCoords, cameraTopLeftPoint, 60, -150, text, Color.Yellow);
         }
 

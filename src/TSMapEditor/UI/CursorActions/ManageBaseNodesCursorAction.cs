@@ -23,9 +23,8 @@ namespace TSMapEditor.UI.CursorActions
 
         public override void DrawPreview(Point2D cellCoords, Point2D cameraTopLeftPoint)
         {
-            string text = "Click on building to place a base node." + Environment.NewLine + Environment.NewLine +
-                "Hold SHIFT while clicking to also delete the building." + Environment.NewLine +
-                "Hold CTRL while clicking to erase a base node.";
+            string text =
+                $"Click on building to place a base node.{Environment.NewLine}{Environment.NewLine}Hold SHIFT while clicking to also delete the building.{Environment.NewLine}Hold CTRL while clicking to erase a base node.";
 
             DrawText(cellCoords, cameraTopLeftPoint, text, UISettings.ActiveSettings.AltColor);
         }

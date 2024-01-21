@@ -20,7 +20,7 @@ namespace TSMapEditor.UI.Controls
         public override void Initialize()
         {
             lblDescription = new XNALabel(WindowManager);
-            lblDescription.Name = Name + "." + nameof(lblDescription);
+            lblDescription.Name = $"{Name}.{nameof(lblDescription)}";
             lblDescription.X = Constants.UIEmptySideSpace;
             lblDescription.Y = Constants.UIEmptyTopSpace;
             lblDescription.Text = string.Empty;

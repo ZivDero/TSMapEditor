@@ -65,7 +65,7 @@ namespace TSMapEditor.Models
             {
                 // Sometimes the file might be used by some external software, making us unable
                 // to access it
-                Logger.Log("IOException when attempting to reload the map INI: " + ex.Message);
+                Logger.Log($"IOException when attempting to reload the map INI: {ex.Message}");
                 return false;
             }
         }
@@ -88,7 +88,8 @@ namespace TSMapEditor.Models
         }
 
         public MapTile GetTile(Point2D cellCoords) => GetTile(cellCoords.X, cellCoords.Y);
-        public MapTile GetTileOrFail(Point2D cellCoords) => GetTile(cellCoords.X, cellCoords.Y) ?? throw new InvalidOperationException("Invalid cell coords: " + cellCoords);
+        public MapTile GetTileOrFail(Point2D cellCoords) => GetTile(cellCoords.X, cellCoords.Y) ?? throw new InvalidOperationException(
+            $"Invalid cell coords: {cellCoords}");
         public List<Aircraft> Aircraft { get; private set; } = new List<Aircraft>();
         public List<Infantry> Infantry { get; private set; } = new List<Infantry>();
         public List<Unit> Units { get; private set; } = new List<Unit>();
@@ -206,7 +207,7 @@ namespace TSMapEditor.Models
 
             InitializeRules(rulesIni, artIni, firestormIni, artFirestormIni);
             LoadedINI = new IniFileEx();
-            var baseMap = new IniFileEx(Environment.CurrentDirectory + "/Config/BaseMap.ini", ccFileManager);
+            var baseMap = new IniFileEx($"{Environment.CurrentDirectory}/Config/BaseMap.ini", ccFileManager);
             baseMap.FileName = string.Empty;
             baseMap.SetStringValue("Map", "Theater", theaterName);
             baseMap.SetStringValue("Map", "Size", $"0,0,{size.X},{size.Y}");
@@ -454,7 +455,8 @@ namespace TSMapEditor.Models
                 {
                     if (!IsCoordWithinMap(tile.CoordsToPoint()))
                     {
-                        Logger.Log("Dropping cell " + tile.CoordsToPoint() + " that would be outside of the allowed map area.");
+                        Logger.Log(
+                            $"Dropping cell {tile.CoordsToPoint()} that would be outside of the allowed map area.");
                         continue;
                     }
 
@@ -749,7 +751,7 @@ namespace TSMapEditor.Models
             var tile = GetTile(cellTag.Position);
             if (tile.CellTag != null)
             {
-                Logger.Log("Tile already has a celltag, skipping placing of celltag at " + cellTag.Position);
+                Logger.Log($"Tile already has a celltag, skipping placing of celltag at {cellTag.Position}");
                 return;
             }
 
@@ -841,7 +843,8 @@ namespace TSMapEditor.Models
         public void RegisterBaseNode(House house, BaseNode baseNode)
         {
             var buildingType = Rules.BuildingTypes.Find(bt => bt.ININame == baseNode.StructureTypeName) ??
-                throw new KeyNotFoundException("Building type not found while adding base node: " + baseNode.StructureTypeName);
+                throw new KeyNotFoundException(
+                    $"Building type not found while adding base node: {baseNode.StructureTypeName}");
 
             GraphicalBaseNodes.Add(new GraphicalBaseNode(baseNode, buildingType, house));
         }
@@ -1316,7 +1319,7 @@ namespace TSMapEditor.Models
 
             while (true)
             {
-                idString = "0" + id.ToString(CultureInfo.InvariantCulture);
+                idString = $"0{id.ToString(CultureInfo.InvariantCulture)}";
 
                 if (TaskForces.Exists(tf => tf.ININame == idString) || 
                     Scripts.Exists(s => s.ININame == idString) || 
@@ -1399,7 +1402,7 @@ namespace TSMapEditor.Models
                     Rules.InitArt(artFirestormIni, initializer);
             }
 
-            var editorRulesIni = new IniFile(Environment.CurrentDirectory + "/Config/EditorRules.ini");
+            var editorRulesIni = new IniFile($"{Environment.CurrentDirectory}/Config/EditorRules.ini");
             Rules.InitEditorOverrides(editorRulesIni);
 
             Rules.InitFromINI(editorRulesIni, initializer, false);
@@ -1407,7 +1410,8 @@ namespace TSMapEditor.Models
             InitStandardHouseTypesAndHouses(editorRulesIni, rulesIni, firestormIni);
 
             // Load impassable cell information for terrain types
-            var impassableTerrainObjectsIni = new IniFile(Environment.CurrentDirectory + "/Config/TerrainTypeImpassability.ini");
+            var impassableTerrainObjectsIni = new IniFile(
+                $"{Environment.CurrentDirectory}/Config/TerrainTypeImpassability.ini");
 
             Rules.TerrainTypes.ForEach(tt =>
             {
@@ -1535,8 +1539,8 @@ namespace TSMapEditor.Models
                     return;
 
                 // If it's not enabled by another trigger, add an issue
-                issueList.Add($"Trigger \"{trigger.Name}\" ({trigger.ID}) is disabled and never enabled by another trigger." + Environment.NewLine +
-                    "Did you forget to enable it? If the trigger exists for debugging purposes, add DEBUG or OBSOLETE to its name to skip this warning.");
+                issueList.Add(
+                    $"Trigger \"{trigger.Name}\" ({trigger.ID}) is disabled and never enabled by another trigger.{Environment.NewLine}Did you forget to enable it? If the trigger exists for debugging purposes, add DEBUG or OBSOLETE to its name to skip this warning.");
             });
 
             // Check for triggers that are enabled by other triggers, but never disabled - enabling them is
@@ -1555,8 +1559,8 @@ namespace TSMapEditor.Models
                     return;
 
                 // This trigger is never disabled, but it is enabled by at least 1 other trigger - add an issue
-                issueList.Add($"Trigger \"{trigger.Name}\" ({trigger.ID}) is enabled by another trigger, but it is never in a disabled state" + Environment.NewLine +
-                    "(it is neither disabled by default nor disabled by other triggers). Did you forget to disable it?");
+                issueList.Add(
+                    $"Trigger \"{trigger.Name}\" ({trigger.ID}) is enabled by another trigger, but it is never in a disabled state{Environment.NewLine}(it is neither disabled by default nor disabled by other triggers). Did you forget to disable it?");
             });
 
             // Check for triggers that enable themselves, there's no need to ever do this -> either redundant action or a scripting error
@@ -1596,8 +1600,8 @@ namespace TSMapEditor.Models
 
                 if (followedUnits.Contains(unit.FollowerUnit))
                 {
-                    issueList.Add($"Multiple units are configured to make unit {unit.FollowerUnit.UnitType.ININame} at {unit.FollowerUnit.Position} to follow them! " + Environment.NewLine +
-                        $"This can cause strange behaviour in the game. {unit.UnitType.ININame} at {unit.Position} is one of the followed units.");
+                    issueList.Add(
+                        $"Multiple units are configured to make unit {unit.FollowerUnit.UnitType.ININame} at {unit.FollowerUnit.Position} to follow them! {Environment.NewLine}This can cause strange behaviour in the game. {unit.UnitType.ININame} at {unit.Position} is one of the followed units.");
                 }
                 else
                 {

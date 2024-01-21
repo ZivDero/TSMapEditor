@@ -213,8 +213,7 @@ namespace TSMapEditor.UI.Windows
             {
                 var messageBox = EditorMessageBox.Show(WindowManager,
                     "Confirm",
-                    $"Are you sure you wish to delete '{editedTaskForce.Name}'?\r\n\r\n" +
-                    $"You'll need to manually fix any TeamTypes using the TaskForce.",
+                    $"Are you sure you wish to delete '{editedTaskForce.Name}'?\r\n\r\nYou'll need to manually fix any TeamTypes using the TaskForce.",
                     MessageBoxButtons.YesNo);
                 messageBox.YesClickedAction = _ => DeleteTaskForce();
             }
@@ -370,7 +369,8 @@ namespace TSMapEditor.UI.Windows
 
             foreach (GameObjectType objectType in gameObjectTypeList)
             {
-                lbUnitType.AddItem(new XNAListBoxItem() { Text = objectType.ININame + " (" + objectType.GetEditorDisplayName() + ")", Tag = objectType });
+                lbUnitType.AddItem(new XNAListBoxItem() { Text =
+                    $"{objectType.ININame} ({objectType.GetEditorDisplayName()})", Tag = objectType });
             }
         }
 

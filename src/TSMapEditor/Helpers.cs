@@ -29,7 +29,7 @@ namespace TSMapEditor
             int coords = Conversions.IntFromString(coordsString, -1);
             if (coords < 0 || coordsString.Length < 4)
             {
-                Logger.Log("CoordStringToPoint: invalid coord string " + coordsString);
+                Logger.Log($"CoordStringToPoint: invalid coord string {coordsString}");
                 return null;
             }
 
@@ -37,7 +37,7 @@ namespace TSMapEditor
             int x = Conversions.IntFromString(xCoordPart, -1);
             if (x < 0)
             {
-                Logger.Log("CoordStringToPoint: invalid X coord " + x);
+                Logger.Log($"CoordStringToPoint: invalid X coord {x}");
                 return null;
             }
 
@@ -45,7 +45,7 @@ namespace TSMapEditor
             int y = Conversions.IntFromString(yCoordPart, -1);
             if (y < 0)
             {
-                Logger.Log("CoordStringToPoint: invalid Y coord " + y);
+                Logger.Log($"CoordStringToPoint: invalid Y coord {y}");
                 return null;
             }
 
@@ -60,7 +60,7 @@ namespace TSMapEditor
 
         public static string LandTypeToString(int landType)
         {
-            return GetLandTypeName(landType) + " (0x" + landType.ToString("X") + ")";
+            return $"{GetLandTypeName(landType)} (0x{landType:X})";
         }
 
         private static string GetLandTypeName(int landType)
@@ -134,7 +134,8 @@ namespace TSMapEditor
 
             if (str.Length < 1 || str.Length > 2 ||
                 str[0] < 'A' || str[0] > 'Z' || (str.Length == 2 && (str[1] < 'A' || str[1] > 'Z')))
-                throw new InvalidOperationException("Waypoint values are only valid between A and ZZ. Invalid value: " + str);
+                throw new InvalidOperationException(
+                    $"Waypoint values are only valid between A and ZZ. Invalid value: {str}");
 
             if (str.Length == 1)
                 return str[0] - 'A';
@@ -261,7 +262,7 @@ namespace TSMapEditor
             string[] parts = str.Split(',');
 
             if (parts.Length < 3 || parts.Length > 4)
-                throw new ArgumentException("ColorFromString: parameter was not in a valid format: " + str);
+                throw new ArgumentException($"ColorFromString: parameter was not in a valid format: {str}");
 
             int r = Conversions.IntFromString(parts[0], 0);
             int g = Conversions.IntFromString(parts[1], 0);
@@ -276,12 +277,11 @@ namespace TSMapEditor
 
         public static string ColorToString(Color color, bool includeAlpha)
         {
-            string returnValue = color.R.ToString(CultureInfo.InvariantCulture) + "," + 
-                color.G.ToString(CultureInfo.InvariantCulture) + "," + 
-                color.B.ToString(CultureInfo.InvariantCulture);
+            string returnValue =
+                $"{color.R.ToString(CultureInfo.InvariantCulture)},{color.G.ToString(CultureInfo.InvariantCulture)},{color.B.ToString(CultureInfo.InvariantCulture)}";
 
             if (includeAlpha)
-                returnValue += "," + color.A.ToString(CultureInfo.InvariantCulture);
+                returnValue += $",{color.A.ToString(CultureInfo.InvariantCulture)}";
 
             return returnValue;
         }

@@ -16,12 +16,13 @@ namespace TSMapEditor.Mutations.Classes
         {
             if (point1.X != point2.X && point1.Y != point2.Y)
             {
-                throw new ArgumentException(nameof(PlaceBridgeMutation) + 
-                    ": either the X or Y coordinate must be identical between bridge start and end points.");
+                throw new ArgumentException(
+                    $"{nameof(PlaceBridgeMutation)}: either the X or Y coordinate must be identical between bridge start and end points.");
             }
 
             if (point1 == point2)
-                throw new ArgumentException(nameof(PlaceBridgeMutation) + ": bridge start and end points cannot point to the same cell.");
+                throw new ArgumentException(
+                    $"{nameof(PlaceBridgeMutation)}: bridge start and end points cannot point to the same cell.");
 
             if (point1.X == point2.X)
             {

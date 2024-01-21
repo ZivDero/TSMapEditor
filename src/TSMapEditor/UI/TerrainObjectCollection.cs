@@ -32,7 +32,7 @@ namespace TSMapEditor.UI
             int i = 0;
             while (true)
             {
-                string terrainTypeName = iniSection.GetStringValue("TerrainObjectType" + i, null);
+                string terrainTypeName = iniSection.GetStringValue($"TerrainObjectType{i}", null);
                 if (string.IsNullOrWhiteSpace(terrainTypeName))
                     break;
 

@@ -496,12 +496,8 @@ namespace TSMapEditor.Initialization
 
                 string attachedTag = GetAttachedTagName(aircraft);
 
-                string value = $"{aircraft.Owner.ININame},{aircraft.ObjectType.ININame},{aircraft.HP}," +
-                               $"{aircraft.Position.X},{aircraft.Position.Y},{aircraft.Facing}," +
-                               $"{aircraft.Mission},{attachedTag},{aircraft.Veterancy}," +
-                               $"{aircraft.Group}," + 
-                               $"{BoolToObjectStyle(aircraft.AutocreateNoRecruitable)}," +
-                               $"{BoolToObjectStyle(aircraft.AutocreateYesRecruitable)}";
+                string value =
+                    $"{aircraft.Owner.ININame},{aircraft.ObjectType.ININame},{aircraft.HP},{aircraft.Position.X},{aircraft.Position.Y},{aircraft.Facing},{aircraft.Mission},{attachedTag},{aircraft.Veterancy},{aircraft.Group},{BoolToObjectStyle(aircraft.AutocreateNoRecruitable)},{BoolToObjectStyle(aircraft.AutocreateYesRecruitable)}";
 
                 section.SetStringValue(i.ToString(), value);
             }
@@ -527,13 +523,8 @@ namespace TSMapEditor.Initialization
                 string attachedTag = GetAttachedTagName(unit);
                 string followsIndex = unit.FollowerUnit == null ? "-1" : map.Units.IndexOf(unit.FollowerUnit).ToString(CultureInfo.InvariantCulture);
 
-                string value = $"{unit.Owner.ININame},{unit.ObjectType.ININame},{unit.HP}," +
-                               $"{unit.Position.X},{unit.Position.Y},{unit.Facing}," +
-                               $"{unit.Mission},{attachedTag},{unit.Veterancy}," +
-                               $"{unit.Group},{BoolToObjectStyle(unit.High)}," +
-                               $"{followsIndex}," +
-                               $"{BoolToObjectStyle(unit.AutocreateNoRecruitable)}," +
-                               $"{BoolToObjectStyle(unit.AutocreateYesRecruitable)}";
+                string value =
+                    $"{unit.Owner.ININame},{unit.ObjectType.ININame},{unit.HP},{unit.Position.X},{unit.Position.Y},{unit.Facing},{unit.Mission},{attachedTag},{unit.Veterancy},{unit.Group},{BoolToObjectStyle(unit.High)},{followsIndex},{BoolToObjectStyle(unit.AutocreateNoRecruitable)},{BoolToObjectStyle(unit.AutocreateYesRecruitable)}";
 
                 section.SetStringValue(i.ToString(), value);
             }
@@ -558,12 +549,8 @@ namespace TSMapEditor.Initialization
 
                 string attachedTag = GetAttachedTagName(infantry);
 
-                string value = $"{infantry.Owner.ININame},{infantry.ObjectType.ININame},{infantry.HP}," +
-                               $"{infantry.Position.X},{infantry.Position.Y},{(int)infantry.SubCell}," +
-                               $"{infantry.Mission},{infantry.Facing},{attachedTag},{infantry.Veterancy}," +
-                               $"{infantry.Group},{BoolToObjectStyle(infantry.High)}," +
-                               $"{BoolToObjectStyle(infantry.AutocreateNoRecruitable)}," +
-                               $"{BoolToObjectStyle(infantry.AutocreateYesRecruitable)}";
+                string value =
+                    $"{infantry.Owner.ININame},{infantry.ObjectType.ININame},{infantry.HP},{infantry.Position.X},{infantry.Position.Y},{(int)infantry.SubCell},{infantry.Mission},{infantry.Facing},{attachedTag},{infantry.Veterancy},{infantry.Group},{BoolToObjectStyle(infantry.High)},{BoolToObjectStyle(infantry.AutocreateNoRecruitable)},{BoolToObjectStyle(infantry.AutocreateYesRecruitable)}";
 
                 section.SetStringValue(i.ToString(), value);
             }
@@ -599,17 +586,8 @@ namespace TSMapEditor.Initialization
                 string upgrade2 = UpgradeToString(structure.Upgrades[1]);
                 string upgrade3 = UpgradeToString(structure.Upgrades[2]);
 
-                string value = $"{structure.Owner.ININame},{structure.ObjectType.ININame},{structure.HP}," +
-                               $"{structure.Position.X},{structure.Position.Y}," +
-                               $"{structure.Facing},{attachedTag}," +
-                               $"{BoolToObjectStyle(structure.AISellable)}," +
-                               $"{BoolToObjectStyle(structure.AIRebuildable)}," +
-                               $"{BoolToObjectStyle(structure.Powered)}," +
-                               $"{structure.UpgradeCount}," +
-                               $"{(int)structure.Spotlight}," + 
-                               $"{upgrade1},{upgrade2},{upgrade3}," +
-                               $"{BoolToObjectStyle(structure.AIRepairable)}," +
-                               $"{BoolToObjectStyle(structure.Nominal)}";
+                string value =
+                    $"{structure.Owner.ININame},{structure.ObjectType.ININame},{structure.HP},{structure.Position.X},{structure.Position.Y},{structure.Facing},{attachedTag},{BoolToObjectStyle(structure.AISellable)},{BoolToObjectStyle(structure.AIRebuildable)},{BoolToObjectStyle(structure.Powered)},{structure.UpgradeCount},{(int)structure.Spotlight},{upgrade1},{upgrade2},{upgrade3},{BoolToObjectStyle(structure.AIRepairable)},{BoolToObjectStyle(structure.Nominal)}";
 
                 section.SetStringValue(i.ToString(), value);
             }

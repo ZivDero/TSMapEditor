@@ -352,7 +352,7 @@ namespace TSMapEditor.UI.Windows
             ddSide.AddItem("0 all sides");
             for (int i = 0; i < map.Rules.Sides.Count; i++)
             {
-                ddSide.AddItem((i + 1).ToString() + " " + map.Rules.Sides[i]);
+                ddSide.AddItem($"{(i + 1)} {map.Rules.Sides[i]}");
             }
 
             ddHouseType.AddItem("<all>");

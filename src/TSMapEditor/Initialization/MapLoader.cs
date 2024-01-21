@@ -52,14 +52,14 @@ namespace TSMapEditor.Initialization
 
             if (width > Constants.MaxMapWidth)
             {
-                throw new MapLoadException($"Map width cannot be greater than " +
-                    $"{Constants.MaxMapWidth} cells; the map is {width} cells wide!");
+                throw new MapLoadException(
+                    $"Map width cannot be greater than {Constants.MaxMapWidth} cells; the map is {width} cells wide!");
             }
 
             if (height > Constants.MaxMapHeight)
             {
-                throw new MapLoadException("Map height cannot be greater than " +
-                    $"{Constants.MaxMapHeight} cells; the map is {height} cells high!");
+                throw new MapLoadException(
+                    $"Map height cannot be greater than {Constants.MaxMapHeight} cells; the map is {height} cells high!");
             }
 
             Logger.Log("Pre-load map checkup complete.");
@@ -84,8 +84,8 @@ namespace TSMapEditor.Initialization
                 int maxSubTileIndex = tile.SubTileCount - 1;
                 if (t.SubTileIndex > maxSubTileIndex)
                 {
-                    AddMapLoadError($"Invalid sub-tile index {t.SubTileIndex} for cell at {t.CoordsToPoint()} (max: {maxSubTileIndex}) - setting it to 0. " +
-                        $"TileSet: {tileSet.SetName} ({tileSet.FileName}), index of tile within its set: {tile.TileIndexInTileSet}");
+                    AddMapLoadError(
+                        $"Invalid sub-tile index {t.SubTileIndex} for cell at {t.CoordsToPoint()} (max: {maxSubTileIndex}) - setting it to 0. TileSet: {tileSet.SetName} ({tileSet.FileName}), index of tile within its set: {tile.TileIndexInTileSet}");
 
                     t.SubTileIndex = 0;
 
@@ -100,8 +100,8 @@ namespace TSMapEditor.Initialization
 
                 if (tile.GetSubTile(t.SubTileIndex).TmpImage == null)
                 {
-                    AddMapLoadError($"Null sub-tile {t.SubTileIndex} for cell at {t.CoordsToPoint()} - clearing the tile. " +
-                        $"TileSet: {tileSet.SetName} ({tileSet.FileName}), index of tile within its set: {tile.TileIndexInTileSet}");
+                    AddMapLoadError(
+                        $"Null sub-tile {t.SubTileIndex} for cell at {t.CoordsToPoint()} - clearing the tile. TileSet: {tileSet.SetName} ({tileSet.FileName}), index of tile within its set: {tile.TileIndexInTileSet}");
 
                     t.ChangeTileIndex(0, 0);
                 }
@@ -168,7 +168,7 @@ namespace TSMapEditor.Initialization
             if (compressedData.Length < 4)
                 throw new InvalidOperationException("Invalid IsoMapPack5 format");
 
-            Logger.Log("IsoMapPack5 CompressedData length: " + compressedData.Length);
+            Logger.Log($"IsoMapPack5 CompressedData length: {compressedData.Length}");
 
             List<byte> uncompressedData = new List<byte>();
 
@@ -179,7 +179,7 @@ namespace TSMapEditor.Initialization
                 ushort inputSize = BitConverter.ToUInt16(compressedData, position);
                 ushort outputSize = BitConverter.ToUInt16(compressedData, position + 2);
 
-                Logger.Log("Decoding IsoMapPack5 block: pos: " + position + ", inSize: " + inputSize + ", outSize: " + outputSize);
+                Logger.Log($"Decoding IsoMapPack5 block: pos: {position}, inSize: {inputSize}, outSize: {outputSize}");
 
                 if (position + inputSize + 4 > compressedData.Length)
                     throw new InvalidOperationException("Error decoding IsoMapPack5");
@@ -346,14 +346,15 @@ namespace TSMapEditor.Initialization
                             var upgradeBuildingType = map.Rules.BuildingTypes.Find(b => b.ININame == upgradeIds[i]);
                             if (upgradeBuildingType == null)
                             {
-                                AddMapLoadError($"Invalid building upgrade specified for building {buildingTypeId}: " + upgradeIds[i]);
+                                AddMapLoadError(
+                                    $"Invalid building upgrade specified for building {buildingTypeId}: {upgradeIds[i]}");
                                 continue;
                             }
 
                             if (string.IsNullOrWhiteSpace(upgradeBuildingType.PowersUpBuilding) || !upgradeBuildingType.PowersUpBuilding.Equals(buildingType.ININame, StringComparison.OrdinalIgnoreCase))
                             {
-                                AddMapLoadError($"Building {buildingTypeId} has an upgrade {upgradeBuildingType.ININame}, but \r\n{upgradeBuildingType.ININame} " +
-                                    $"does not specify {buildingTypeId} in its PowersUpBuilding= key. Skipping adding upgrade to map.");
+                                AddMapLoadError(
+                                    $"Building {buildingTypeId} has an upgrade {upgradeBuildingType.ININame}, but \r\n{upgradeBuildingType.ININame} does not specify {buildingTypeId} in its PowersUpBuilding= key. Skipping adding upgrade to map.");
                                 continue;
                             }
 
@@ -685,7 +686,8 @@ namespace TSMapEditor.Initialization
 
                     if (overlayTypeIndex >= map.Rules.OverlayTypes.Count)
                     {
-                        AddMapLoadError("Ignoring overlay on tile at " + x + ", " + y + " because it's out of bounds compared to Rules.ini overlay list");
+                        AddMapLoadError(
+                            $"Ignoring overlay on tile at {x}, {y} because it's out of bounds compared to Rules.ini overlay list");
                         continue;
                     }
 
@@ -828,7 +830,7 @@ namespace TSMapEditor.Initialization
                 Trigger trigger = map.Triggers.Find(t => t.ID == triggerId);
                 if (trigger == null)
                 {
-                    AddMapLoadError("Ignoring tag " + kvp.Key + " because its related trigger " + triggerId + " does not exist!");
+                    AddMapLoadError($"Ignoring tag {kvp.Key} because its related trigger {triggerId} does not exist!");
                     continue;
                 }
 
@@ -1006,7 +1008,7 @@ namespace TSMapEditor.Initialization
 
         public static void ReadHouseTypes(IMap map, IniFile mapIni)
         {
-            Logger.Log("Reading HouseTypes. Using countries: " + Constants.UseCountries);
+            Logger.Log($"Reading HouseTypes. Using countries: {Constants.UseCountries}");
 
             var section = mapIni.GetSection(Constants.UseCountries ? "Countries" : "Houses");
             if (section == null)
@@ -1107,7 +1109,7 @@ namespace TSMapEditor.Initialization
                         houseType = map.FindHouseType(house.Country);
 
                     if (houseType == null)
-                        AddMapLoadError("Nonexistent Country= or no Country= specified for House " + houseName);
+                        AddMapLoadError($"Nonexistent Country= or no Country= specified for House {houseName}");
                 }
                 else
                 {
@@ -1223,7 +1225,7 @@ namespace TSMapEditor.Initialization
 
                 if (enterX < 1 || enterY < 1 || exitX < 1 || exitY < 1 || (int)initialFacing < -1 || initialFacing > TubeDirection.Max)
                 {
-                    AddMapLoadError("Invalid tube entry: " + kvp.Value);
+                    AddMapLoadError($"Invalid tube entry: {kvp.Value}");
                     continue;
                 }
 

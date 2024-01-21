@@ -354,7 +354,7 @@ namespace TSMapEditor.UI
                 string issuesString = string.Join(newline + newline, issues);
 
                 EditorMessageBox.Show(WindowManager, "Issues Found",
-                    "The map has been saved, but one or more issues have been found in the map. Please consider resolving them." + newline + newline + issuesString,
+                    $"The map has been saved, but one or more issues have been found in the map. Please consider resolving them.{newline}{newline}{issuesString}",
                     MessageBoxButtons.OK);
             }
         }
@@ -661,9 +661,8 @@ namespace TSMapEditor.UI
             {
                 if (mapFileWatcher.HandleModifyEvent())
                 {
-                    notificationManager.AddNotification("The map file has been modified outside of the editor. The map's INI data has been reloaded." + Environment.NewLine + Environment.NewLine +
-                        "If you made edits to visible map data (terrain, objects, overlay etc.) outside of the editor, you can" + Environment.NewLine +
-                        "re-load the map to apply the effects. If you only made changes to other INI data, you can ignore this message.");
+                    notificationManager.AddNotification(
+                        $"The map file has been modified outside of the editor. The map's INI data has been reloaded.{Environment.NewLine}{Environment.NewLine}If you made edits to visible map data (terrain, objects, overlay etc.) outside of the editor, you can{Environment.NewLine}re-load the map to apply the effects. If you only made changes to other INI data, you can ignore this message.");
                 }
             }
         }

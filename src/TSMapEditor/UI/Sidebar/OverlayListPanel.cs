@@ -259,7 +259,7 @@ namespace TSMapEditor.UI.Sidebar
 
                 category.Nodes.Add(new TreeViewNode()
                 {
-                    Text = overlayType.Name + " (" + overlayType.ININame + ")",
+                    Text = $"{overlayType.Name} ({overlayType.ININame})",
                     Texture = texture,
                     Tag = overlayType
                 });

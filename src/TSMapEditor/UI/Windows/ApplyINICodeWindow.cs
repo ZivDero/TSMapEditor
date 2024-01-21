@@ -83,12 +83,13 @@ namespace TSMapEditor.UI.Windows
         {
             lbINIFiles.Clear();
 
-            string directoryPath = Environment.CurrentDirectory + "/Config/MapCode";
+            string directoryPath = $"{Environment.CurrentDirectory}/Config/MapCode";
 
             if (!Directory.Exists(directoryPath))
             {
                 Logger.Log("Map INI code directory not found!");
-                EditorMessageBox.Show(WindowManager, "Error", "Map INI code directory not found!\r\n\r\nExpected path: " + directoryPath, MessageBoxButtons.OK);
+                EditorMessageBox.Show(WindowManager, "Error",
+                    $"Map INI code directory not found!\r\n\r\nExpected path: {directoryPath}", MessageBoxButtons.OK);
                 return;
             }
 

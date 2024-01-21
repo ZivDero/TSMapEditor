@@ -32,7 +32,7 @@ namespace TSMapEditor.UI.Controls
         {
             T child = FindChild<T>(Children, childName);
             if (child == null && !optional)
-                throw new KeyNotFoundException("Could not find required child control: " + childName);
+                throw new KeyNotFoundException($"Could not find required child control: {childName}");
 
             return child;
         }
@@ -58,10 +58,11 @@ namespace TSMapEditor.UI.Controls
                 throw new InvalidOperationException("INItializableWindow cannot be initialized twice.");
 
             var dsc = Path.DirectorySeparatorChar;
-            string configIniPath = Path.Combine(Environment.CurrentDirectory, "Config", "UI", SubDirectory, Name + ".ini");
+            string configIniPath = Path.Combine(Environment.CurrentDirectory, "Config", "UI", SubDirectory,
+                $"{Name}.ini");
             
             if (!File.Exists(configIniPath))
-                throw new FileNotFoundException("Config INI not found: " + configIniPath);
+                throw new FileNotFoundException($"Config INI not found: {configIniPath}");
 
             ConfigIni = new IniFile(configIniPath);
 
@@ -107,7 +108,7 @@ namespace TSMapEditor.UI.Controls
                 {
                     var child = CreateChildControl(control, kvp.Value);
                     if (!ReadINIForControl(child))
-                        throw new INIConfigException("No section exists for child control " + kvp.Value);
+                        throw new INIConfigException($"No section exists for child control {kvp.Value}");
 
                     child.Initialize();
                 }
@@ -136,7 +137,7 @@ namespace TSMapEditor.UI.Controls
                 {
                     string[] parts = kvp.Value.Split(',');
                     if (parts.Length != 2)
-                        throw new FormatException("Invalid format for AnchorPoint: " + kvp.Value);
+                        throw new FormatException($"Invalid format for AnchorPoint: {kvp.Value}");
                     ((XNALabel)control).AnchorPoint = new Vector2(Parser.Instance.GetExprValue(parts[0], control), Parser.Instance.GetExprValue(parts[1], control));
                 }
                 else if (kvp.Key == "$MaxValue" && control is XNATrackbar)
@@ -232,14 +233,14 @@ namespace TSMapEditor.UI.Controls
             string[] parts = keyValue.Split(new char[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
 
             if (parts.Length != 2)
-                throw new INIConfigException("Invalid child control definition " + keyValue);
+                throw new INIConfigException($"Invalid child control definition {keyValue}");
 
             if (string.IsNullOrEmpty(parts[0]))
-                throw new INIConfigException("Empty name in child control definition for " + parent.Name);
+                throw new INIConfigException($"Empty name in child control definition for {parent.Name}");
 
             if (FindChild<XNAControl>(parts[0], true) != null)
             {
-                throw new INIConfigException("A control named " + parts[0] + " has been defined more than once.");
+                throw new INIConfigException($"A control named {parts[0]} has been defined more than once.");
             }
 
             var childControl = EditorGUICreator.Instance.CreateControl(WindowManager, parts[1]);

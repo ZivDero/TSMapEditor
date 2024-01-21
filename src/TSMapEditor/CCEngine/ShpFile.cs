@@ -29,7 +29,7 @@ namespace TSMapEditor.CCEngine
         public ShpFileHeader(byte[] buffer)
         {
             if (buffer.Length < SizeOf)
-                throw new ShpLoadException(nameof(ShpFileHeader) + ": buffer is not long enough");
+                throw new ShpLoadException($"{nameof(ShpFileHeader)}: buffer is not long enough");
 
             Unknown = BitConverter.ToUInt16(buffer, 0);
             if (Unknown != 0)
@@ -56,7 +56,7 @@ namespace TSMapEditor.CCEngine
         public ShpFrameInfo(Stream stream)
         {
             if (stream.Length < stream.Position + SizeOf)
-                throw new ShpLoadException(nameof(ShpFrameInfo) + ": buffer is not long enough");
+                throw new ShpLoadException($"{nameof(ShpFrameInfo)}: buffer is not long enough");
 
             XOffset = ReadUShortFromStream(stream);
             YOffset = ReadUShortFromStream(stream);
@@ -158,7 +158,8 @@ namespace TSMapEditor.CCEngine
             }
             catch (ShpLoadException ex)
             {
-                throw new ShpLoadException("Failed to load SHP file. Make sure that the file is not corrupted. Filename: " + fileName + ", original exception: " + ex.Message);
+                throw new ShpLoadException(
+                    $"Failed to load SHP file. Make sure that the file is not corrupted. Filename: {fileName}, original exception: {ex.Message}");
             }
         }
 
@@ -204,8 +205,8 @@ namespace TSMapEditor.CCEngine
 
                 if (lineDataStartOffset + lineDataLength > fileData.Length || lineDataLength < 2)
                 {
-                    throw new ShpLoadException($"Line data length out-of-bounds in SHP RLE-Zero frame. " +
-                        $"File name: {fileName}, frame index: {frameIndex}, line data length: {lineDataLength}");
+                    throw new ShpLoadException(
+                        $"Line data length out-of-bounds in SHP RLE-Zero frame. File name: {fileName}, frame index: {frameIndex}, line data length: {lineDataLength}");
                 }
 
                 // Line length includes the two-byte line data length value, skip it
@@ -224,8 +225,8 @@ namespace TSMapEditor.CCEngine
                         // If we are at the end of a line when we encounter a zero, something is wrong.
                         if (currentByteIndex == lineDataLength - 1)
                         {
-                            throw new ShpLoadException($"Zero-byte encountered at end of line data in SHP RLE-Zero frame. " +
-                                $"File name: {fileName}, line index: {lineIndex}, file offset: {lineDataStartOffset + currentByteIndex}");
+                            throw new ShpLoadException(
+                                $"Zero-byte encountered at end of line data in SHP RLE-Zero frame. File name: {fileName}, line index: {lineIndex}, file offset: {lineDataStartOffset + currentByteIndex}");
                         }
 
                         // A zero value means transparent pixels. The following byte
@@ -235,8 +236,8 @@ namespace TSMapEditor.CCEngine
                         // -1 prevents us from counting the current pixel "twice"
                         if (pixelPositionOnLine + transparentPixelCount - 1 > frameInfo.Width)
                         {
-                            throw new ShpLoadException($"Out-of-bounds pixel position on transparent data in SHP RLE-Zero frame. " +
-                                $"File name: {fileName}, frame index: {frameIndex}, line index: {lineIndex}, file offset: {lineDataStartOffset + currentByteIndex}");
+                            throw new ShpLoadException(
+                                $"Out-of-bounds pixel position on transparent data in SHP RLE-Zero frame. File name: {fileName}, frame index: {frameIndex}, line index: {lineIndex}, file offset: {lineDataStartOffset + currentByteIndex}");
                         }
 
                         // Assign transparent pixel data
@@ -254,8 +255,8 @@ namespace TSMapEditor.CCEngine
                     {
                         if (pixelPositionOnLine >= frameInfo.Width)
                         {
-                            throw new ShpLoadException($"Out-of-bounds pixel position on color data in SHP RLE-Zero frame. " +
-                                $"File name: {fileName}, frame index: {frameIndex}, line index: {lineIndex}, file offset: {lineDataStartOffset + currentByteIndex}");
+                            throw new ShpLoadException(
+                                $"Out-of-bounds pixel position on color data in SHP RLE-Zero frame. File name: {fileName}, frame index: {frameIndex}, line index: {lineIndex}, file offset: {lineDataStartOffset + currentByteIndex}");
                         }
 
                         // A non-zero value is color data that should be just applied directly.

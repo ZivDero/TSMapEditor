@@ -25,7 +25,8 @@ namespace TSMapEditor.Scripts
             }
             catch (Exception ex) // rare case where catching Exception is OK, we cannot know what the script can throw
             {
-                return "An error occurred while running the script. Returned error message: " + Environment.NewLine + Environment.NewLine + ex.Message;
+                return
+                    $"An error occurred while running the script. Returned error message: {Environment.NewLine}{Environment.NewLine}{ex.Message}";
             }
         }
 

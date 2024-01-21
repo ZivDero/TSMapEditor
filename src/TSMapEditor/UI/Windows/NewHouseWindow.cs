@@ -64,7 +64,7 @@ namespace TSMapEditor.UI.Windows
             if (houseName.EndsWith("House"))
                 houseTypeName = houseName.Replace("House", "Country");
             else
-                houseTypeName = houseName + "Country";
+                houseTypeName = $"{houseName}Country";
 
             var newHouseType = new HouseType(houseTypeName)
             {
@@ -119,7 +119,7 @@ namespace TSMapEditor.UI.Windows
         public void Open()
         {
             if (!Constants.UseCountries)
-                throw new NotSupportedException(nameof(NewHouseWindow) + " should only be used with Countries.");
+                throw new NotSupportedException($"{nameof(NewHouseWindow)} should only be used with Countries.");
 
             Show();
             ListParentCountries();

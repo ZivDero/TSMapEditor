@@ -44,14 +44,14 @@ namespace TSMapEditor.GameMath
 
         public override string ToString()
         {
-            return X + ", " + Y;
+            return $"{X}, {Y}";
         }
 
         public static Point2D FromString(string str)
         {
             string[] pointData = str.Split(',');
             if (pointData.Length != 2)
-                throw new ArgumentException("Point2D.FromString: Invalid source string " + str);
+                throw new ArgumentException($"Point2D.FromString: Invalid source string {str}");
 
             int x = Conversions.IntFromString(pointData[0].Trim(), -1);
             int y = Conversions.IntFromString(pointData[1].Trim(), -1);

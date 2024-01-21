@@ -73,14 +73,14 @@ namespace TSMapEditor.UI
 
         public string GetDataString()
         {
-            return Key.ToString() + ":" + ((int)Modifiers).ToString();
+            return $"{Key}:{((int)Modifiers)}";
         }
 
         public void ApplyDataString(string str)
         {
             string[] parts = str.Split(':');
             if (parts.Length != 2)
-                throw new ArgumentException("Incorrect KeyboardCommandInput data format: " + str);
+                throw new ArgumentException($"Incorrect KeyboardCommandInput data format: {str}");
 
             Key = (Keys)Enum.Parse(typeof(Keys), parts[0]);
             Modifiers = (KeyboardModifiers)Conversions.IntFromString(parts[1], 0);

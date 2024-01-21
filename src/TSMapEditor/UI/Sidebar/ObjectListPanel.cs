@@ -227,7 +227,7 @@ namespace TSMapEditor.UI.Sidebar
 
                     category.Nodes.Add(new TreeViewNode()
                     {
-                        Text = objectType.GetEditorDisplayName() + " (" + objectType.ININame + ")",
+                        Text = $"{objectType.GetEditorDisplayName()} ({objectType.ININame})",
                         Texture = texture,
                         RemapTexture = remapTexture,
                         RemapColor = remapColors[categoryIndex],

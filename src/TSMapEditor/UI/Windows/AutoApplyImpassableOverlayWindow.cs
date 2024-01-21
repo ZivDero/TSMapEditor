@@ -48,7 +48,8 @@ namespace TSMapEditor.UI.Windows
             
             if (impassableOverlayType == null)
             {
-                Logger.Log(nameof(AutoApplyImpassableOverlayWindow) + ": Invalid impassable overlay type " + overlayTypeName);
+                Logger.Log(
+                    $"{nameof(AutoApplyImpassableOverlayWindow)}: Invalid impassable overlay type {overlayTypeName}");
             }
 
             chkRemoveExistingImpassableOverlay = FindChild<XNACheckBox>(nameof(chkRemoveExistingImpassableOverlay));
@@ -66,8 +67,7 @@ namespace TSMapEditor.UI.Windows
             if (impassableOverlayType == null)
             {
                 EditorMessageBox.Show(WindowManager, "Cannot apply impassable overlay",
-                    "The editor has not been configured properly for applying impassable overlay.\r\n\r\n" +
-                    "Expected overlay type not found, name: " + overlayTypeName, MessageBoxButtons.OK);
+                    $"The editor has not been configured properly for applying impassable overlay.\r\n\r\nExpected overlay type not found, name: {overlayTypeName}", MessageBoxButtons.OK);
 
                 return;
             }

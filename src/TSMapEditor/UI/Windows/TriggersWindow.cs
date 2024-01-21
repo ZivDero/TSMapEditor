@@ -344,9 +344,7 @@ namespace TSMapEditor.UI.Windows
             if (tag == null)
             {
                 EditorMessageBox.Show(WindowManager, "No tag found",
-                    $"The selected trigger '{editedTrigger.Name}' has no" +
-                    $"associated tag. As such, it cannot be attached to any objects." + Environment.NewLine + Environment.NewLine +
-                    "This should never happen, have you modified the map with another editor?",
+                    $"The selected trigger '{editedTrigger.Name}' has noassociated tag. As such, it cannot be attached to any objects.{Environment.NewLine}{Environment.NewLine}This should never happen, have you modified the map with another editor?",
                     MessageBoxButtons.OK);
 
                 return;
@@ -366,9 +364,8 @@ namespace TSMapEditor.UI.Windows
             var tag = map.Tags.Find(t => t.Trigger == editedTrigger);
             if (tag == null)
             {
-                EditorMessageBox.Show(WindowManager, "No tag found", 
-                    $"The selected trigger '{editedTrigger.Name}' has no" +
-                    $"associated tag. As such, it is not attached to any objects.",
+                EditorMessageBox.Show(WindowManager, "No tag found",
+                    $"The selected trigger '{editedTrigger.Name}' has noassociated tag. As such, it is not attached to any objects.",
                     MessageBoxButtons.OK);
 
                 return;
@@ -412,7 +409,8 @@ namespace TSMapEditor.UI.Windows
             if (celltag != null)
             {
                 stringBuilder.Append(Environment.NewLine);
-                stringBuilder.Append("The trigger is linked to one or more celltags (first match at " + celltag.Position + ").");
+                stringBuilder.Append(
+                    $"The trigger is linked to one or more celltags (first match at {celltag.Position}).");
             }
 
             // Check other triggers to see whether this trigger is referenced to by them
@@ -441,7 +439,8 @@ namespace TSMapEditor.UI.Windows
             {
                 stringBuilder.Append(Environment.NewLine);
                 stringBuilder.Append("The trigger is referenced to by the following other triggers:");
-                allReferringTriggers.ForEach(trig => stringBuilder.Append(Environment.NewLine + $"    - {trig.Name} ({trig.ID})"));
+                allReferringTriggers.ForEach(trig => stringBuilder.Append(
+                    $"{Environment.NewLine}    - {trig.Name} ({trig.ID})"));
             }
 
             if (stringBuilder.Length == 0)
@@ -481,11 +480,7 @@ namespace TSMapEditor.UI.Windows
         private void RegenerateIDs()
         {
             var messageBox = EditorMessageBox.Show(WindowManager, "Are you sure?",
-                "This will re-generate the internal IDs (01000000, 01000001 etc.) for ALL* of your map's script elements" + Environment.NewLine +
-                "that start their ID with 0100 (all editor-generated script elements do)." + Environment.NewLine + Environment.NewLine +
-                "It might make the list more sensible in case there are deleted triggers. However, this feature is" + Environment.NewLine +
-                "experimental and if it goes wrong, it can destroy all of your scripting. Do you want to continue?" + Environment.NewLine + Environment.NewLine +
-                "* AITriggers are not yet handled by the editor, so you might need to update them manually afterwards.",
+                $"This will re-generate the internal IDs (01000000, 01000001 etc.) for ALL* of your map's script elements{Environment.NewLine}that start their ID with 0100 (all editor-generated script elements do).{Environment.NewLine}{Environment.NewLine}It might make the list more sensible in case there are deleted triggers. However, this feature is{Environment.NewLine}experimental and if it goes wrong, it can destroy all of your scripting. Do you want to continue?{Environment.NewLine}{Environment.NewLine}* AITriggers are not yet handled by the editor, so you might need to update them manually afterwards.",
                 MessageBoxButtons.YesNo);
 
             messageBox.YesClickedAction = _ => map.RegenerateInternalIds();
@@ -499,12 +494,7 @@ namespace TSMapEditor.UI.Windows
 
             var messageBox = EditorMessageBox.Show(WindowManager,
                 "Are you sure?",
-                "Cloning this trigger for easier difficulties will create duplicate instances" + Environment.NewLine +
-                "of this trigger for Medium and Easy difficulties, replacing Hard-mode globals" + Environment.NewLine +
-                "with respective globals of easier difficulties." + Environment.NewLine + Environment.NewLine +
-                "In case the trigger references TeamTypes, duplicates of the TeamTypes" + Environment.NewLine +
-                "and their TaskForces are also created for the easier-difficulty triggers." + Environment.NewLine + Environment.NewLine +
-                "No un-do is available. Do you want to continue?", MessageBoxButtons.YesNo);
+                $"Cloning this trigger for easier difficulties will create duplicate instances{Environment.NewLine}of this trigger for Medium and Easy difficulties, replacing Hard-mode globals{Environment.NewLine}with respective globals of easier difficulties.{Environment.NewLine}{Environment.NewLine}In case the trigger references TeamTypes, duplicates of the TeamTypes{Environment.NewLine}and their TaskForces are also created for the easier-difficulty triggers.{Environment.NewLine}{Environment.NewLine}No un-do is available. Do you want to continue?", MessageBoxButtons.YesNo);
 
             messageBox.YesClickedAction = _ => DoCloneForEasierDifficulties();
         }
@@ -518,7 +508,7 @@ namespace TSMapEditor.UI.Windows
             map.Tags.Add(new Tag()
             {
                 ID = map.GetNewUniqueInternalId(),
-                Name = mediumDifficultyTrigger.Name + " (tag)",
+                Name = $"{mediumDifficultyTrigger.Name} (tag)",
                 Trigger = mediumDifficultyTrigger,
                 Repeating = originalTag == null ? 0 : originalTag.Repeating
             });
@@ -528,22 +518,22 @@ namespace TSMapEditor.UI.Windows
             map.Tags.Add(new Tag()
             {
                 ID = map.GetNewUniqueInternalId(),
-                Name = easyDifficultyTrigger.Name + " (tag)",
+                Name = $"{easyDifficultyTrigger.Name} (tag)",
                 Trigger = easyDifficultyTrigger,
                 Repeating = originalTag == null ? 0 : originalTag.Repeating
             });
 
             mediumDifficultyTrigger.Name = editedTrigger.Name.Replace("Hard", "Medium");
             if (editedTrigger.Name.StartsWith("H "))
-                mediumDifficultyTrigger.Name = "M " + editedTrigger.Name[2..];
+                mediumDifficultyTrigger.Name = $"M {editedTrigger.Name[2..]}";
             else if (editedTrigger.Name.EndsWith(" H"))
-                mediumDifficultyTrigger.Name = editedTrigger.Name[..^2] + " M";
+                mediumDifficultyTrigger.Name = $"{editedTrigger.Name[..^2]} M";
 
             easyDifficultyTrigger.Name = editedTrigger.Name.Replace("Hard", "Easy");
             if (editedTrigger.Name.StartsWith("H "))
-                easyDifficultyTrigger.Name = "E " + editedTrigger.Name[2..];
+                easyDifficultyTrigger.Name = $"E {editedTrigger.Name[2..]}";
             else if (editedTrigger.Name.EndsWith(" H"))
-                easyDifficultyTrigger.Name = editedTrigger.Name[..^2] + " E";
+                easyDifficultyTrigger.Name = $"{editedTrigger.Name[..^2]} E";
 
             int mediumDiffGlobalVariableIndex = map.Rules.GlobalVariables.FindIndex(gv => gv.Name == "Difficulty Medium");
             int easyDiffGlobalVariableIndex = map.Rules.GlobalVariables.FindIndex(gv => gv.Name == "Difficulty Easy");
@@ -707,7 +697,8 @@ namespace TSMapEditor.UI.Windows
                 case TriggerParamType.GlobalVariable:
                     ctxEventParameterPresetValues.ClearItems();
                     ctxEventParameterPresetValues.Width = 250;
-                    map.Rules.GlobalVariables.ForEach(globalVariable => ctxEventParameterPresetValues.AddItem(globalVariable.Index.ToString(CultureInfo.InvariantCulture) + " " + globalVariable.Name));
+                    map.Rules.GlobalVariables.ForEach(globalVariable => ctxEventParameterPresetValues.AddItem(
+                        $"{globalVariable.Index.ToString(CultureInfo.InvariantCulture)} {globalVariable.Name}"));
                     ctxEventParameterPresetValues.Open(GetCursorPoint());
 
                     // GlobalVariable existingGlobalVariable = map.Rules.GlobalVariables.Find(gv => gv.Index == Conversions.IntFromString(triggerEvent.Parameters[paramIndex], -1));
@@ -717,7 +708,8 @@ namespace TSMapEditor.UI.Windows
                 case TriggerParamType.LocalVariable:
                     ctxEventParameterPresetValues.ClearItems();
                     ctxEventParameterPresetValues.Width = 250;
-                    map.LocalVariables.ForEach(localVariable => ctxEventParameterPresetValues.AddItem(localVariable.Index.ToString(CultureInfo.InvariantCulture) + " " + localVariable.Name));
+                    map.LocalVariables.ForEach(localVariable => ctxEventParameterPresetValues.AddItem(
+                        $"{localVariable.Index.ToString(CultureInfo.InvariantCulture)} {localVariable.Name}"));
                     ctxEventParameterPresetValues.Open(GetCursorPoint());
 
                     // LocalVariable existingLocalVariable = map.LocalVariables.Find(lv => lv.Index == Conversions.IntFromString(triggerEvent.Parameters[paramIndex], -1));
@@ -811,7 +803,8 @@ namespace TSMapEditor.UI.Windows
                 case TriggerParamType.GlobalVariable:
                     ctxActionParameterPresetValues.ClearItems();
                     ctxActionParameterPresetValues.Width = 250;
-                    map.Rules.GlobalVariables.ForEach(globalVariable => ctxActionParameterPresetValues.AddItem(globalVariable.Index.ToString(CultureInfo.InvariantCulture) + " " + globalVariable.Name));
+                    map.Rules.GlobalVariables.ForEach(globalVariable => ctxActionParameterPresetValues.AddItem(
+                        $"{globalVariable.Index.ToString(CultureInfo.InvariantCulture)} {globalVariable.Name}"));
                     ctxActionParameterPresetValues.Open(GetCursorPoint());
 
                     // GlobalVariable existingGlobalVariable = map.Rules.GlobalVariables.Find(gv => gv.Index == Conversions.IntFromString(triggerAction.Parameters[paramIndex], -1));
@@ -821,7 +814,8 @@ namespace TSMapEditor.UI.Windows
                 case TriggerParamType.LocalVariable:
                     ctxActionParameterPresetValues.ClearItems();
                     ctxActionParameterPresetValues.Width = 250;
-                    map.LocalVariables.ForEach(localVariable => ctxActionParameterPresetValues.AddItem(localVariable.Index.ToString(CultureInfo.InvariantCulture) + " " + localVariable.Name));
+                    map.LocalVariables.ForEach(localVariable => ctxActionParameterPresetValues.AddItem(
+                        $"{localVariable.Index.ToString(CultureInfo.InvariantCulture)} {localVariable.Name}"));
                     ctxActionParameterPresetValues.Open(GetCursorPoint());
 
                     // LocalVariable existingLocalVariable = map.LocalVariables.Find(lv => lv.Index == Conversions.IntFromString(triggerAction.Parameters[paramIndex], -1));
@@ -1054,7 +1048,7 @@ namespace TSMapEditor.UI.Windows
 
             var clone = editedTrigger.Clone(map.GetNewUniqueInternalId());
             map.Triggers.Add(clone);
-            map.Tags.Add(new Tag() { ID = map.GetNewUniqueInternalId(), Name = clone.Name + " (tag)", Trigger = clone, Repeating = originalTag == null ? 0 : originalTag.Repeating });
+            map.Tags.Add(new Tag() { ID = map.GetNewUniqueInternalId(), Name = $"{clone.Name} (tag)", Trigger = clone, Repeating = originalTag == null ? 0 : originalTag.Repeating });
             ListTriggers();
             SelectTrigger(clone);
         }
@@ -1072,8 +1066,7 @@ namespace TSMapEditor.UI.Windows
             {
                 var msgBox = EditorMessageBox.Show(WindowManager,
                     "Are you sure?",
-                    "Do you really want to delete trigger \"" + editedTrigger.Name + "\"?" + Environment.NewLine + Environment.NewLine +
-                    "(You can hold Shift to skip this confirmation dialog.)", MessageBoxButtons.YesNo);
+                    $"Do you really want to delete trigger \"{editedTrigger.Name}\"?{Environment.NewLine}{Environment.NewLine}(You can hold Shift to skip this confirmation dialog.)", MessageBoxButtons.YesNo);
 
                 msgBox.YesClickedAction = _ => DeleteTrigger();
             }
@@ -1411,7 +1404,7 @@ namespace TSMapEditor.UI.Windows
         {
             var tag = map.Tags.Find(t => t.Trigger == editedTrigger);
             if (tag != null)
-                tag.Name = tbName.Text + " (tag)";
+                tag.Name = $"{tbName.Text} (tag)";
 
             editedTrigger.Name = tbName.Text;
             lbTriggers.SelectedItem.Text = tbName.Text;
@@ -1433,7 +1426,8 @@ namespace TSMapEditor.UI.Windows
             var triggerAction = (TriggerAction)lbActions.SelectedItem.Tag;
             TriggerActionType triggerActionType = map.EditorConfig.TriggerActionTypes.GetValueOrDefault(triggerAction.ActionIndex);
 
-            selActionType.Text = triggerAction.ActionIndex + " " + (triggerActionType == null ? "Unknown" : triggerActionType.Name);
+            selActionType.Text =
+                $"{triggerAction.ActionIndex} {(triggerActionType == null ? "Unknown" : triggerActionType.Name)}";
             panelActionDescription.Text = triggerActionType == null ? "Unknown action. It has most likely been added with another editor." : triggerActionType.Description;
 
             lbActionParameters.Clear();
@@ -1535,11 +1529,11 @@ namespace TSMapEditor.UI.Windows
 
             if (triggerActionType == null)
             {
-                lbActions.AddItem(new XNAListBoxItem() { Text = action.ActionIndex + " Unknown", Tag = action });
+                lbActions.AddItem(new XNAListBoxItem() { Text = $"{action.ActionIndex} Unknown", Tag = action });
                 return;
             }
 
-            lbActions.AddItem(new XNAListBoxItem() { Text = action.ActionIndex + " " + triggerActionType.Name, Tag = action });
+            lbActions.AddItem(new XNAListBoxItem() { Text = $"{action.ActionIndex} {triggerActionType.Name}", Tag = action });
         }
 
         private void LbEvents_SelectedIndexChanged(object sender, EventArgs e)
@@ -1559,7 +1553,8 @@ namespace TSMapEditor.UI.Windows
             var triggerCondition = (TriggerCondition)lbEvents.SelectedItem.Tag;
             TriggerEventType triggerEventType = map.EditorConfig.TriggerEventTypes.GetValueOrDefault(triggerCondition.ConditionIndex);
 
-            selEventType.Text = triggerCondition.ConditionIndex + " " + (triggerEventType == null ? "Unknown" : triggerEventType.Name);
+            selEventType.Text =
+                $"{triggerCondition.ConditionIndex} {(triggerEventType == null ? "Unknown" : triggerEventType.Name)}";
             panelEventDescription.Text = triggerEventType == null ? "Unknown event. It has most likely been added with another editor." : triggerEventType.Description;
 
             lbEventParameters.Clear();
@@ -1655,11 +1650,11 @@ namespace TSMapEditor.UI.Windows
 
             if (triggerEventType == null)
             {
-                lbEvents.AddItem(new XNAListBoxItem() { Text = condition.ConditionIndex + " Unknown", Tag = condition });
+                lbEvents.AddItem(new XNAListBoxItem() { Text = $"{condition.ConditionIndex} Unknown", Tag = condition });
                 return;
             }
 
-            lbEvents.AddItem(new XNAListBoxItem() { Text = condition.ConditionIndex + " " + triggerEventType.Name, Tag = condition });
+            lbEvents.AddItem(new XNAListBoxItem() { Text = $"{condition.ConditionIndex} {triggerEventType.Name}", Tag = condition });
         }
 
         private TriggerEventType GetTriggerEventType(int index)
@@ -1728,17 +1723,17 @@ namespace TSMapEditor.UI.Windows
                         return paramValue;
 
                     if (intValue >= map.Rules.AnimTypes.Count)
-                        return intValue + " - nonexistent animation";
+                        return $"{intValue} - nonexistent animation";
 
-                    return intValue + " " + map.Rules.AnimTypes[intValue].ININame;
+                    return $"{intValue} {map.Rules.AnimTypes[intValue].ININame}";
                 case TriggerParamType.HouseType:
                     if (intParseSuccess)
                     {
                         var houseType = map.FindHouseType(intValue);
                         if (houseType == null)
-                            return intValue.ToString() + " - Unknown HouseType";
+                            return $"{intValue} - Unknown HouseType";
 
-                        return intValue + " " + houseType.ININame;
+                        return $"{intValue} {houseType.ININame}";
                     }
 
                     return paramValue;
@@ -1747,9 +1742,9 @@ namespace TSMapEditor.UI.Windows
                     {
                         var houses = map.GetHouses();
                         if (intValue >= houses.Count)
-                            return intValue.ToString() + " - Unknown House";
+                            return $"{intValue} - Unknown House";
 
-                        return intValue + " " + houses[intValue].ININame;
+                        return $"{intValue} {houses[intValue].ININame}";
                     }
 
                     return paramValue;
@@ -1758,17 +1753,17 @@ namespace TSMapEditor.UI.Windows
                         return paramValue;
 
                     if (!map.Rules.GlobalVariables.Exists(v => v.Index == intValue))
-                        return intValue + " - nonexistent variable";
+                        return $"{intValue} - nonexistent variable";
 
-                    return intValue + " " + map.Rules.GlobalVariables.Find(v => v.Index == intValue).Name;
+                    return $"{intValue} {map.Rules.GlobalVariables.Find(v => v.Index == intValue).Name}";
                 case TriggerParamType.LocalVariable:
                     if (!intParseSuccess)
                         return paramValue;
 
                     if (!map.LocalVariables.Exists(v => v.Index == intValue))
-                        return intValue + " - nonexistent variable";
+                        return $"{intValue} - nonexistent variable";
 
-                    return intValue + " " + map.LocalVariables.Find(v => v.Index == intValue).Name;
+                    return $"{intValue} {map.LocalVariables.Find(v => v.Index == intValue).Name}";
                 case TriggerParamType.WaypointZZ:
                     if (!intParseSuccess)
                         return Helpers.GetWaypointNumberFromAlphabeticalString(paramValue).ToString();
@@ -1779,13 +1774,13 @@ namespace TSMapEditor.UI.Windows
                     if (teamType == null)
                         return paramValue;
 
-                    return paramValue + " " + teamType.Name;
+                    return $"{paramValue} {teamType.Name}";
                 case TriggerParamType.Trigger:
                     Trigger trigger = map.Triggers.Find(t => t.ID == paramValue);
                     if (trigger == null)
                         return paramValue;
 
-                    return paramValue + " " + trigger.Name;
+                    return $"{paramValue} {trigger.Name}";
                 case TriggerParamType.Building:
                     return GetObjectValueText(RTTIType.Building, map.Rules.BuildingTypes, paramValue);
                 case TriggerParamType.Aircraft:
@@ -1796,31 +1791,31 @@ namespace TSMapEditor.UI.Windows
                     return GetObjectValueText(RTTIType.Unit, map.Rules.UnitTypes, paramValue);
                 case TriggerParamType.Text:
                     if (!intParseSuccess)
-                        return paramValue + " - Unknown text line";
+                        return $"{paramValue} - Unknown text line";
 
-                    return paramValue + " " + map.Rules.TutorialLines.GetStringByIdOrEmptyString(intValue);
+                    return $"{paramValue} {map.Rules.TutorialLines.GetStringByIdOrEmptyString(intValue)}";
                 case TriggerParamType.Theme:
                     if (!intParseSuccess)
                         return paramValue;
 
                     Theme theme = map.Rules.Themes.GetByIndex(intValue);
                     if (theme == null)
-                        return paramValue + " - nonexistent theme";
+                        return $"{paramValue} - nonexistent theme";
 
-                    return paramValue + " " + theme.Name;
+                    return $"{paramValue} {theme.Name}";
                 case TriggerParamType.Tag:
                     Tag tag = map.Tags.Find(t => t.ID == paramValue);
 
                     if (tag == null)
-                        return paramValue + " - nonexistent tag";
+                        return $"{paramValue} - nonexistent tag";
 
-                    return paramValue + " " + tag.Name;
+                    return $"{paramValue} {tag.Name}";
                 case TriggerParamType.Float:
                     if (!intParseSuccess)
                         return paramValue;
 
                     float floatValue = BitConverter.ToSingle(BitConverter.GetBytes(intValue));
-                    return floatValue.ToString(CultureInfo.InvariantCulture) + " (" + paramValue + ")";
+                    return $"{floatValue.ToString(CultureInfo.InvariantCulture)} ({paramValue})";
 
                 case TriggerParamType.Boolean:
                 default:
@@ -1840,19 +1835,19 @@ namespace TSMapEditor.UI.Windows
                 switch (rtti)
                 {
                     case RTTIType.Aircraft:
-                        return intValue + " - Unknown Aircraft";
+                        return $"{intValue} - Unknown Aircraft";
                     case RTTIType.Building:
-                        return intValue + " - Unknown Building";
+                        return $"{intValue} - Unknown Building";
                     case RTTIType.Infantry:
-                        return intValue + " - Unknown Infantry";
+                        return $"{intValue} - Unknown Infantry";
                     case RTTIType.Unit:
-                        return intValue + " - Unknown Unit";
+                        return $"{intValue} - Unknown Unit";
                     default:
-                        return intValue + " - Unknown Object";
+                        return $"{intValue} - Unknown Object";
                 }
             }
 
-            return intValue + " " + objectTypeList[intValue].GetEditorDisplayName();
+            return $"{intValue} {objectTypeList[intValue].GetEditorDisplayName()}";
         }
     }
 }

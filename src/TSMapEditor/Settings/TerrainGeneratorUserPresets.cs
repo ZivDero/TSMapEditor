@@ -36,7 +36,7 @@ namespace TSMapEditor.Settings
             int i = 0;
             while (true)
             {
-                string sectionName = "Preset" + i.ToString(CultureInfo.InvariantCulture);
+                string sectionName = $"Preset{i.ToString(CultureInfo.InvariantCulture)}";
                 var iniSection = iniFile.GetSection(sectionName);
                 if (iniSection == null)
                     break;
@@ -70,7 +70,8 @@ namespace TSMapEditor.Settings
             }
             catch (IOException ex)
             {
-                Logger.Log("IOException while trying to create directories for terrain generator user presets file! Returned error: " + ex.Message);
+                Logger.Log(
+                    $"IOException while trying to create directories for terrain generator user presets file! Returned error: {ex.Message}");
                 return false;
             }
 
@@ -79,7 +80,7 @@ namespace TSMapEditor.Settings
             int i = 0;
             configurations.ForEach(c =>
             {
-                iniFile.AddSection(c.GetIniConfigSection("Preset" + i.ToString(CultureInfo.InvariantCulture)));
+                iniFile.AddSection(c.GetIniConfigSection($"Preset{i.ToString(CultureInfo.InvariantCulture)}"));
                 i++;
             });
             
@@ -89,7 +90,7 @@ namespace TSMapEditor.Settings
             }
             catch (IOException ex)
             {
-                Logger.Log("IOException while saving terrain generator presets! Returned error: " + ex.Message);
+                Logger.Log($"IOException while saving terrain generator presets! Returned error: {ex.Message}");
                 return false;
             }
 

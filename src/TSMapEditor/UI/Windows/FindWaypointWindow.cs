@@ -42,7 +42,7 @@ namespace TSMapEditor.UI.Windows
             if (waypoint == null)
             {
                 EditorMessageBox.Show(WindowManager, "Waypoint not found",
-                    "Waypoint #" + waypointNumber + " does not exist on the map!", MessageBoxButtons.OK);
+                    $"Waypoint #{waypointNumber} does not exist on the map!", MessageBoxButtons.OK);
 
                 return;
             }

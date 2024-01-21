@@ -45,10 +45,10 @@ namespace TSMapEditor.CCEngine
         public CsfFileHeader(byte[] buffer)
         {
             if (buffer.Length < SizeOf)
-                throw new CsfLoadException(nameof(CsfFileHeader) + ": buffer is not long enough");
+                throw new CsfLoadException($"{nameof(CsfFileHeader)}: buffer is not long enough");
 
             if (BitConverter.ToUInt32(buffer, 0) != CsfPrefix)
-                throw new CsfLoadException(nameof(CsfFileHeader) + ": FSC prefix not found");
+                throw new CsfLoadException($"{nameof(CsfFileHeader)}: FSC prefix not found");
 
             Version = (CsfVersion)BitConverter.ToUInt32(buffer, 4);
             NumberOfLabels = BitConverter.ToUInt32(buffer, 8);
@@ -150,7 +150,8 @@ namespace TSMapEditor.CCEngine
             }
             catch (CsfLoadException ex)
             {
-                throw new CsfLoadException("Failed to load CSF file. Make sure that the file is not corrupted. Filename: " + fileName + ", original exception: " + ex.Message);
+                throw new CsfLoadException(
+                    $"Failed to load CSF file. Make sure that the file is not corrupted. Filename: {fileName}, original exception: {ex.Message}");
             }
         }
 
@@ -165,7 +166,7 @@ namespace TSMapEditor.CCEngine
             memoryStream.Read(buffer, 0, 4);
 
             if (BitConverter.ToUInt32(buffer) != LblPrefix)
-                throw new CsfLoadException(nameof(CsfFile) + ": LBL prefix not found");
+                throw new CsfLoadException($"{nameof(CsfFile)}: LBL prefix not found");
 
             memoryStream.Read(buffer, 0, 4);
             uint numberOfPairs = BitConverter.ToUInt32(buffer, 0);
@@ -198,7 +199,7 @@ namespace TSMapEditor.CCEngine
             bool hasExtra = prefix == StrwPrefix;
 
             if ((prefix != StrPrefix) && !hasExtra)
-                throw new CsfLoadException(nameof(CsfFile) + ": STR/STRW prefix not found");
+                throw new CsfLoadException($"{nameof(CsfFile)}: STR/STRW prefix not found");
 
             memoryStream.Read(buffer, 0, 4);
             uint stringLength = BitConverter.ToUInt32(buffer, 0);

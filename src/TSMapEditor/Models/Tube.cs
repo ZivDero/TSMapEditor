@@ -75,7 +75,7 @@ namespace TSMapEditor.Models
                 case TubeDirection.None:
                     return TubeDirection.None;
                 default:
-                    throw new ArgumentException("Unknown tube direction: " + direction);
+                    throw new ArgumentException($"Unknown tube direction: {direction}");
             }
         } 
 

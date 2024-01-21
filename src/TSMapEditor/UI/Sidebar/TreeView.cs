@@ -439,7 +439,7 @@ namespace TSMapEditor.UI.Sidebar
 
                     string text = null;
                     if (category.Nodes.Count > 0)
-                        text = category.IsOpened ? "- " + category.Text : "+ " + category.Text;
+                        text = category.IsOpened ? $"- {category.Text}" : $"+ {category.Text}";
                     else
                         text = category.Text;
 

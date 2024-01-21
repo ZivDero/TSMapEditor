@@ -191,7 +191,7 @@ namespace TSMapEditor.UI
                 return GetExprValue();
             }
             else
-                throw new INIConfigException("Unexpected character " + c + " when parsing input: " + Input);
+                throw new INIConfigException($"Unexpected character {c} when parsing input: {Input}");
         }
 
         private void SkipWhitespace()
@@ -321,21 +321,21 @@ namespace TSMapEditor.UI
                     parsingControl.CenterOnParentHorizontally();
                     return parsingControl.X;
                 default:
-                    throw new INIConfigException("Unknown function " + functionName + " in expression " + Input);
+                    throw new INIConfigException($"Unknown function {functionName} in expression {Input}");
             }
         }
 
         private void ConsumeChar(char token)
         {
             if (Input[tokenPlace] != token)
-                throw new INIConfigException("Parse error: expected '" + token + "' in expression " + Input);
+                throw new INIConfigException($"Parse error: expected '{token}' in expression {Input}");
             tokenPlace++;
         }
 
         private char PeekChar()
         {
             if (IsEndOfInput())
-                throw new INIConfigException("Parse error: unexpected end of input in expression " + Input);
+                throw new INIConfigException($"Parse error: unexpected end of input in expression {Input}");
 
             return Input[tokenPlace];
         }

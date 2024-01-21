@@ -14,7 +14,8 @@ namespace TSMapEditor.Mutations.Classes
         {
             this.objectToClone = (AbstractObject)movable;
             if (!objectToClone.IsTechno() && objectToClone.WhatAmI() != RTTIType.Terrain)
-                throw new NotSupportedException(nameof(CloneObjectMutation) + " only supports cloning Technos and TerrainObjects!");
+                throw new NotSupportedException(
+                    $"{nameof(CloneObjectMutation)} only supports cloning Technos and TerrainObjects!");
 
             this.clonePosition = clonePosition;
         }

@@ -33,7 +33,7 @@ namespace TSMapEditor.UI
 
         public override string ToString()
         {
-            return Width + "x" + Height;
+            return $"{Width}x{Height}";
         }
 
         public int CompareTo(ScreenResolution res2)
@@ -116,7 +116,8 @@ namespace TSMapEditor.UI
                 Point2D screenSize = new Point2D((int)(MaxWidth / renderScales[i]), (int)(MaxHeight / renderScales[i]));
                 if (screenSize.X > MinWidth && screenSize.Y > MinHeight)
                 {
-                    ddRenderScale.AddItem(new XNADropDownItem() { Text = renderScales[i].ToString("F2", CultureInfo.InvariantCulture) + "x", Tag = renderScales[i] });
+                    ddRenderScale.AddItem(new XNADropDownItem() { Text =
+                        $"{renderScales[i].ToString("F2", CultureInfo.InvariantCulture)}x", Tag = renderScales[i] });
                 }
             }
 

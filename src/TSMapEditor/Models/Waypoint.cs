@@ -64,7 +64,7 @@ namespace TSMapEditor.Models
 
             if (waypointIndex < 0 || waypointIndex > Constants.MaxWaypoint)
             {
-                Logger.Log("Waypoint.Read: invalid waypoint index " + waypointIndex);
+                Logger.Log($"Waypoint.Read: invalid waypoint index {waypointIndex}");
                 return null;
             }
 

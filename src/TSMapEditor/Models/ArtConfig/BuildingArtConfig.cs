@@ -36,7 +36,8 @@ namespace TSMapEditor.Models.ArtConfig
                 Height = iniSection.GetIntValue("Foundation.Y", -1);
 
                 if (Width < 0 || Height < 0)
-                    throw new InvalidOperationException("Invalid custom Foundation specified in Art.ini section " + iniSection.SectionName);
+                    throw new InvalidOperationException(
+                        $"Invalid custom Foundation specified in Art.ini section {iniSection.SectionName}");
 
                 CellsFromINI(iniSection);
                 CreateCustomEdges(Width, Height);
@@ -45,7 +46,8 @@ namespace TSMapEditor.Models.ArtConfig
             {
                 string[] foundationParts = foundationString.ToLower().Split('x');
                 if (foundationParts.Length != 2)
-                    throw new InvalidOperationException("Invalid Foundation= specified in Art.ini section " + iniSection.SectionName);
+                    throw new InvalidOperationException(
+                        $"Invalid Foundation= specified in Art.ini section {iniSection.SectionName}");
 
                 Width = Conversions.IntFromString(foundationParts[0], 0);
                 Height = Conversions.IntFromString(foundationParts[1], 0);
@@ -87,13 +89,13 @@ namespace TSMapEditor.Models.ArtConfig
             while (true)
             {
                 // The dot is intentional, Ares expects Foundation.N=X,Y syntax
-                string value = iniSection.GetStringValue("Foundation." + i, null);
+                string value = iniSection.GetStringValue($"Foundation.{i}", null);
                 if (string.IsNullOrEmpty(value))
                     break;
 
                 string[] parts = value.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
                 if (parts.Length != 2)
-                    throw new INIConfigException($"Building type \"{iniSection.SectionName}\" has invalid custom \"{"Foundation." + i}\"");
+                    throw new INIConfigException($"Building type \"{iniSection.SectionName}\" has invalid custom \"{$"Foundation.{i}"}\"");
 
                 foundationCells.Add(new Point2D(Conversions.IntFromString(parts[0], -1), Conversions.IntFromString(parts[1], -1)));
                 i++;
@@ -258,8 +260,8 @@ namespace TSMapEditor.Models.ArtConfig
                     if (string.IsNullOrEmpty(animTypeName))
                         break;
 
-                    int animYSort = iniSection.GetIntValue(name + suffix + "YSort", 0);
-                    int animZAdjust = iniSection.GetIntValue(name + suffix + "ZAdjust", 0);
+                    int animYSort = iniSection.GetIntValue($"{name}{suffix}YSort", 0);
+                    int animZAdjust = iniSection.GetIntValue($"{name}{suffix}ZAdjust", 0);
 
                     anims.Add(new BuildingAnimType
                     {

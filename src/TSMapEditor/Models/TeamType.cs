@@ -57,29 +57,31 @@ namespace TSMapEditor.Models
         public string GetHintText()
         {
             var stringBuilder = new StringBuilder();
-            stringBuilder.Append("Owner: " + (HouseType == null ? Constants.NoneValue2 : HouseType.ININame));
+            stringBuilder.Append($"Owner: {(HouseType == null ? Constants.NoneValue2 : HouseType.ININame)}");
             stringBuilder.Append(Environment.NewLine + Environment.NewLine);
-            stringBuilder.Append("Script: " + (Script == null ? Constants.NoneValue2 : Script.Name));
+            stringBuilder.Append($"Script: {(Script == null ? Constants.NoneValue2 : Script.Name)}");
             stringBuilder.Append(Environment.NewLine + Environment.NewLine);
 
             if (Tag != null)
             {
-                stringBuilder.Append("Tag: " + Tag.Name);
+                stringBuilder.Append($"Tag: {Tag.Name}");
                 stringBuilder.Append(Environment.NewLine + Environment.NewLine);
             }
 
-            stringBuilder.Append("Waypoint: " + (string.IsNullOrWhiteSpace(Waypoint) ? Constants.NoneValue2 : Helpers.GetWaypointNumberFromAlphabeticalString(Waypoint)));
+            stringBuilder.Append(
+                $"Waypoint: {(string.IsNullOrWhiteSpace(Waypoint) ? Constants.NoneValue2 : Helpers.GetWaypointNumberFromAlphabeticalString(Waypoint))}");
 
             if (Constants.UseCountries)
             {
-                stringBuilder.Append("TransportWaypoint: " + (string.IsNullOrWhiteSpace(TransportWaypoint) ? Constants.NoneValue2 : Helpers.GetWaypointNumberFromAlphabeticalString(TransportWaypoint)));
+                stringBuilder.Append(
+                    $"TransportWaypoint: {(string.IsNullOrWhiteSpace(TransportWaypoint) ? Constants.NoneValue2 : Helpers.GetWaypointNumberFromAlphabeticalString(TransportWaypoint))}");
             }
 
             stringBuilder.Append(Environment.NewLine + Environment.NewLine);
 
             if (VeteranLevel > 1)
             {
-                stringBuilder.Append("Veteran Level: " + (VeteranLevel > 2 ? "Elite" : "Veteran"));
+                stringBuilder.Append($"Veteran Level: {(VeteranLevel > 2 ? "Elite" : "Veteran")}");
                 stringBuilder.Append(Environment.NewLine + Environment.NewLine);
             }
 
@@ -111,7 +113,7 @@ namespace TSMapEditor.Models
                 }
                 else
                 {
-                    stringBuilder.Append(name + ": " + flagValue.ToString());
+                    stringBuilder.Append($"{name}: {flagValue}");
                     stringBuilder.Append(Environment.NewLine);
                 }
             }
@@ -125,7 +127,7 @@ namespace TSMapEditor.Models
         {
             var clone = MemberwiseClone() as TeamType;
             clone.ININame = iniName;
-            clone.Name = "Clone of " + Name;
+            clone.Name = $"Clone of {Name}";
 
             clone.EnabledTeamTypeFlags = new List<string>(EnabledTeamTypeFlags);
 

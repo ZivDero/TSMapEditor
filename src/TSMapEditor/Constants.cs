@@ -88,7 +88,7 @@ namespace TSMapEditor
             const string ConstantsSectionName = "Constants";
             const string FilePathsSectionName = "FilePaths";
 
-            IniFile constantsIni = new IniFile(Environment.CurrentDirectory + "/Config/Constants.ini");
+            IniFile constantsIni = new IniFile($"{Environment.CurrentDirectory}/Config/Constants.ini");
 
             CellSizeX = constantsIni.GetIntValue(ConstantsSectionName, nameof(CellSizeX), CellSizeX);
             MaxMapWidth = TextureSizeLimit / CellSizeX;

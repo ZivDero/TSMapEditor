@@ -30,7 +30,8 @@ namespace TSMapEditor.Mutations.Classes
                 throw new InvalidOperationException("Invalid cell coords");
 
             if (cell.Infantry[(int)subCell] != null)
-                throw new InvalidOperationException(nameof(PlaceInfantryMutation) + ": cannot place infantry on an occupied sub-cell spot!");
+                throw new InvalidOperationException(
+                    $"{nameof(PlaceInfantryMutation)}: cannot place infantry on an occupied sub-cell spot!");
 
             var infantry = new Infantry(infantryType);
             infantry.Owner = MutationTarget.ObjectOwner;

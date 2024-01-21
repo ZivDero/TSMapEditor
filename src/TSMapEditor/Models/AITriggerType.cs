@@ -43,7 +43,8 @@ namespace TSMapEditor.Models
         {
             int quantity = Helpers.ReverseEndianness(Quantity);
 
-            return quantity.ToString("X8") + "0" + ((int)ComparatorOperator).ToString(CultureInfo.InvariantCulture) + "000000000000000000000000000000000000000000000000000000";
+            return
+                $"{quantity:X8}0{((int)ComparatorOperator).ToString(CultureInfo.InvariantCulture)}000000000000000000000000000000000000000000000000000000";
         }
     }
 
@@ -92,7 +93,7 @@ namespace TSMapEditor.Models
         public AITriggerType Clone(string newUniqueId)
         {
             var clonedAITrigger = (AITriggerType)MemberwiseClone();
-            clonedAITrigger.Name = "Clone of " + Name;
+            clonedAITrigger.Name = $"Clone of {Name}";
             clonedAITrigger.ININame = newUniqueId;
             return clonedAITrigger;
         }

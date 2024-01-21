@@ -196,7 +196,7 @@ namespace TSMapEditor.UI
         {
             string error = MapSetup.InitializeMap(gameDirectory, true, null, e.Theater, e.MapSize, WindowManager);
             if (!string.IsNullOrWhiteSpace(error))
-                throw new InvalidOperationException("Failed to create new map! Returned error message: " + error);
+                throw new InvalidOperationException($"Failed to create new map! Returned error message: {error}");
 
             MapSetup.LoadTheaterGraphics(WindowManager, gameDirectory);
             ((CreateNewMapWindow)sender).OnCreateNewMap -= CreateMapWindow_OnCreateNewMap;
@@ -223,7 +223,8 @@ namespace TSMapEditor.UI
             catch (Exception ex)
             {
                 tbGameDirectory.Text = string.Empty;
-                Logger.Log("Failed to read game installation path from the Windows registry! Exception message: " + ex.Message);
+                Logger.Log(
+                    $"Failed to read game installation path from the Windows registry! Exception message: {ex.Message}");
             }
         }
 

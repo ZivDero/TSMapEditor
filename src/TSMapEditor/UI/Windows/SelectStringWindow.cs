@@ -54,7 +54,8 @@ namespace TSMapEditor.UI.Windows
                 if (csf.ID.Length > maxLength)
                     preview = csf.ID[..maxLength];
                 else
-                    preview = (csf.ID.Length + csf.Value.Length) > maxLength ? csf.Value[..(maxLength - csf.ID.Length)] + "..." : csf.Value;
+                    preview = (csf.ID.Length + csf.Value.Length) > maxLength ? $"{csf.Value[..(maxLength - csf.ID.Length)]}..."
+                        : csf.Value;
 
                 lbObjectList.AddItem(new XNAListBoxItem() { Text = $"({csf.ID}) {preview}", Tag = csf });
                 if (csf == SelectedObject)

@@ -214,7 +214,7 @@ namespace TSMapEditor.UI.Sidebar
 
                 category.Nodes.Add(new TreeViewNode()
                 {
-                    Text = smudgeType.Name + " (" + smudgeType.ININame + ")",
+                    Text = $"{smudgeType.Name} ({smudgeType.ININame})",
                     Texture = texture,
                     Tag = smudgeType
                 });

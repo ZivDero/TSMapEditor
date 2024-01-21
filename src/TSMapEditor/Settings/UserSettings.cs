@@ -17,7 +17,7 @@ namespace TSMapEditor.Settings
 
             Instance = this;
 
-            UserSettingsIni = new IniFile(Environment.CurrentDirectory + "/MapEditorSettings.ini");
+            UserSettingsIni = new IniFile($"{Environment.CurrentDirectory}/MapEditorSettings.ini");
 
             settings = new IINILoadable[]
             {
