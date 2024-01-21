@@ -131,6 +131,12 @@ namespace TSMapEditor.CCEngine
         /// <param name="name">The name of the MIX file.</param>
         public void LoadPrimaryMixFile(string name)
         {
+            if (IsSpecialMixName(name))
+            {
+                HandleSpecialMixName(name);
+                return;
+            }
+
             if (!LoadMixFile(name))
             {
                 throw new FileNotFoundException("Primary MIX file not found: " + name);
@@ -147,6 +153,46 @@ namespace TSMapEditor.CCEngine
             if (!LoadMixFile(name))
             {
                 Logger.Log("Secondary MIX file not found: " + name);
+            }
+        }
+
+        /// <summary>
+        /// Loads MIX files of the format NAME##.
+        /// </summary>
+        /// <param name="name">The common name of the MIX files.</param>
+        /// <param name="reversed">Whether to load mixes starting from 99 instead of 00.</param>
+        public void LoadIndexedMixFiles(string name, bool reversed = false)
+        {
+            if (reversed)
+            {
+                for (int i = 99; i >= 0; i--)
+                {
+                    LoadMixFile($"{name}{i:00}.mix");
+                }
+            }
+            else
+            {
+                for (int i = 0; i <= 99; i++)
+                {
+                    LoadMixFile($"{name}{i:00}.mix");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Loads MIX files with a wildcard.
+        /// </summary>
+        /// <param name="name">The common name of the MIX files.</param>
+        public void LoadWildcardMixFiles(string name)
+        {
+            foreach (string searchDirectory in searchDirectories)
+            {
+                if (!Directory.Exists(searchDirectory))
+                    continue;
+
+                var files = Directory.GetFiles(searchDirectory, name);
+                foreach (string file in files)
+                    LoadMixFile(file);
             }
         }
 
@@ -182,6 +228,45 @@ namespace TSMapEditor.CCEngine
             }
 
             return null;
+        }
+
+        private bool IsSpecialMixName(string name)
+        {
+            name = name.ToUpper();
+            switch (name)
+            {
+                case "$TSECACHE":
+                case "$RA2ECACHE":
+                case "$ELOCAL":
+                case "$EXPAND":
+                case "$EXPANDMD":
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        private void HandleSpecialMixName(string name)
+        {
+            name = name.ToUpper();
+            switch (name)
+            {
+                case "$TSECACHE":
+                    LoadIndexedMixFiles("ecache", false);
+                    break;
+                case "$RA2ECACHE":
+                    LoadWildcardMixFiles("ecache*.mix");
+                    break;
+                case "$ELOCAL":
+                    LoadIndexedMixFiles("elocal", true);
+                    break;
+                case "$EXPAND":
+                    LoadIndexedMixFiles("expand", true);
+                    break;
+                case "$EXPANDMD":
+                    LoadIndexedMixFiles("expandmd", true);
+                    break;
+            }
         }
     }
 
