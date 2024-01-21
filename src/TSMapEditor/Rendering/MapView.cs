@@ -1076,6 +1076,18 @@ namespace TSMapEditor.Rendering
             {
                 DrawRangeIndicator(TechnoUnderCursor.Position, range, TechnoUnderCursor.Owner.XNAColor * 0.25f);
             }
+
+            range = TechnoUnderCursor.GetGapGeneratorRange();
+            if (range > 0.0)
+            {
+                DrawRangeIndicator(TechnoUnderCursor.Position, range, new Color(0, 0, 0, 192));
+            }
+
+            range = TechnoUnderCursor.GetCloakGeneratorRange();
+            if (range > 0.0)
+            {
+                DrawRangeIndicator(TechnoUnderCursor.Position, range, new Color(0, 0, 0, 128));
+            }
         }
 
         private void DrawRangeIndicator(Point2D cellCoords, double range, Color color)

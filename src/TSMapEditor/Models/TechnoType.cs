@@ -18,6 +18,9 @@ namespace TSMapEditor.Models
 
         public double GuardRange { get; set; }
 
+        public bool GapGenerator { get; set; }
+        public int GapRadiusInCells { get; set; }
+
         public double GetWeaponRange()
         {
             double primaryRange = Primary != null ? Primary.Range : 0.0;
