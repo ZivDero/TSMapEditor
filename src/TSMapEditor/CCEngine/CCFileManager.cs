@@ -192,7 +192,7 @@ namespace TSMapEditor.CCEngine
 
                 var files = Directory.GetFiles(searchDirectory, name);
                 foreach (string file in files)
-                    LoadMixFile(file);
+                    LoadMixFile(Path.GetFileName(file));
             }
         }
 
