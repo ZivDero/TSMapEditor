@@ -69,8 +69,13 @@ namespace TSMapEditor.Rendering
                 return value;
 
             var texture = VxlRenderer.Render(graphicsDevice, facing, ramp, vxl, hva, palette, vpl, forRemap: false);
-            var positionedTexture = texture == null ? null :
-                new PositionedTexture(texture.Width, texture.Height, 0, 0, texture);
+            if (texture == null)
+            {
+                Frames[key] = null;
+                return Frames[key];
+            }
+
+            var positionedTexture = new PositionedTexture(texture.Width, texture.Height, 0, 0, texture);
             Frames[key] = positionedTexture;
             return Frames[key];
         }
@@ -91,6 +96,12 @@ namespace TSMapEditor.Rendering
                 return value;
 
             var texture = VxlRenderer.Render(graphicsDevice, facing, ramp, vxl, hva, palette, vpl, forRemap: true);
+            if (texture == null)
+            {
+                RemapFrames[key] = null;
+                return RemapFrames[key];
+            }
+
             var colorData = new Color[texture.Width * texture.Height];
             texture.GetData(colorData);
 
