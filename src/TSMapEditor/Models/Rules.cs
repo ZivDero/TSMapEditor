@@ -315,7 +315,7 @@ namespace TSMapEditor.Models
 
                 // If we encounter the same object listed twice, don't create a duplicate
                 var iniNameProperty = objectType.GetProperty("ININame");
-                if (targetList.Find(t => iniNameProperty?.GetValue(t)?.ToString() == typeName) != null)
+                if (targetList.Exists(t => iniNameProperty?.GetValue(t)?.ToString() == typeName))
                     continue;
 
                 // We assume that the type has a constructor
