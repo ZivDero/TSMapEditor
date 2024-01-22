@@ -115,7 +115,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
 
             /********** Rendering *********/
 
-            // The model is actually empty, return an empty texture
+            // The model is actually empty, return null so we can draw replacement text
             if (vertexData.Count == 0)
                 return null;
 
