@@ -69,7 +69,8 @@ namespace TSMapEditor.Rendering
                 return value;
 
             var texture = VxlRenderer.Render(graphicsDevice, facing, ramp, vxl, hva, palette, vpl, forRemap: false);
-            var positionedTexture = new PositionedTexture(texture.Width, texture.Height, 0, 0, texture);
+            var positionedTexture = texture == null ? null :
+                new PositionedTexture(texture.Width, texture.Height, 0, 0, texture);
             Frames[key] = positionedTexture;
             return Frames[key];
         }
