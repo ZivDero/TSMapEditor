@@ -245,7 +245,7 @@ namespace TSMapEditor.CCEngine
                     LoadWildcardMixFiles("ecache*.mix");
                     break;
                 case "$ELOCAL":
-                    LoadIndexedMixFiles("elocal");
+                    LoadWildcardMixFiles("elocal*.mix");
                     break;
                 case "$EXPAND":
                     LoadIndexedMixFiles("expand");
