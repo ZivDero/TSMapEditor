@@ -160,23 +160,10 @@ namespace TSMapEditor.CCEngine
         /// Loads MIX files of the format NAME##.
         /// </summary>
         /// <param name="name">The common name of the MIX files.</param>
-        /// <param name="reversed">Whether to load mixes starting from 99 instead of 00.</param>
-        public void LoadIndexedMixFiles(string name, bool reversed = false)
+        public void LoadIndexedMixFiles(string name)
         {
-            if (reversed)
-            {
-                for (int i = 99; i >= 0; i--)
-                {
-                    LoadMixFile($"{name}{i:00}.mix");
-                }
-            }
-            else
-            {
-                for (int i = 0; i <= 99; i++)
-                {
-                    LoadMixFile($"{name}{i:00}.mix");
-                }
-            }
+            for (int i = 99; i >= 0; i--)
+                LoadMixFile($"{name}{i:00}.mix");
         }
 
         /// <summary>
@@ -252,19 +239,19 @@ namespace TSMapEditor.CCEngine
             switch (name)
             {
                 case "$TSECACHE":
-                    LoadIndexedMixFiles("ecache", false);
+                    LoadIndexedMixFiles("ecache");
                     break;
                 case "$RA2ECACHE":
                     LoadWildcardMixFiles("ecache*.mix");
                     break;
                 case "$ELOCAL":
-                    LoadIndexedMixFiles("elocal", true);
+                    LoadIndexedMixFiles("elocal");
                     break;
                 case "$EXPAND":
-                    LoadIndexedMixFiles("expand", true);
+                    LoadIndexedMixFiles("expand");
                     break;
                 case "$EXPANDMD":
-                    LoadIndexedMixFiles("expandmd", true);
+                    LoadIndexedMixFiles("expandmd");
                     break;
             }
         }
