@@ -244,7 +244,10 @@ namespace TSMapEditor.CCEngine
                 case "$RA2ECACHE":
                     LoadWildcardMixFiles("ecache*.mix");
                     break;
-                case "$ELOCAL":
+                case "$TSELOCAL":
+                    LoadIndexedMixFiles("elocal");
+                    break;
+                case "$RA2ELOCAL":
                     LoadWildcardMixFiles("elocal*.mix");
                     break;
                 case "$EXPAND":
