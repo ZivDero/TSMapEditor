@@ -27,7 +27,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             return false;
         }
 
-        protected override void Render(Animation gameObject, int heightOffset, Point2D drawPoint, CommonDrawParams drawParams)
+        protected override void Render(Animation gameObject, int heightOffset, Point2D drawPoint, in CommonDrawParams drawParams)
         {
             if (drawParams.MainImage == null)
                 return;
@@ -65,7 +65,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
                 drawPoint, heightOffset);
         }
 
-        protected override void DrawShadow(Animation gameObject, CommonDrawParams drawParams, Point2D drawPoint, int heightOffset)
+        protected override void DrawShadow(Animation gameObject, in CommonDrawParams drawParams, Point2D drawPoint, int heightOffset)
         {
             if (!Constants.DrawBuildingAnimationShadows && gameObject.IsBuildingAnim)
                 return;

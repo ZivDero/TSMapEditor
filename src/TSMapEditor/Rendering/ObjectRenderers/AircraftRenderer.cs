@@ -26,11 +26,11 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             };
         }
 
-        protected override void Render(Aircraft gameObject, int yDrawPointWithoutCellHeight, Point2D drawPoint, CommonDrawParams drawParams)
+        protected override void Render(Aircraft gameObject, int heightOffset, Point2D drawPoint, in CommonDrawParams drawParams)
         {
             DrawVoxelModel(gameObject, drawParams, drawParams.MainModel,
                 gameObject.Facing, RampType.None, Color.White, true, gameObject.GetRemapColor(),
-                drawPoint, yDrawPointWithoutCellHeight);
+                drawPoint, heightOffset);
         }
     }
 }

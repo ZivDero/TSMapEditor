@@ -21,7 +21,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             };
         }
 
-        protected override void Render(Overlay gameObject, int heightOffset, Point2D drawPoint, CommonDrawParams drawParams)
+        protected override void Render(Overlay gameObject, int heightOffset, Point2D drawPoint, in CommonDrawParams drawParams)
         {
             int tiberiumIndex = gameObject.OverlayType.GetTiberiumIndex(Constants.UseCountries);
 

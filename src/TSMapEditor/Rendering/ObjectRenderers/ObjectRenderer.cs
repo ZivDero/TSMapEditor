@@ -64,7 +64,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             }
             else
             {
-                Render(gameObject, drawPointWithoutCellHeight.Y, drawPoint, drawParams);
+                Render(gameObject, heightOffset, drawPoint, drawParams);
             }
         }
 
@@ -91,10 +91,10 @@ namespace TSMapEditor.Rendering.ObjectRenderers
         /// Renders an object. Override in derived classes to implement and customize the rendering process.
         /// </summary>
         /// <param name="gameObject">The game object to draw.</param>
-        /// <param name="yDrawPointWithoutCellHeight">The Y-axis draw coordinate of the object, prior to taking cell height into account.</param>
+        /// <param name="heightOffset">The Y-axis draw offset from cell height.</param>
         /// <param name="drawPoint">The draw point of the object, with cell height taken into account.</param>
         /// <param name="drawParams">Draw parameters.</param>
-        protected abstract void Render(T gameObject, int yDrawPointWithoutCellHeight, Point2D drawPoint, CommonDrawParams drawParams);
+        protected abstract void Render(T gameObject, int heightOffset, Point2D drawPoint, in CommonDrawParams drawParams);
 
         /// <summary>
         /// Renders the replacement text of an object, displayed when no graphics for an object have been loaded.
@@ -103,7 +103,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
         /// <param name="gameObject">The game object for which to draw a replacement text.</param>
         /// <param name="drawParams">Draw parameters.</param>
         /// <param name="drawPoint">The draw point of the object, with cell height taken into account.</param>
-        protected virtual void DrawObjectReplacementText(T gameObject, CommonDrawParams drawParams, Point2D drawPoint)
+        protected virtual void DrawObjectReplacementText(T gameObject, in CommonDrawParams drawParams, Point2D drawPoint)
         {
             SetEffectParams(0.0f, 0.0f, Vector2.Zero, Vector2.Zero);
 
@@ -145,7 +145,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             return true;
         }
 
-        private PositionedTexture GetFrameTexture(T gameObject, CommonDrawParams drawParams)
+        private PositionedTexture GetFrameTexture(T gameObject, in CommonDrawParams drawParams)
         {
             if (drawParams.MainImage != null && drawParams.MainImage.GetFrameCount() > 0)
             {
@@ -209,7 +209,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             }
         }
 
-        protected virtual void DrawShadow(T gameObject, CommonDrawParams drawParams, Point2D drawPoint, int heightOffset)
+        protected virtual void DrawShadow(T gameObject, in CommonDrawParams drawParams, Point2D drawPoint, int heightOffset)
         {
             if (drawParams.MainImage == null)
                 return;
@@ -222,7 +222,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             }
         }
 
-        protected void DrawShapeImage(T gameObject, CommonDrawParams drawParams, ShapeImage image,
+        protected void DrawShapeImage(T gameObject, in CommonDrawParams drawParams, ShapeImage image,
             int frameIndex, Color color, bool drawRemap, Color remapColor, Point2D drawPoint, int heightOffset)
         {
             if (image == null)
@@ -242,7 +242,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
                 drawingBounds.X, drawingBounds.Y, heightOffset);
         }
 
-        protected void DrawVoxelModel(T gameObject, CommonDrawParams drawParams, VoxelModel model,
+        protected void DrawVoxelModel(T gameObject, in CommonDrawParams drawParams, VoxelModel model,
             byte facing, RampType ramp, Color color, bool drawRemap, Color remapColor, Point2D drawPoint, int heightOffset)
         {
             if (model == null)

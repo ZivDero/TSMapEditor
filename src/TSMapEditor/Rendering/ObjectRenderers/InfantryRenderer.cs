@@ -24,7 +24,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             };
         }
 
-        protected override void Render(Infantry gameObject, int heightOffset, Point2D drawPoint, CommonDrawParams drawParams)
+        protected override void Render(Infantry gameObject, int heightOffset, Point2D drawPoint, in CommonDrawParams drawParams)
         {
             switch (gameObject.SubCell)
             {

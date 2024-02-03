@@ -73,12 +73,12 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             return base.ShouldRenderReplacementText(gameObject);
         }
 
-        private void DrawBibGraphics(Structure gameObject, ShapeImage bibGraphics, int heightOffset, Point2D drawPoint, CommonDrawParams drawParams)
+        private void DrawBibGraphics(Structure gameObject, ShapeImage bibGraphics, int heightOffset, Point2D drawPoint, in CommonDrawParams drawParams)
         {
             DrawShapeImage(gameObject, drawParams, bibGraphics, 0, Color.White, true, gameObject.GetRemapColor(), drawPoint, heightOffset);
         }
 
-        protected override void Render(Structure gameObject, int heightOffset, Point2D drawPoint, CommonDrawParams drawParams)
+        protected override void Render(Structure gameObject, int heightOffset, Point2D drawPoint, in CommonDrawParams drawParams)
         {
             DrawFoundationLines(gameObject);
 
@@ -142,7 +142,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             }
         }
 
-        protected override void DrawObjectReplacementText(Structure gameObject, CommonDrawParams drawParams, Point2D drawPoint)
+        protected override void DrawObjectReplacementText(Structure gameObject, in CommonDrawParams drawParams, Point2D drawPoint)
         {
             DrawFoundationLines(gameObject);
 

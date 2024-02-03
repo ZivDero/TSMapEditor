@@ -27,8 +27,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             };
         }
 
-        protected override void Render(Unit gameObject, int heightOffset, Point2D drawPoint,
-            CommonDrawParams drawParams)
+        protected override void Render(Unit gameObject, int heightOffset, Point2D drawPoint, in CommonDrawParams drawParams)
         {
             if (gameObject.UnitType.ArtConfig.Voxel)
             {
@@ -83,7 +82,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
         }
 
         private void RenderVoxelModel(Unit gameObject, int heightOffset, Point2D drawPoint,
-            CommonDrawParams drawParams, VoxelModel model)
+            in CommonDrawParams drawParams, VoxelModel model)
         {
             var unitTile = RenderDependencies.Map.GetTile(gameObject.Position.X, gameObject.Position.Y);
 
