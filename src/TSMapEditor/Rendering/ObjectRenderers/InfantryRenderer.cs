@@ -12,15 +12,19 @@ namespace TSMapEditor.Rendering.ObjectRenderers
 
         protected override Color ReplacementColor => Color.Teal;
 
-        protected override ICommonDrawParams GetDrawParams(Infantry gameObject)
+        protected override CommonDrawParams GetDrawParams(Infantry gameObject)
         {
-            var graphics = TheaterGraphics.InfantryTextures[gameObject.ObjectType.Index];
+            var mainImage = TheaterGraphics.InfantryTextures[gameObject.ObjectType.Index];
             string iniName = gameObject.ObjectType.ININame;
 
-            return new ShapeDrawParams(graphics, iniName);
+            return new CommonDrawParams()
+            {
+                IniName = iniName,
+                MainImage = mainImage
+            };
         }
 
-        protected override void Render(Infantry gameObject, int yDrawPointWithoutCellHeight, Point2D drawPoint, ICommonDrawParams drawParams)
+        protected override void Render(Infantry gameObject, int heightOffset, Point2D drawPoint, CommonDrawParams drawParams)
         {
             switch (gameObject.SubCell)
             {
@@ -41,15 +45,12 @@ namespace TSMapEditor.Rendering.ObjectRenderers
                     break;
             }
 
-            if (drawParams is not ShapeDrawParams shapeDrawParams)
-                return;
-
             if (!gameObject.ObjectType.NoShadow)
-                DrawShadow(gameObject, drawParams, drawPoint, yDrawPointWithoutCellHeight);
+                DrawShadow(gameObject, drawParams, drawPoint, heightOffset);
 
-            DrawShapeImage(gameObject, shapeDrawParams, shapeDrawParams.Graphics, 
-                gameObject.GetFrameIndex(shapeDrawParams.Graphics.GetFrameCount()), 
-                Color.White, true, gameObject.GetRemapColor(), drawPoint, yDrawPointWithoutCellHeight);
+            DrawShapeImage(gameObject, drawParams, drawParams.MainImage, 
+                gameObject.GetFrameIndex(drawParams.MainImage.GetFrameCount()), 
+                Color.White, true, gameObject.GetRemapColor(), drawPoint, heightOffset);
         }
     }
 }

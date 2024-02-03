@@ -12,9 +12,13 @@ namespace TSMapEditor.Rendering.ObjectRenderers
 
         protected override Color ReplacementColor => Color.Orange;
 
-        protected override ICommonDrawParams GetDrawParams(Animation gameObject)
+        protected override CommonDrawParams GetDrawParams(Animation gameObject)
         {
-            return new ShapeDrawParams(TheaterGraphics.AnimTextures[gameObject.AnimType.Index], gameObject.AnimType.ININame);
+            return new CommonDrawParams()
+            {
+                IniName = gameObject.AnimType.ININame,
+                MainImage = TheaterGraphics.AnimTextures[gameObject.AnimType.Index]
+            };
         }
 
         protected override bool ShouldRenderReplacementText(Animation gameObject)
@@ -23,17 +27,17 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             return false;
         }
 
-        protected override void Render(Animation gameObject, int yDrawPointWithoutCellHeight, Point2D drawPoint, ICommonDrawParams drawParams)
+        protected override void Render(Animation gameObject, int heightOffset, Point2D drawPoint, CommonDrawParams drawParams)
         {
-            if (drawParams is not ShapeDrawParams shapeDrawParams || shapeDrawParams.Graphics == null)
+            if (drawParams.MainImage == null)
                 return;
 
-            int frameIndex = gameObject.GetFrameIndex(shapeDrawParams.Graphics.GetFrameCount());
+            int frameIndex = gameObject.GetFrameIndex(drawParams.MainImage.GetFrameCount());
             if (gameObject.IsTurretAnim)
             {
                 // Turret anims have their facing frames reversed
                 byte facing = (byte)(255 - gameObject.Facing - 31);
-                frameIndex = facing / (512 / shapeDrawParams.Graphics.GetFrameCount());
+                frameIndex = facing / (512 / drawParams.MainImage.GetFrameCount());
             }
 
             float alpha = 1.0f;
@@ -53,35 +57,32 @@ namespace TSMapEditor.Rendering.ObjectRenderers
                     break;
             }
 
-            DrawShadow(gameObject, shapeDrawParams, drawPoint, yDrawPointWithoutCellHeight);
+            DrawShadow(gameObject, drawParams, drawPoint, heightOffset);
 
-            DrawShapeImage(gameObject, shapeDrawParams, shapeDrawParams.Graphics,
+            DrawShapeImage(gameObject, drawParams, drawParams.MainImage,
                 frameIndex, Color.White * alpha,
                 gameObject.IsBuildingAnim, gameObject.GetRemapColor() * alpha,
-                drawPoint, yDrawPointWithoutCellHeight);
+                drawPoint, heightOffset);
         }
 
-        protected override void DrawShadow(Animation gameObject, ICommonDrawParams drawParams, Point2D drawPoint, int initialYDrawPointWithoutCellHeight)
+        protected override void DrawShadow(Animation gameObject, CommonDrawParams drawParams, Point2D drawPoint, int heightOffset)
         {
             if (!Constants.DrawBuildingAnimationShadows && gameObject.IsBuildingAnim)
                 return;
 
-            if (drawParams is not ShapeDrawParams shapeDrawParams)
-                return;
-
-            int shadowFrameIndex = gameObject.GetShadowFrameIndex(shapeDrawParams.Graphics.GetFrameCount());
+            int shadowFrameIndex = gameObject.GetShadowFrameIndex(drawParams.MainImage.GetFrameCount());
 
             if (gameObject.IsTurretAnim)
             {
                 // Turret anims have their facing frames reversed
                 byte facing = (byte)(255 - gameObject.Facing - 31);
-                shadowFrameIndex += facing / (512 / shapeDrawParams.Graphics.GetFrameCount());
+                shadowFrameIndex += facing / (512 / drawParams.MainImage.GetFrameCount());
             }
 
-            if (shadowFrameIndex > 0 && shadowFrameIndex < shapeDrawParams.Graphics.GetFrameCount())
+            if (shadowFrameIndex > 0 && shadowFrameIndex < drawParams.MainImage.GetFrameCount())
             {
-                DrawShapeImage(gameObject, drawParams, shapeDrawParams.Graphics, shadowFrameIndex,
-                    new Color(0, 0, 0, 128), false, Color.White, drawPoint, initialYDrawPointWithoutCellHeight);
+                DrawShapeImage(gameObject, drawParams, drawParams.MainImage, shadowFrameIndex,
+                    new Color(0, 0, 0, 128), false, Color.White, drawPoint, heightOffset);
             }
         }
     }

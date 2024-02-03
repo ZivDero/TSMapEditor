@@ -13,61 +13,77 @@ namespace TSMapEditor.Rendering.ObjectRenderers
 
         protected override Color ReplacementColor => Color.Red;
 
-        protected override ICommonDrawParams GetDrawParams(Unit gameObject)
+        protected override CommonDrawParams GetDrawParams(Unit gameObject)
+        {
+            string iniName = gameObject.ObjectType.ININame;
+
+            return new CommonDrawParams()
+            {
+                IniName = iniName,
+                MainImage = TheaterGraphics.UnitTextures[gameObject.ObjectType.Index],
+                MainModel = TheaterGraphics.UnitModels[gameObject.ObjectType.Index],
+                TurretModel = TheaterGraphics.UnitTurretModels[gameObject.ObjectType.Index],
+                BarrelModel = TheaterGraphics.UnitBarrelModels[gameObject.ObjectType.Index]
+            };
+        }
+
+        protected override void Render(Unit gameObject, int heightOffset, Point2D drawPoint,
+            CommonDrawParams drawParams)
         {
             if (gameObject.UnitType.ArtConfig.Voxel)
             {
-                var graphics = TheaterGraphics.UnitModels[gameObject.ObjectType.Index];
-                string iniName = gameObject.ObjectType.ININame;
-                return new VoxelDrawParams(graphics, iniName);
+                RenderVoxelModel(gameObject, heightOffset, drawPoint, drawParams, drawParams.MainModel);
+                
+                const byte facingStartDrawAbove = (byte)Direction.NE * 32;
+                const byte facingEndDrawAbove = (byte)Direction.SW * 32;
+
+                if (gameObject.Facing is > facingStartDrawAbove and <= facingEndDrawAbove)
+                {
+                    RenderVoxelModel(gameObject, heightOffset, drawPoint, drawParams, drawParams.TurretModel);
+                    RenderVoxelModel(gameObject, heightOffset, drawPoint, drawParams, drawParams.BarrelModel);
+                }
+                else
+                {
+                    RenderVoxelModel(gameObject, heightOffset, drawPoint, drawParams, drawParams.BarrelModel);
+                    RenderVoxelModel(gameObject, heightOffset, drawPoint, drawParams, drawParams.TurretModel);
+                }
             }
             else
             {
-                var graphics = TheaterGraphics.UnitTextures[gameObject.ObjectType.Index];
-                string iniName = gameObject.ObjectType.ININame;
-                return new ShapeDrawParams(graphics, iniName);
+                RenderShape(gameObject, heightOffset, drawPoint, drawParams);
             }
         }
 
-        protected override void Render(Unit gameObject, int yDrawPointWithoutCellHeight, Point2D drawPoint,
-            ICommonDrawParams drawParams)
-        {
-            if (drawParams is ShapeDrawParams shapeDrawParams)
-                RenderShape(gameObject, yDrawPointWithoutCellHeight, drawPoint, shapeDrawParams);
-            else if (drawParams is VoxelDrawParams voxelDrawParams)
-                RenderVoxelModel(gameObject, yDrawPointWithoutCellHeight, drawPoint, voxelDrawParams);
-        }
-
-        private void RenderShape(Unit gameObject, int yDrawPointWithoutCellHeight, Point2D drawPoint,
-            ShapeDrawParams drawParams)
+        private void RenderShape(Unit gameObject, int heightOffset, Point2D drawPoint,
+            CommonDrawParams drawParams)
         {
             if (!gameObject.ObjectType.NoShadow)
-                DrawShadow(gameObject, drawParams, drawPoint, yDrawPointWithoutCellHeight);
+                DrawShadow(gameObject, drawParams, drawPoint, heightOffset);
 
-            DrawShapeImage(gameObject, drawParams, drawParams.Graphics, 
-                gameObject.GetFrameIndex(drawParams.Graphics.GetFrameCount()),
-                Color.White, true, gameObject.GetRemapColor(), drawPoint, yDrawPointWithoutCellHeight);
+            DrawShapeImage(gameObject, drawParams, drawParams.MainImage, 
+                gameObject.GetFrameIndex(drawParams.MainImage.GetFrameCount()),
+                Color.White, true, gameObject.GetRemapColor(), drawPoint, heightOffset);
 
             if (gameObject.UnitType.Turret)
             {
                 int turretFrameIndex = gameObject.GetTurretFrameIndex();
 
-                if (turretFrameIndex > -1 && turretFrameIndex < drawParams.Graphics.GetFrameCount())
+                if (turretFrameIndex > -1 && turretFrameIndex < drawParams.MainImage.GetFrameCount())
                 {
-                    PositionedTexture frame = drawParams.Graphics.GetFrame(turretFrameIndex);
+                    PositionedTexture frame = drawParams.MainImage.GetFrame(turretFrameIndex);
 
                     if (frame == null)
                         return;
 
-                    DrawShapeImage(gameObject, drawParams, drawParams.Graphics, 
+                    DrawShapeImage(gameObject, drawParams, drawParams.MainImage, 
                         turretFrameIndex, Color.White, true, gameObject.GetRemapColor(),
-                        drawPoint, yDrawPointWithoutCellHeight);
+                        drawPoint, heightOffset);
                 }
             }
         }
 
-        private void RenderVoxelModel(Unit gameObject, int yDrawPointWithoutCellHeight, Point2D drawPoint,
-            VoxelDrawParams drawParams)
+        private void RenderVoxelModel(Unit gameObject, int heightOffset, Point2D drawPoint,
+            CommonDrawParams drawParams, VoxelModel model)
         {
             var unitTile = RenderDependencies.Map.GetTile(gameObject.Position.X, gameObject.Position.Y);
 
@@ -78,9 +94,9 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             ISubTileImage subTile = tile.GetSubTile(unitTile.SubTileIndex);
             RampType ramp = subTile.TmpImage.RampType;
 
-            DrawVoxelModel(gameObject, drawParams, drawParams.Graphics,
+            DrawVoxelModel(gameObject, drawParams, model,
                 gameObject.Facing, ramp, Color.White, true, gameObject.GetRemapColor(),
-                drawPoint, yDrawPointWithoutCellHeight);
+                drawPoint, heightOffset);
         }
     }
 }
