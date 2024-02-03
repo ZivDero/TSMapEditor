@@ -16,13 +16,10 @@ namespace TSMapEditor.Rendering.ObjectRenderers
 
         protected override CommonDrawParams GetDrawParams(Aircraft gameObject)
         {
-            var mainModel = TheaterGraphics.AircraftModels[gameObject.ObjectType.Index];
-            string iniName = gameObject.ObjectType.ININame;
-
             return new CommonDrawParams()
             {
-                IniName = iniName,
-                MainVoxel = mainModel
+                IniName = gameObject.ObjectType.ININame,
+                MainVoxel = TheaterGraphics.AircraftModels[gameObject.ObjectType.Index]
             };
         }
 
