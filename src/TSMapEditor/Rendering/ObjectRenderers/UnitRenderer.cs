@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 using TSMapEditor.CCEngine;
 using TSMapEditor.GameMath;
 using TSMapEditor.Models;
@@ -32,28 +33,51 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             if (gameObject.UnitType.ArtConfig.Voxel)
             {
                 RenderVoxelModel(gameObject, heightOffset, drawPoint, drawParams, drawParams.MainModel);
-                
-                const byte facingStartDrawAbove = (byte)Direction.NE * 32;
-                const byte facingEndDrawAbove = (byte)Direction.SW * 32;
-
-                if (gameObject.Facing is > facingStartDrawAbove and <= facingEndDrawAbove)
-                {
-                    RenderVoxelModel(gameObject, heightOffset, drawPoint, drawParams, drawParams.TurretModel);
-                    RenderVoxelModel(gameObject, heightOffset, drawPoint, drawParams, drawParams.BarrelModel);
-                }
-                else
-                {
-                    RenderVoxelModel(gameObject, heightOffset, drawPoint, drawParams, drawParams.BarrelModel);
-                    RenderVoxelModel(gameObject, heightOffset, drawPoint, drawParams, drawParams.TurretModel);
-                }
             }
             else
             {
-                RenderShape(gameObject, heightOffset, drawPoint, drawParams);
+                RenderMainShape(gameObject, heightOffset, drawPoint, drawParams);
+            }
+
+            if (gameObject.UnitType.Turret)
+            {
+                const byte facingStartDrawAbove = (byte)Direction.E * 32;
+                const byte facingEndDrawAbove = (byte)Direction.W * 32;
+
+                byte facing = Convert.ToByte(Math.Clamp(
+                    Math.Round((float)gameObject.Facing / 8, MidpointRounding.AwayFromZero) * 8,
+                    byte.MinValue,
+                    byte.MaxValue));
+
+                float rotationFromFacing = 2 * (float)Math.PI * ((float)facing / Constants.FacingMax);
+
+                Vector2 leptonTurretOffset = new Vector2(0, -gameObject.UnitType.ArtConfig.TurretOffset);
+                leptonTurretOffset = Vector2.Transform(leptonTurretOffset, Matrix.CreateRotationZ(rotationFromFacing));
+
+                Point2D turretOffset = Helpers.ScreenCoordsFromWorldLeptons(leptonTurretOffset);
+
+                if (gameObject.Facing is > facingStartDrawAbove and <= facingEndDrawAbove)
+                {
+                    if (gameObject.UnitType.ArtConfig.Voxel)
+                        RenderVoxelModel(gameObject, heightOffset, drawPoint + turretOffset, drawParams, drawParams.TurretModel);
+                    else
+                        RenderTurretShape(gameObject, heightOffset, drawPoint, drawParams);
+                    
+                    RenderVoxelModel(gameObject, heightOffset, drawPoint + turretOffset, drawParams, drawParams.BarrelModel);
+                }
+                else
+                {
+                    RenderVoxelModel(gameObject, heightOffset, drawPoint + turretOffset, drawParams, drawParams.BarrelModel);
+
+                    if (gameObject.UnitType.ArtConfig.Voxel)
+                        RenderVoxelModel(gameObject, heightOffset, drawPoint + turretOffset, drawParams, drawParams.TurretModel);
+                    else
+                        RenderTurretShape(gameObject, heightOffset, drawPoint, drawParams);
+                }
             }
         }
 
-        private void RenderShape(Unit gameObject, int heightOffset, Point2D drawPoint,
+        private void RenderMainShape(Unit gameObject, int heightOffset, Point2D drawPoint,
             CommonDrawParams drawParams)
         {
             if (!gameObject.ObjectType.NoShadow)
@@ -62,22 +86,23 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             DrawShapeImage(gameObject, drawParams, drawParams.MainImage, 
                 gameObject.GetFrameIndex(drawParams.MainImage.GetFrameCount()),
                 Color.White, true, gameObject.GetRemapColor(), drawPoint, heightOffset);
+        }
 
-            if (gameObject.UnitType.Turret)
+        private void RenderTurretShape(Unit gameObject, int heightOffset, Point2D drawPoint,
+            CommonDrawParams drawParams)
+        {
+            int turretFrameIndex = gameObject.GetTurretFrameIndex();
+
+            if (turretFrameIndex > -1 && turretFrameIndex < drawParams.MainImage.GetFrameCount())
             {
-                int turretFrameIndex = gameObject.GetTurretFrameIndex();
+                PositionedTexture frame = drawParams.MainImage.GetFrame(turretFrameIndex);
 
-                if (turretFrameIndex > -1 && turretFrameIndex < drawParams.MainImage.GetFrameCount())
-                {
-                    PositionedTexture frame = drawParams.MainImage.GetFrame(turretFrameIndex);
+                if (frame == null)
+                    return;
 
-                    if (frame == null)
-                        return;
-
-                    DrawShapeImage(gameObject, drawParams, drawParams.MainImage, 
-                        turretFrameIndex, Color.White, true, gameObject.GetRemapColor(),
-                        drawPoint, heightOffset);
-                }
+                DrawShapeImage(gameObject, drawParams, drawParams.MainImage,
+                    turretFrameIndex, Color.White, true, gameObject.GetRemapColor(),
+                    drawPoint, heightOffset);
             }
         }
 

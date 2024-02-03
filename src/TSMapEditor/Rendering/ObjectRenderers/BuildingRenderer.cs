@@ -99,8 +99,8 @@ namespace TSMapEditor.Rendering.ObjectRenderers
                 var turretOffset = new Point2D(gameObject.ObjectType.TurretAnimX, gameObject.ObjectType.TurretAnimY);
                 var turretDrawPoint = drawPoint + turretOffset;
 
-                const byte facingStartDrawAbove = (byte)Direction.NE * 32;
-                const byte facingEndDrawAbove = (byte)Direction.SW * 32;
+                const byte facingStartDrawAbove = (byte)Direction.E * 32;
+                const byte facingEndDrawAbove = (byte)Direction.W * 32;
 
                 if (gameObject.Facing is > facingStartDrawAbove and <= facingEndDrawAbove)
                 {

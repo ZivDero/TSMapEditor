@@ -918,7 +918,7 @@ namespace TSMapEditor.Rendering
             {
                 var unitType = unitTypes[i];
 
-                if (!(unitType.Turret && unitType.ArtConfig.Voxel))
+                if (!unitType.Turret)
                     continue;
 
                 string turretModelName = string.IsNullOrWhiteSpace(unitType.Image) ? unitType.ININame : unitType.Image;
@@ -962,7 +962,7 @@ namespace TSMapEditor.Rendering
             {
                 var unitType = unitTypes[i];
 
-                if (!(unitType.Turret && unitType.ArtConfig.Voxel))
+                if (!unitType.Turret)
                     continue;
 
                 string barrelModelName = string.IsNullOrWhiteSpace(unitType.Image) ? unitType.ININame : unitType.Image;
