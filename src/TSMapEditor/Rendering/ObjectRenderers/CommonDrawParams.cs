@@ -3,9 +3,9 @@
     public readonly ref struct CommonDrawParams
     {
         public string IniName { get; init; }
-        public ShapeImage MainImage { get; init; }
-        public VoxelModel MainModel { get; init; }
-        public VoxelModel TurretModel { get; init; }
-        public VoxelModel BarrelModel { get; init; }
+        public ShapeImage ShapeImage { get; init; }
+        public VoxelModel MainVoxel { get; init; }
+        public VoxelModel TurretVoxel { get; init; }
+        public VoxelModel BarrelVoxel { get; init; }
     }
 }

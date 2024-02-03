@@ -17,7 +17,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             return new CommonDrawParams()
             {
                 IniName = gameObject.OverlayType.ININame,
-                MainImage = TheaterGraphics.OverlayTextures[gameObject.OverlayType.Index]
+                ShapeImage = TheaterGraphics.OverlayTextures[gameObject.OverlayType.Index]
             };
         }
 
@@ -53,7 +53,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             }
 
             DrawShadow(gameObject, drawParams, drawPoint, heightOffset);
-            DrawShapeImage(gameObject, drawParams, drawParams.MainImage, gameObject.FrameIndex, Color.White, true, remapColor, drawPoint, heightOffset);
+            DrawShapeImage(gameObject, drawParams, drawParams.ShapeImage, gameObject.FrameIndex, Color.White, true, remapColor, drawPoint, heightOffset);
         }
     }
 }

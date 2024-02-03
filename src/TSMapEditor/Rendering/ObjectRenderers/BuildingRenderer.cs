@@ -54,9 +54,9 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             return new CommonDrawParams()
             {
                 IniName = iniName,
-                MainImage = RenderDependencies.TheaterGraphics.BuildingTextures[gameObject.ObjectType.Index],
-                TurretModel = RenderDependencies.TheaterGraphics.BuildingTurretModels[gameObject.ObjectType.Index],
-                BarrelModel = RenderDependencies.TheaterGraphics.BuildingBarrelModels[gameObject.ObjectType.Index]
+                ShapeImage = RenderDependencies.TheaterGraphics.BuildingTextures[gameObject.ObjectType.Index],
+                TurretVoxel = RenderDependencies.TheaterGraphics.BuildingTurretModels[gameObject.ObjectType.Index],
+                BarrelVoxel = RenderDependencies.TheaterGraphics.BuildingBarrelModels[gameObject.ObjectType.Index]
             };
         }
 
@@ -90,8 +90,8 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             if (!gameObject.ObjectType.NoShadow)
                 DrawShadow(gameObject, drawParams, drawPoint, heightOffset);
 
-            DrawShapeImage(gameObject, drawParams, drawParams.MainImage,
-                gameObject.GetFrameIndex(drawParams.MainImage.GetFrameCount()),
+            DrawShapeImage(gameObject, drawParams, drawParams.ShapeImage,
+                gameObject.GetFrameIndex(drawParams.ShapeImage.GetFrameCount()),
                 Color.White, true, gameObject.GetRemapColor(), drawPoint, heightOffset);
 
             if (gameObject.ObjectType.Turret && gameObject.ObjectType.TurretAnimIsVoxel)
@@ -104,21 +104,21 @@ namespace TSMapEditor.Rendering.ObjectRenderers
 
                 if (gameObject.Facing is > facingStartDrawAbove and <= facingEndDrawAbove)
                 {
-                    DrawVoxelModel(gameObject, drawParams, drawParams.TurretModel,
+                    DrawVoxelModel(gameObject, drawParams, drawParams.TurretVoxel,
                         gameObject.Facing, RampType.None, Color.White, true, gameObject.GetRemapColor(),
                         turretDrawPoint, heightOffset);
 
-                    DrawVoxelModel(gameObject, drawParams, drawParams.BarrelModel,
+                    DrawVoxelModel(gameObject, drawParams, drawParams.BarrelVoxel,
                         gameObject.Facing, RampType.None, Color.White, true, gameObject.GetRemapColor(),
                         turretDrawPoint, heightOffset);
                 }
                 else
                 {
-                    DrawVoxelModel(gameObject, drawParams, drawParams.BarrelModel,
+                    DrawVoxelModel(gameObject, drawParams, drawParams.BarrelVoxel,
                         gameObject.Facing, RampType.None, Color.White, true, gameObject.GetRemapColor(),
                         turretDrawPoint, heightOffset);
 
-                    DrawVoxelModel(gameObject, drawParams, drawParams.TurretModel,
+                    DrawVoxelModel(gameObject, drawParams, drawParams.TurretVoxel,
                         gameObject.Facing, RampType.None, Color.White, true, gameObject.GetRemapColor(),
                         turretDrawPoint, heightOffset);
                 }
@@ -126,13 +126,13 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             else if (gameObject.ObjectType.Turret && !gameObject.ObjectType.TurretAnimIsVoxel &&
                      gameObject.ObjectType.BarrelAnimIsVoxel)
             {
-                DrawVoxelModel(gameObject, drawParams, drawParams.BarrelModel,
+                DrawVoxelModel(gameObject, drawParams, drawParams.BarrelVoxel,
                     gameObject.Facing, RampType.None, Color.White, true, gameObject.GetRemapColor(),
                     drawPoint, heightOffset);
             }
 
             if (gameObject.ObjectType.HasSpotlight ||
-                (gameObject.ObjectType.Turret && gameObject.ObjectType.TurretAnimIsVoxel && drawParams.TurretModel == null))
+                (gameObject.ObjectType.Turret && gameObject.ObjectType.TurretAnimIsVoxel && drawParams.TurretVoxel == null))
             {
                 Point2D cellCenter = RenderDependencies.EditorState.Is2DMode ?
                     CellMath.CellTopLeftPointFromCellCoords(gameObject.Position, Map) :

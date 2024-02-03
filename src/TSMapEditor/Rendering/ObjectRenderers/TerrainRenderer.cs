@@ -17,7 +17,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             return new CommonDrawParams()
             {
                 IniName = gameObject.TerrainType.ININame,
-                MainImage = TheaterGraphics.TerrainObjectTextures[gameObject.TerrainType.Index]
+                ShapeImage = TheaterGraphics.TerrainObjectTextures[gameObject.TerrainType.Index]
             };
         }
 
@@ -25,7 +25,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
         {
             DrawShadow(gameObject, drawParams, drawPoint, heightOffset);
 
-            DrawShapeImage(gameObject, drawParams, drawParams.MainImage, 0, 
+            DrawShapeImage(gameObject, drawParams, drawParams.ShapeImage, 0, 
                 Color.White, false, Color.White, drawPoint, heightOffset);
         }
     }

@@ -14,14 +14,11 @@ namespace TSMapEditor.Rendering.ObjectRenderers
 
         protected override CommonDrawParams GetDrawParams(Infantry gameObject)
         {
-            var mainImage = TheaterGraphics.InfantryTextures[gameObject.ObjectType.Index];
-            string iniName = gameObject.ObjectType.ININame;
-
             return new CommonDrawParams()
             {
-                IniName = iniName,
-                MainImage = mainImage
-            };
+                IniName = gameObject.ObjectType.ININame,
+                ShapeImage = TheaterGraphics.InfantryTextures[gameObject.ObjectType.Index]
+        };
         }
 
         protected override void Render(Infantry gameObject, int heightOffset, Point2D drawPoint, in CommonDrawParams drawParams)
@@ -48,8 +45,8 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             if (!gameObject.ObjectType.NoShadow)
                 DrawShadow(gameObject, drawParams, drawPoint, heightOffset);
 
-            DrawShapeImage(gameObject, drawParams, drawParams.MainImage, 
-                gameObject.GetFrameIndex(drawParams.MainImage.GetFrameCount()), 
+            DrawShapeImage(gameObject, drawParams, drawParams.ShapeImage, 
+                gameObject.GetFrameIndex(drawParams.ShapeImage.GetFrameCount()), 
                 Color.White, true, gameObject.GetRemapColor(), drawPoint, heightOffset);
         }
     }

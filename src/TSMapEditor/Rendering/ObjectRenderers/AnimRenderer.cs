@@ -17,7 +17,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             return new CommonDrawParams()
             {
                 IniName = gameObject.AnimType.ININame,
-                MainImage = TheaterGraphics.AnimTextures[gameObject.AnimType.Index]
+                ShapeImage = TheaterGraphics.AnimTextures[gameObject.AnimType.Index]
             };
         }
 
@@ -29,15 +29,15 @@ namespace TSMapEditor.Rendering.ObjectRenderers
 
         protected override void Render(Animation gameObject, int heightOffset, Point2D drawPoint, in CommonDrawParams drawParams)
         {
-            if (drawParams.MainImage == null)
+            if (drawParams.ShapeImage == null)
                 return;
 
-            int frameIndex = gameObject.GetFrameIndex(drawParams.MainImage.GetFrameCount());
+            int frameIndex = gameObject.GetFrameIndex(drawParams.ShapeImage.GetFrameCount());
             if (gameObject.IsTurretAnim)
             {
                 // Turret anims have their facing frames reversed
                 byte facing = (byte)(255 - gameObject.Facing - 31);
-                frameIndex = facing / (512 / drawParams.MainImage.GetFrameCount());
+                frameIndex = facing / (512 / drawParams.ShapeImage.GetFrameCount());
             }
 
             float alpha = 1.0f;
@@ -59,7 +59,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
 
             DrawShadow(gameObject, drawParams, drawPoint, heightOffset);
 
-            DrawShapeImage(gameObject, drawParams, drawParams.MainImage,
+            DrawShapeImage(gameObject, drawParams, drawParams.ShapeImage,
                 frameIndex, Color.White * alpha,
                 gameObject.IsBuildingAnim, gameObject.GetRemapColor() * alpha,
                 drawPoint, heightOffset);
@@ -70,18 +70,18 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             if (!Constants.DrawBuildingAnimationShadows && gameObject.IsBuildingAnim)
                 return;
 
-            int shadowFrameIndex = gameObject.GetShadowFrameIndex(drawParams.MainImage.GetFrameCount());
+            int shadowFrameIndex = gameObject.GetShadowFrameIndex(drawParams.ShapeImage.GetFrameCount());
 
             if (gameObject.IsTurretAnim)
             {
                 // Turret anims have their facing frames reversed
                 byte facing = (byte)(255 - gameObject.Facing - 31);
-                shadowFrameIndex += facing / (512 / drawParams.MainImage.GetFrameCount());
+                shadowFrameIndex += facing / (512 / drawParams.ShapeImage.GetFrameCount());
             }
 
-            if (shadowFrameIndex > 0 && shadowFrameIndex < drawParams.MainImage.GetFrameCount())
+            if (shadowFrameIndex > 0 && shadowFrameIndex < drawParams.ShapeImage.GetFrameCount())
             {
-                DrawShapeImage(gameObject, drawParams, drawParams.MainImage, shadowFrameIndex,
+                DrawShapeImage(gameObject, drawParams, drawParams.ShapeImage, shadowFrameIndex,
                     new Color(0, 0, 0, 128), false, Color.White, drawPoint, heightOffset);
             }
         }

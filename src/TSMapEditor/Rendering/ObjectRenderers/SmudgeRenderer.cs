@@ -17,13 +17,13 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             return new CommonDrawParams()
             {
                 IniName = gameObject.SmudgeType.ININame,
-                MainImage = TheaterGraphics.SmudgeTextures[gameObject.SmudgeType.Index]
+                ShapeImage = TheaterGraphics.SmudgeTextures[gameObject.SmudgeType.Index]
             };
         }
 
         protected override void Render(Smudge gameObject, int heightOffset, Point2D drawPoint, in CommonDrawParams drawParams)
         {
-            DrawShapeImage(gameObject, drawParams, drawParams.MainImage, 0, Color.White, false, Color.White, drawPoint, heightOffset);
+            DrawShapeImage(gameObject, drawParams, drawParams.ShapeImage, 0, Color.White, false, Color.White, drawPoint, heightOffset);
         }
     }
 }

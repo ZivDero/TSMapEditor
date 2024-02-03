@@ -22,13 +22,13 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             return new CommonDrawParams()
             {
                 IniName = iniName,
-                MainModel = mainModel
+                MainVoxel = mainModel
             };
         }
 
         protected override void Render(Aircraft gameObject, int heightOffset, Point2D drawPoint, in CommonDrawParams drawParams)
         {
-            DrawVoxelModel(gameObject, drawParams, drawParams.MainModel,
+            DrawVoxelModel(gameObject, drawParams, drawParams.MainVoxel,
                 gameObject.Facing, RampType.None, Color.White, true, gameObject.GetRemapColor(),
                 drawPoint, heightOffset);
         }

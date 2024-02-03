@@ -147,16 +147,16 @@ namespace TSMapEditor.Rendering.ObjectRenderers
 
         private PositionedTexture GetFrameTexture(T gameObject, in CommonDrawParams drawParams)
         {
-            if (drawParams.MainImage != null && drawParams.MainImage.GetFrameCount() > 0)
+            if (drawParams.ShapeImage != null && drawParams.ShapeImage.GetFrameCount() > 0)
             {
-                int frameIndex = gameObject.GetFrameIndex(drawParams.MainImage.GetFrameCount());
+                int frameIndex = gameObject.GetFrameIndex(drawParams.ShapeImage.GetFrameCount());
 
-                if (frameIndex > -1 && frameIndex < drawParams.MainImage.GetFrameCount())
-                    return drawParams.MainImage.GetFrame(frameIndex);
+                if (frameIndex > -1 && frameIndex < drawParams.ShapeImage.GetFrameCount())
+                    return drawParams.ShapeImage.GetFrame(frameIndex);
             }
-            else if (drawParams.MainModel?.Frames != null)
+            else if (drawParams.MainVoxel?.Frames != null)
             {
-                return drawParams.MainModel.GetFrame(0, RampType.None);
+                return drawParams.MainVoxel.GetFrame(0, RampType.None);
             }
 
             return null;
@@ -211,13 +211,13 @@ namespace TSMapEditor.Rendering.ObjectRenderers
 
         protected virtual void DrawShadow(T gameObject, in CommonDrawParams drawParams, Point2D drawPoint, int heightOffset)
         {
-            if (drawParams.MainImage == null)
+            if (drawParams.ShapeImage == null)
                 return;
 
-            int shadowFrameIndex = gameObject.GetShadowFrameIndex(drawParams.MainImage.GetFrameCount());
-            if (shadowFrameIndex > 0 && shadowFrameIndex < drawParams.MainImage.GetFrameCount())
+            int shadowFrameIndex = gameObject.GetShadowFrameIndex(drawParams.ShapeImage.GetFrameCount());
+            if (shadowFrameIndex > 0 && shadowFrameIndex < drawParams.ShapeImage.GetFrameCount())
             {
-                DrawShapeImage(gameObject, drawParams, drawParams.MainImage, shadowFrameIndex,
+                DrawShapeImage(gameObject, drawParams, drawParams.ShapeImage, shadowFrameIndex,
                     new Color(0, 0, 0, 128), false, Color.White, drawPoint, heightOffset);
             }
         }

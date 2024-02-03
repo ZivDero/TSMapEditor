@@ -21,10 +21,10 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             return new CommonDrawParams()
             {
                 IniName = iniName,
-                MainImage = TheaterGraphics.UnitTextures[gameObject.ObjectType.Index],
-                MainModel = TheaterGraphics.UnitModels[gameObject.ObjectType.Index],
-                TurretModel = TheaterGraphics.UnitTurretModels[gameObject.ObjectType.Index],
-                BarrelModel = TheaterGraphics.UnitBarrelModels[gameObject.ObjectType.Index]
+                ShapeImage = TheaterGraphics.UnitTextures[gameObject.ObjectType.Index],
+                MainVoxel = TheaterGraphics.UnitModels[gameObject.ObjectType.Index],
+                TurretVoxel = TheaterGraphics.UnitTurretModels[gameObject.ObjectType.Index],
+                BarrelVoxel = TheaterGraphics.UnitBarrelModels[gameObject.ObjectType.Index]
             };
         }
 
@@ -32,7 +32,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
         {
             if (gameObject.UnitType.ArtConfig.Voxel)
             {
-                RenderVoxelModel(gameObject, heightOffset, drawPoint, drawParams, drawParams.MainModel);
+                RenderVoxelModel(gameObject, heightOffset, drawPoint, drawParams, drawParams.MainVoxel);
             }
             else
             {
@@ -59,18 +59,18 @@ namespace TSMapEditor.Rendering.ObjectRenderers
                 if (gameObject.Facing is > facingStartDrawAbove and <= facingEndDrawAbove)
                 {
                     if (gameObject.UnitType.ArtConfig.Voxel)
-                        RenderVoxelModel(gameObject, heightOffset, drawPoint + turretOffset, drawParams, drawParams.TurretModel);
+                        RenderVoxelModel(gameObject, heightOffset, drawPoint + turretOffset, drawParams, drawParams.TurretVoxel);
                     else
                         RenderTurretShape(gameObject, heightOffset, drawPoint, drawParams);
                     
-                    RenderVoxelModel(gameObject, heightOffset, drawPoint + turretOffset, drawParams, drawParams.BarrelModel);
+                    RenderVoxelModel(gameObject, heightOffset, drawPoint + turretOffset, drawParams, drawParams.BarrelVoxel);
                 }
                 else
                 {
-                    RenderVoxelModel(gameObject, heightOffset, drawPoint + turretOffset, drawParams, drawParams.BarrelModel);
+                    RenderVoxelModel(gameObject, heightOffset, drawPoint + turretOffset, drawParams, drawParams.BarrelVoxel);
 
                     if (gameObject.UnitType.ArtConfig.Voxel)
-                        RenderVoxelModel(gameObject, heightOffset, drawPoint + turretOffset, drawParams, drawParams.TurretModel);
+                        RenderVoxelModel(gameObject, heightOffset, drawPoint + turretOffset, drawParams, drawParams.TurretVoxel);
                     else
                         RenderTurretShape(gameObject, heightOffset, drawPoint, drawParams);
                 }
@@ -83,8 +83,8 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             if (!gameObject.ObjectType.NoShadow)
                 DrawShadow(gameObject, drawParams, drawPoint, heightOffset);
 
-            DrawShapeImage(gameObject, drawParams, drawParams.MainImage, 
-                gameObject.GetFrameIndex(drawParams.MainImage.GetFrameCount()),
+            DrawShapeImage(gameObject, drawParams, drawParams.ShapeImage, 
+                gameObject.GetFrameIndex(drawParams.ShapeImage.GetFrameCount()),
                 Color.White, true, gameObject.GetRemapColor(), drawPoint, heightOffset);
         }
 
@@ -93,14 +93,14 @@ namespace TSMapEditor.Rendering.ObjectRenderers
         {
             int turretFrameIndex = gameObject.GetTurretFrameIndex();
 
-            if (turretFrameIndex > -1 && turretFrameIndex < drawParams.MainImage.GetFrameCount())
+            if (turretFrameIndex > -1 && turretFrameIndex < drawParams.ShapeImage.GetFrameCount())
             {
-                PositionedTexture frame = drawParams.MainImage.GetFrame(turretFrameIndex);
+                PositionedTexture frame = drawParams.ShapeImage.GetFrame(turretFrameIndex);
 
                 if (frame == null)
                     return;
 
-                DrawShapeImage(gameObject, drawParams, drawParams.MainImage,
+                DrawShapeImage(gameObject, drawParams, drawParams.ShapeImage,
                     turretFrameIndex, Color.White, true, gameObject.GetRemapColor(),
                     drawPoint, heightOffset);
             }
