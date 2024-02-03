@@ -158,6 +158,14 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             {
                 return drawParams.MainVoxel.GetFrame(0, RampType.None);
             }
+            else if (drawParams.TurretVoxel?.Frames != null)
+            {
+                return drawParams.TurretVoxel.GetFrame(0, RampType.None);
+            }
+            else if (drawParams.BarrelVoxel?.Frames != null)
+            {
+                return drawParams.BarrelVoxel.GetFrame(0, RampType.None);
+            }
 
             return null;
         }
