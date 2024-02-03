@@ -16,11 +16,9 @@ namespace TSMapEditor.Rendering.ObjectRenderers
 
         protected override CommonDrawParams GetDrawParams(Unit gameObject)
         {
-            string iniName = gameObject.ObjectType.ININame;
-
             return new CommonDrawParams()
             {
-                IniName = iniName,
+                IniName = gameObject.ObjectType.ININame,
                 ShapeImage = TheaterGraphics.UnitTextures[gameObject.ObjectType.Index],
                 MainVoxel = TheaterGraphics.UnitModels[gameObject.ObjectType.Index],
                 TurretVoxel = TheaterGraphics.UnitTurretModels[gameObject.ObjectType.Index],
