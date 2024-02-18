@@ -22,7 +22,7 @@ namespace TSMapEditor.Models
                 if (!animType.RenderInEditor)
                     continue;
 
-                var animArtConfig = objectType.ArtConfig.BuildingAnimsConfigs.Find(x => x.ININame == animType.ININame)
+                var animArtConfig = objectType.ArtConfig.BuildingAnimConfigs.Find(x => x.ININame == animType.ININame)
                                     ?? new BuildingAnimArtConfig();
 
                 anims.Add(new Animation(animType)
@@ -165,11 +165,11 @@ namespace TSMapEditor.Models
                 if (upgrade == null)
                     continue;
 
-                string upgradeImage = string.IsNullOrWhiteSpace(upgrade.ArtConfig.Image) ?
-                                      string.IsNullOrWhiteSpace(upgrade.Image) ?
-                                      upgrade.ININame :
-                                      upgrade.Image :
-                                      upgrade.ArtConfig.Image;
+                string upgradeImage = upgrade.ArtConfig.Image;
+                if (string.IsNullOrWhiteSpace(upgradeImage))
+                    upgradeImage = upgrade.Image;
+                if (string.IsNullOrWhiteSpace(upgradeImage))
+                    upgradeImage = upgrade.ININame;
 
                 var config = ObjectType.ArtConfig.PowerUpAnimConfigs[i];
                 var animType = Array.Find(ObjectType.ArtConfig.PowerUpAnims, at => at.ININame == upgradeImage);

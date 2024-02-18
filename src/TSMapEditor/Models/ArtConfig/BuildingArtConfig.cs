@@ -244,7 +244,7 @@ namespace TSMapEditor.Models.ArtConfig
         public bool Theater { get; set; }
         public string Image { get; set; }
         public string BibShape { get; set; }
-        public List<BuildingAnimArtConfig> BuildingAnimsConfigs { get; set; } = new();
+        public List<BuildingAnimArtConfig> BuildingAnimConfigs { get; set; } = new();
         public List<PowerUpAnimArtConfig> PowerUpAnimConfigs { get; set; } = new();
         public AnimType[] Anims { get; set; } = Array.Empty<AnimType>();
         public AnimType[] PowerUpAnims { get; set; } = Array.Empty<AnimType>();
@@ -292,7 +292,7 @@ namespace TSMapEditor.Models.ArtConfig
                 }
             }
 
-            BuildingAnimsConfigs = anims;
+            BuildingAnimConfigs = anims;
         }
 
         public void ReadUpgradeAnims(int upgradeCount, IniSection iniSection)

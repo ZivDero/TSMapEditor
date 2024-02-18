@@ -420,7 +420,7 @@ namespace TSMapEditor.Models
         {
             var anims = new List<AnimType>();
 
-            foreach (var buildingAnimConfig in type.ArtConfig.BuildingAnimsConfigs)
+            foreach (var buildingAnimConfig in type.ArtConfig.BuildingAnimConfigs)
             {
                 AnimType anim = AnimTypes.Find(at => at.ININame == buildingAnimConfig.ININame);
                 if (anim != null)
@@ -437,11 +437,12 @@ namespace TSMapEditor.Models
             foreach (var powerUpType in BuildingTypes.Where(bt => !string.IsNullOrWhiteSpace(bt.PowersUpBuilding) &&
                                                                   bt.PowersUpBuilding.Equals(type.ININame, StringComparison.OrdinalIgnoreCase)))
             {
-                string image = string.IsNullOrWhiteSpace(powerUpType.ArtConfig.Image) ?
-                               string.IsNullOrWhiteSpace(powerUpType.Image) ?
-                               powerUpType.ININame :
-                               powerUpType.Image :
-                               powerUpType.ArtConfig.Image;
+                string image = powerUpType.ArtConfig.Image;
+                if (string.IsNullOrWhiteSpace(image))
+                    image = powerUpType.Image;
+                if (string.IsNullOrWhiteSpace(image))
+                    image = powerUpType.ININame;
+
                 AnimType anim = AnimTypes.Find(at => at.ININame == image);
                 if (anim != null)
                 {

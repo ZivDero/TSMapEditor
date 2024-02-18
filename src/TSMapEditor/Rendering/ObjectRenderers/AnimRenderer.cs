@@ -36,7 +36,7 @@ namespace TSMapEditor.Rendering.ObjectRenderers
             if (gameObject.IsTurretAnim)
             {
                 // Turret anims have their facing frames reversed
-                // Turret anims also only have 32 facings. GACTWR_C is broken, so we have to hardcode that
+                // Turret anims also only have 32 facings
                 byte facing = (byte)(255 - gameObject.Facing - 31);
                 frameIndex = facing / (256 / 32);
             }
