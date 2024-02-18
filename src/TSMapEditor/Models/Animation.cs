@@ -65,10 +65,11 @@ namespace TSMapEditor.Models
 
     public struct BuildingAnimDrawConfig
     {
+        private const int ZAdjustMult = 5; // Random value to make z-sorting work
         public int Y { get; set; }
         public int X { get; set; }
         public int YSort { get; set; }
         public int ZAdjust { get; set; }
-        public readonly int SortValue => YSort - ZAdjust;
+        public readonly int SortValue => YSort - ZAdjust * ZAdjustMult;
     }
 }

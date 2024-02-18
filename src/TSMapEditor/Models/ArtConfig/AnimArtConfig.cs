@@ -6,7 +6,7 @@ namespace TSMapEditor.Models.ArtConfig
     {
         public AnimArtConfig() { }
 
-        public bool Remapable => false;
+        public bool Remapable => IsBuildingAnim;
         public string Image { get; set; }
         public int YDrawOffset { get; set; }
         public int XDrawOffset { get; set; } // Phobos
