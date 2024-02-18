@@ -135,7 +135,7 @@ namespace TSMapEditor.Models
         {
             var anims = new List<Animation>();
 
-            for (int i = 0; i < UpgradeCount; i++)
+            for (int i = 0; i < Upgrades.Length; i++)
             {
                 var upgrade = Upgrades[i];
                 if (upgrade == null)
