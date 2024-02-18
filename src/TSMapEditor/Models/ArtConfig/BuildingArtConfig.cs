@@ -207,16 +207,6 @@ namespace TSMapEditor.Models.ArtConfig
             ZAdjust = iniSection.GetIntValue($"{name}ZAdjust", ZAdjust);
         }
 
-        // PowerUp version
-        public void ReadFromIniSection(IniSection iniSection, int i)
-        {
-            ININame = iniSection.GetStringValue($"PowerUp{i}Anim", ININame);
-            X = iniSection.GetIntValue($"PowerUp{i}LocXX", X);
-            Y = iniSection.GetIntValue($"PowerUp{i}LocYY", Y);
-            YSort = iniSection.GetIntValue($"PowerUp{i}LocXX", YSort);
-            ZAdjust = iniSection.GetIntValue($"PowerUp{i}LocZZ", ZAdjust);
-        }
-
         public string ININame { get; set; }
         public int X { get; set; }
         public int Y { get; set; }
