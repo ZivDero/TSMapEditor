@@ -165,7 +165,11 @@ namespace TSMapEditor.Models
                 if (upgrade == null)
                     continue;
 
-                string upgradeImage = string.IsNullOrWhiteSpace(upgrade.ArtConfig.Image) ? upgrade.ININame : upgrade.ArtConfig.Image;
+                string upgradeImage = string.IsNullOrWhiteSpace(upgrade.ArtConfig.Image) ?
+                                      string.IsNullOrWhiteSpace(upgrade.Image) ?
+                                      upgrade.ININame :
+                                      upgrade.Image :
+                                      upgrade.ArtConfig.Image;
 
                 var config = ObjectType.ArtConfig.PowerUpAnimConfigs[i];
                 var animType = Array.Find(ObjectType.ArtConfig.PowerUpAnims, at => at.ININame == upgradeImage);
