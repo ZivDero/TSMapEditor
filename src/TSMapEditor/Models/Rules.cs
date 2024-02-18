@@ -437,7 +437,7 @@ namespace TSMapEditor.Models
             foreach (var powerUpType in BuildingTypes.Where(bt => !string.IsNullOrWhiteSpace(bt.PowersUpBuilding) &&
                                                                   bt.PowersUpBuilding.Equals(type.ININame, StringComparison.OrdinalIgnoreCase)))
             {
-                string image = string.IsNullOrWhiteSpace(powerUpType.Image) ? powerUpType.ININame : powerUpType.Image;
+                string image = string.IsNullOrWhiteSpace(powerUpType.ArtConfig.Image) ? powerUpType.ININame : powerUpType.ArtConfig.Image;
                 AnimType anim = AnimTypes.Find(at => at.ININame == image);
                 if (anim != null)
                 {

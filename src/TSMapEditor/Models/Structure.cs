@@ -73,6 +73,14 @@ namespace TSMapEditor.Models
                 foreach (var anim in Anims)
                     anim.Position = value;
 
+                foreach (var powerUpAnim in PowerUpAnims)
+                {
+                    if (powerUpAnim != null)
+                    {
+                        powerUpAnim.Position = value;
+                    }
+                }
+
                 if (TurretAnim != null)
                     TurretAnim.Position = value;
             }
@@ -89,6 +97,14 @@ namespace TSMapEditor.Models
                 foreach (var anim in Anims)
                     anim.Owner = value;
 
+                foreach (var powerUpAnim in PowerUpAnims)
+                {
+                    if (powerUpAnim != null)
+                    {
+                        powerUpAnim.Owner = value;
+                    }
+                }
+
                 if (TurretAnim != null)
                     TurretAnim.Owner = value;
             }
@@ -101,6 +117,14 @@ namespace TSMapEditor.Models
             set
             {
                 _facing = value;
+
+                foreach (var powerUpAnim in PowerUpAnims)
+                {
+                    if (powerUpAnim != null)
+                    {
+                        powerUpAnim.Facing = value;
+                    }
+                }
 
                 if (TurretAnim != null)
                     TurretAnim.Facing = value;
@@ -141,7 +165,7 @@ namespace TSMapEditor.Models
                 if (upgrade == null)
                     continue;
 
-                string upgradeImage = string.IsNullOrWhiteSpace(upgrade.Image) ? upgrade.ININame : upgrade.Image;
+                string upgradeImage = string.IsNullOrWhiteSpace(upgrade.ArtConfig.Image) ? upgrade.ININame : upgrade.ArtConfig.Image;
 
                 var config = ObjectType.ArtConfig.PowerUpAnimConfigs[i];
                 var animType = Array.Find(ObjectType.ArtConfig.PowerUpAnims, at => at.ININame == upgradeImage);
@@ -151,7 +175,11 @@ namespace TSMapEditor.Models
 
                 anims.Add(new Animation(animType)
                 {
+                    Position = this.Position,
+                    Owner = this.Owner,
+                    Facing = this.Facing,
                     IsBuildingAnim = true,
+                    IsTurretAnim = upgrade.Turret && !upgrade.TurretAnimIsVoxel,
                     ParentBuilding = this,
                     BuildingAnimDrawConfig = new BuildingAnimDrawConfig
                     {
