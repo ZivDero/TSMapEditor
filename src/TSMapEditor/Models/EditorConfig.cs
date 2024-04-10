@@ -168,6 +168,10 @@ namespace TSMapEditor.Models
                 var scriptSection = iniFile.GetSection(sections[i]);
                 scriptAction.ReadIniSection(scriptSection);
 
+                if (ScriptActions.ContainsKey(scriptAction.ID))
+                    throw new INIConfigException(
+                        $"Error while adding Script Action {scriptAction.Name}: a Script Action with ID {scriptAction.ID} already exists!");
+
                 ScriptActions.Add(scriptAction.ID, scriptAction);
             }
         }
@@ -183,6 +187,10 @@ namespace TSMapEditor.Models
                 var section = iniFile.GetSection(sections[i]);
                 triggerEventType.ReadPropertiesFromIniSection(section);
 
+                if (TriggerEventTypes.ContainsKey(triggerEventType.ID))
+                    throw new INIConfigException(
+                        $"Error while adding Trigger Event {triggerEventType.Name}: a Trigger Event with ID {triggerEventType.ID} already exists!");
+
                 TriggerEventTypes.Add(triggerEventType.ID, triggerEventType);
             }
         }
@@ -197,6 +205,10 @@ namespace TSMapEditor.Models
                 var triggerActionType = new TriggerActionType(i);
                 var section = iniFile.GetSection(sections[i]);
                 triggerActionType.ReadPropertiesFromIniSection(section);
+
+                if (TriggerActionTypes.ContainsKey(triggerActionType.ID))
+                    throw new INIConfigException(
+                        $"Error while adding Trigger Action {triggerActionType.Name}: a Trigger Action with ID {triggerActionType.ID} already exists!");
 
                 TriggerActionTypes.Add(triggerActionType.ID, triggerActionType);
             }
