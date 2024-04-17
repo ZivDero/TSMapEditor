@@ -213,8 +213,8 @@ namespace TSMapEditor.Models
 
                 if (TriggerEventTypes.ContainsKey(triggerEventType.ID))
                 {
-                    throw new INIConfigException( $"Error while adding Trigger Event {triggerEventType.Name}: " + 
-                                                  $"a Trigger Event with ID {triggerEventType.ID} already exists!");
+                    throw new INIConfigException($"Error while adding Trigger Event {triggerEventType.Name}: " + 
+                                                 $"a Trigger Event with ID {triggerEventType.ID} already exists!");
                 }
 
                 TriggerEventTypes.Add(triggerEventType.ID, triggerEventType);

@@ -61,7 +61,6 @@ namespace TSMapEditor.Models
             InitFromTypeSection(iniFile, "SuperWeaponTypes", SuperWeaponTypes);
             InitFromTypeSection(iniFile, "Tiberiums", TiberiumTypes);
 
-
             if (!isMapIni)
             {
                 if (Constants.UseCountries)
