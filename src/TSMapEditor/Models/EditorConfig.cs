@@ -292,9 +292,6 @@ namespace TSMapEditor.Models
 
         private void ReadTiberiumOverlays(Rules rules)
         {
-            // There are the default hard-coded values the game uses
-            
-
             var iniFile = new IniFile(Environment.CurrentDirectory + "/Config/Tiberiums.ini");
             const string sectionName = "Tiberiums";
 
