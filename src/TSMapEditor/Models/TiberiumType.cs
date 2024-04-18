@@ -11,7 +11,7 @@ namespace TSMapEditor.Models
         }
 
         public string ININame { get; }
-        public int Index { get; set;  }
+        public int Index { get; set; }
         public string Name { get; set; }
         public int Value { get; set; }
         public int Power { get; set; }
