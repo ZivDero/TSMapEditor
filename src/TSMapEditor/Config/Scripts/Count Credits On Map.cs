@@ -47,8 +47,7 @@ namespace WAEScript
                 TiberiumType tiberiumType = cell.Overlay.OverlayType.TiberiumType;
                 if (tiberiumType != null)
                 {
-                    int tiberiumTypeValue = map.Rules.TiberiumTypes[tiberiumType.Index].Value;
-                    count += tiberiumTypeValue * (cell.Overlay.FrameIndex + 1);
+                    count += tiberiumType.Value * (cell.Overlay.FrameIndex + 1);
                 }
             });
         }

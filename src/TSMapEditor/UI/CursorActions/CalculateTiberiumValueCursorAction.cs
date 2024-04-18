@@ -89,8 +89,7 @@ namespace TSMapEditor.UI.CursorActions
                     TiberiumType tiberiumType = cell.Overlay.OverlayType.TiberiumType;
                     if (tiberiumType != null)
                     {
-                        int tiberiumTypeValue = Map.Rules.TiberiumTypes[tiberiumType.Index].Value;
-                        tiberiumValue += tiberiumTypeValue * (cell.Overlay.FrameIndex + 1);
+                        tiberiumValue += tiberiumType.Value * (cell.Overlay.FrameIndex + 1);
                     }
                 }
             }
