@@ -34,7 +34,6 @@ namespace TSMapEditor.CCEngine
             var iniFile = new IniFile(configPath);
 
             AddSearchDirectory(Environment.CurrentDirectory);
-
             iniFile.DoForEveryValueInSection("SearchDirectories", v => AddSearchDirectory(Path.Combine(GameDirectory, v)));
 
             var mixesSection = iniFile.GetSection("MIXFiles");
