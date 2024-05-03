@@ -2,6 +2,7 @@ using Rampastring.Tools;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using TSMapEditor.UI;
 
 namespace TSMapEditor.CCEngine
 {
@@ -33,9 +34,32 @@ namespace TSMapEditor.CCEngine
             var iniFile = new IniFile(configPath);
 
             AddSearchDirectory(Environment.CurrentDirectory);
+
             iniFile.DoForEveryValueInSection("SearchDirectories", v => AddSearchDirectory(Path.Combine(GameDirectory, v)));
-            iniFile.DoForEveryValueInSection("PrimaryMIXFiles", LoadPrimaryMixFile);
-            iniFile.DoForEveryValueInSection("SecondaryMIXFiles", LoadSecondaryMixFile);
+
+            var mixesSection = iniFile.GetSection("MIXFiles");
+            foreach (var kvp in mixesSection.Keys)
+            {
+                if (IsSpecialMixName(kvp.Key))
+                {
+                    HandleSpecialMixName(kvp.Key);
+                    continue;
+                }
+
+                switch (kvp.Value.ToLower().Trim())
+                {
+                    case "required":
+                        LoadRequiredMixFile(kvp.Key);
+                        break;
+                    case "optional":
+                        LoadOptionalMixFile(kvp.Key);
+                        break;
+                    default:
+                        throw new INIConfigException(
+                            $"MIX File {kvp.Key} has an invalid requirement degree: {kvp.Value}!");
+                }
+            }
+
             iniFile.DoForEveryValueInSection("StringTables", LoadStringTable);
         }
 
@@ -129,17 +153,11 @@ namespace TSMapEditor.CCEngine
         /// Throws a FileNotFoundException if the MIX file isn't found.
         /// </summary>
         /// <param name="name">The name of the MIX file.</param>
-        public void LoadPrimaryMixFile(string name)
+        public void LoadRequiredMixFile(string name)
         {
-            if (IsSpecialMixName(name))
-            {
-                HandleSpecialMixName(name);
-                return;
-            }
-
             if (!LoadMixFile(name))
             {
-                throw new FileNotFoundException("Primary MIX file not found: " + name);
+                throw new FileNotFoundException("Required MIX file not found: " + name);
             }
         }
 
@@ -148,11 +166,11 @@ namespace TSMapEditor.CCEngine
         /// Does not throw an exception if the MIX file is not found.
         /// </summary>
         /// <param name="name">The name of the MIX file.</param>
-        public void LoadSecondaryMixFile(string name)
+        public void LoadOptionalMixFile(string name)
         {
             if (!LoadMixFile(name))
             {
-                Logger.Log("Secondary MIX file not found: " + name);
+                Logger.Log("Optional MIX file not found: " + name);
             }
         }
 
