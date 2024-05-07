@@ -1960,7 +1960,7 @@ namespace TSMapEditor.UI.Windows
                         int speechIndex = map.Rules.EvaSpeeches.Speeches.FindIndex(speech => speech.Name == paramValue);
 
                         if (speechIndex == -1)
-                            return intValue + " - unknown speech";
+                            return paramValue + " - unknown speech";
 
                         return map.Rules.EvaSpeeches.Speeches[speechIndex].Name;
                     }
