@@ -35,7 +35,7 @@ namespace TSMapEditor.UI.Windows
         {
             lbObjectList.Clear();
 
-            if (Constants.UseCountries)
+            if (Constants.IsRA2YR)
             {
                 foreach (var evaSpeech in map.Rules.EvaSpeeches.Speeches)
                 {

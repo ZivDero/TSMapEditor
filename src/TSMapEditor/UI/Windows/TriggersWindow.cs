@@ -1044,7 +1044,7 @@ namespace TSMapEditor.UI.Windows
             if (selectSpeechWindow.SelectedObject < 0)
                 return;
 
-            if (Constants.UseCountries)
+            if (Constants.IsRA2YR)
             {
                 AssignParamValue(selectSpeechWindow.IsForEvent, map.Rules.EvaSpeeches.Speeches[selectSpeechWindow.SelectedObject].Name);
             }
@@ -1955,7 +1955,7 @@ namespace TSMapEditor.UI.Windows
 
                     return intValue + " " + map.Rules.SuperWeaponTypes[intValue].GetDisplayStringWithoutIndex();
                 case TriggerParamType.Speech:
-                    if (Constants.UseCountries)
+                    if (Constants.IsRA2YR)
                     {
                         int speechIndex = map.Rules.EvaSpeeches.Speeches.FindIndex(speech => speech.Name == paramValue);
 
