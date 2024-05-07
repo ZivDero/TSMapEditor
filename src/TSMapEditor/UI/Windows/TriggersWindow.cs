@@ -89,6 +89,7 @@ namespace TSMapEditor.UI.Windows
         private SelectTagWindow selectTagWindow;
         private SelectStringWindow selectStringWindow;
         private SelectSpeechWindow selectSpeechWindow;
+        private SelectSoundWindow selectSoundWindow;
 
         private XNAContextMenu actionContextMenu;
         private XNAContextMenu eventContextMenu;
@@ -267,6 +268,10 @@ namespace TSMapEditor.UI.Windows
             selectSpeechWindow = new SelectSpeechWindow(WindowManager, map);
             var speechDarkeningPanel = DarkeningPanel.InitializeAndAddToParentControlWithChild(WindowManager, Parent, selectSpeechWindow);
             speechDarkeningPanel.Hidden += SpeechDarkeningPanel_Hidden;
+
+            selectSoundWindow = new SelectSoundWindow(WindowManager, map);
+            var soundDarkeningPanel = DarkeningPanel.InitializeAndAddToParentControlWithChild(WindowManager, Parent, selectSoundWindow);
+            soundDarkeningPanel.Hidden += SoundDarkeningPanel_Hidden;
 
             eventContextMenu = new XNAContextMenu(WindowManager);
             eventContextMenu.Name = nameof(eventContextMenu);
@@ -942,6 +947,10 @@ namespace TSMapEditor.UI.Windows
                     selectSpeechWindow.IsForEvent = false;
                     selectSpeechWindow.Open(Conversions.IntFromString(triggerAction.Parameters[paramIndex], -1));
                     break;
+                case TriggerParamType.Sound:
+                    selectSoundWindow.IsForEvent = false;
+                    selectSoundWindow.Open(Conversions.IntFromString(triggerAction.Parameters[paramIndex], -1));
+                    break;
                 default:
                     break;
             }
@@ -1052,6 +1061,14 @@ namespace TSMapEditor.UI.Windows
             {
                 AssignParamValue(selectSpeechWindow.IsForEvent, selectSpeechWindow.SelectedObject);
             }
+        }
+
+        private void SoundDarkeningPanel_Hidden(object sender, EventArgs e)
+        {
+            if (selectSoundWindow.SelectedObject < 0)
+                return;
+
+            AssignParamValue(selectSoundWindow.IsForEvent, selectSoundWindow.SelectedObject);
         }
 
         private void AssignParamValue(bool isForEvent, int paramValue)
@@ -1938,7 +1955,7 @@ namespace TSMapEditor.UI.Windows
                     if (theme == null)
                         return paramValue + " - nonexistent theme";
 
-                    return paramValue + " " + theme.Name;
+                    return theme.ToString();
                 case TriggerParamType.Tag:
                     Tag tag = map.Tags.Find(t => t.ID == paramValue);
 
@@ -1974,6 +1991,14 @@ namespace TSMapEditor.UI.Windows
 
                         return intValue + " " + map.EditorConfig.Speeches[intValue];
                     }
+                case TriggerParamType.Sound:
+                    if (!intParseSuccess)
+                        return paramValue;
+
+                    if (intValue < 0 || intValue >= map.Rules.Sounds.List.Count)
+                        return intValue + " - unknown speech";
+
+                    return map.Rules.Sounds.List[intValue].ToString();
                 case TriggerParamType.Float:
                     if (!intParseSuccess)
                         return paramValue;
