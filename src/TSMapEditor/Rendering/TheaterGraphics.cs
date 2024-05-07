@@ -408,7 +408,7 @@ namespace TSMapEditor.Rendering
             theaterPalette = GetPaletteOrFail(theater.TerrainPaletteName, false);
             unitPalette = GetPaletteOrFail(Theater.UnitPaletteName, true);
             animPalette = GetPaletteOrFail("anim.pal", true);
-            tiberiumPalette = !string.IsNullOrEmpty(Theater.TiberiumPaletteName) ? GetPaletteOrFail(Theater.TiberiumPaletteName, false) : theaterPalette;
+            tiberiumPalette = string.IsNullOrEmpty(Theater.TiberiumPaletteName) ? theaterPalette : GetPaletteOrFail(Theater.TiberiumPaletteName, false);
             vplFile = GetVplFile();
 
             if (UserSettings.Instance.MultithreadedTextureLoading)
