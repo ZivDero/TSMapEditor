@@ -1046,7 +1046,7 @@ namespace TSMapEditor.UI.Windows
 
             if (Constants.IsRA2YR)
             {
-                AssignParamValue(selectSpeechWindow.IsForEvent, map.Rules.EvaSpeeches.Speeches[selectSpeechWindow.SelectedObject].Name);
+                AssignParamValue(selectSpeechWindow.IsForEvent, map.Rules.EvaSpeeches.List[selectSpeechWindow.SelectedObject].Name);
             }
             else
             {
@@ -1957,12 +1957,12 @@ namespace TSMapEditor.UI.Windows
                 case TriggerParamType.Speech:
                     if (Constants.IsRA2YR)
                     {
-                        int speechIndex = map.Rules.EvaSpeeches.Speeches.FindIndex(speech => speech.Name == paramValue);
+                        int speechIndex = map.Rules.EvaSpeeches.List.FindIndex(speech => speech.Name == paramValue);
 
                         if (speechIndex == -1)
                             return paramValue + " - unknown speech";
 
-                        return map.Rules.EvaSpeeches.Speeches[speechIndex].Name;
+                        return map.Rules.EvaSpeeches.List[speechIndex].Name;
                     }
                     else
                     {

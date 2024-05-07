@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
 using TSMapEditor.Extensions;
 
 namespace TSMapEditor.Models
@@ -29,13 +31,11 @@ namespace TSMapEditor.Models
             Initialize(evaIni);
         }
 
-        private List<EvaSpeech> speeches;
-        public List<EvaSpeech> Speeches => new(speeches);
-
+        public ImmutableList<EvaSpeech> List { get; private set; }
 
         private void Initialize(IniFileEx evaIni)
         {
-            speeches = new List<EvaSpeech>();
+            var speeches = new List<EvaSpeech>();
 
             const string speechSectionName = "DialogList";
 
@@ -54,6 +54,8 @@ namespace TSMapEditor.Models
 
                 speeches.Add(new EvaSpeech(speeches.Count, name, text));
             });
+
+            List = ImmutableList.Create(speeches.ToArray());
         }
     }
 }

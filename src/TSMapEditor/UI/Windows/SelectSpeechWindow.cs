@@ -22,7 +22,7 @@ namespace TSMapEditor.UI.Windows
 
         protected override void LbObjectList_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (lbObjectList.SelectedItem == null || lbObjectList.SelectedItem.Tag == null)
+            if (lbObjectList.SelectedItem?.Tag == null)
             {
                 SelectedObject = -1;
                 return;
@@ -37,7 +37,7 @@ namespace TSMapEditor.UI.Windows
 
             if (Constants.IsRA2YR)
             {
-                foreach (var evaSpeech in map.Rules.EvaSpeeches.Speeches)
+                foreach (var evaSpeech in map.Rules.EvaSpeeches.List)
                 {
                     lbObjectList.AddItem(new XNAListBoxItem() { Text = evaSpeech.ToString(), Tag = evaSpeech.Index });
                     if (evaSpeech.Index == SelectedObject)
