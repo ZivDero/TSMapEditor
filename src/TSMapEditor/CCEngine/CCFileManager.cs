@@ -39,24 +39,24 @@ namespace TSMapEditor.CCEngine
             var mixesSection = iniFile.GetSection("MIXFiles");
             foreach (var kvp in mixesSection.Keys)
             {
-                if (IsSpecialMixName(kvp.Key))
+                var parts = kvp.Value.Split(',', StringSplitOptions.TrimEntries);
+                string mixName = parts[0];
+
+                if (IsSpecialMixName(mixName))
                 {
-                    HandleSpecialMixName(kvp.Key);
+                    HandleSpecialMixName(mixName);
                     continue;
                 }
 
-                switch (kvp.Value.ToLower().Trim())
-                {
-                    case "required":
-                        LoadRequiredMixFile(kvp.Key);
-                        break;
-                    case "optional":
-                        LoadOptionalMixFile(kvp.Key);
-                        break;
-                    default:
-                        throw new INIConfigException(
-                            $"MIX File {kvp.Key} has an invalid requirement degree: {kvp.Value}!");
-                }
+                bool required = false;
+
+                if (parts.Length > 1)
+                    required = Conversions.BooleanFromString(parts[1], required);
+
+                if (required)
+                    LoadRequiredMixFile(mixName);
+                else
+                    LoadOptionalMixFile(mixName);
             }
 
             iniFile.DoForEveryValueInSection("StringTables", LoadStringTable);
