@@ -1294,12 +1294,11 @@ namespace TSMapEditor.Rendering
                     var shpFile = new ShpFile(loadedShpName);
                     shpFile.ParseFromBuffer(shpData);
                     XNAPalette palette = theaterPalette;
-
-                    if (overlayType.Tiberium || overlayType.IsVeins)
-                        palette = Constants.TheaterPaletteForTiberium ? tiberiumPalette : unitPalette;
-
+                    
                     if (overlayType.Wall || overlayType.IsVeinholeMonster)
                         palette = unitPalette;
+                    else if (overlayType.Tiberium || overlayType.IsVeins)
+                        palette = Constants.TheaterPaletteForTiberium ? tiberiumPalette : unitPalette;
 
                     // Palette override for wall overlays in Phobos
                     if (overlayType.Wall && !string.IsNullOrWhiteSpace(overlayType.ArtConfig.Palette))
