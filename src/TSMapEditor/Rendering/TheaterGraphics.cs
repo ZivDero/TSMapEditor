@@ -408,8 +408,7 @@ namespace TSMapEditor.Rendering
             theaterPalette = GetPaletteOrFail(theater.TerrainPaletteName, false);
             unitPalette = GetPaletteOrFail(Theater.UnitPaletteName, true);
             animPalette = GetPaletteOrFail("anim.pal", true);
-            if (!string.IsNullOrEmpty(Theater.TiberiumPaletteName))
-                tiberiumPalette = GetPaletteOrFail(Theater.TiberiumPaletteName, false);
+            tiberiumPalette = !string.IsNullOrEmpty(Theater.TiberiumPaletteName) ? GetPaletteOrFail(Theater.TiberiumPaletteName, false) : theaterPalette;
             vplFile = GetVplFile();
 
             if (UserSettings.Instance.MultithreadedTextureLoading)
@@ -1297,12 +1296,7 @@ namespace TSMapEditor.Rendering
                     XNAPalette palette = theaterPalette;
 
                     if (overlayType.Tiberium || overlayType.IsVeins)
-                    {
-                        palette = unitPalette;
-
-                        if (Constants.TheaterPaletteForTiberium)
-                            palette = tiberiumPalette ?? theaterPalette;
-                    }
+                        palette = Constants.TheaterPaletteForTiberium ? tiberiumPalette : unitPalette;
 
                     if (overlayType.Wall || overlayType.IsVeinholeMonster)
                         palette = unitPalette;
