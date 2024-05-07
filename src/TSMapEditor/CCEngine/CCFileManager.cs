@@ -48,12 +48,12 @@ namespace TSMapEditor.CCEngine
                     continue;
                 }
 
-                bool required = false;
+                bool isRequired = false;
 
                 if (parts.Length > 1)
-                    required = Conversions.BooleanFromString(parts[1], required);
+                    isRequired = Conversions.BooleanFromString(parts[1], isRequired);
 
-                if (required)
+                if (isRequired)
                     LoadRequiredMixFile(mixName);
                 else
                     LoadOptionalMixFile(mixName);
