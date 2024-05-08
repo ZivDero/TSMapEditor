@@ -917,7 +917,7 @@ namespace TSMapEditor.UI.Windows
                     selectTutorialLineWindow.Open(new TutorialLine(Conversions.IntFromString(triggerAction.Parameters[paramIndex], -1), string.Empty));
                     break;
                 case TriggerParamType.Theme:
-                    selectThemeWindow.Open(map.Rules.Themes.GetByIndex(Conversions.IntFromString(triggerAction.Parameters[paramIndex], -1)));
+                    selectThemeWindow.Open(map.Rules.Themes.Get(Conversions.IntFromString(triggerAction.Parameters[paramIndex], -1)));
                     break;
                 case TriggerParamType.Tag:
                     Tag existingTag = map.Tags.Find(tag => tag.ID == triggerAction.Parameters[paramIndex]);
@@ -1964,7 +1964,7 @@ namespace TSMapEditor.UI.Windows
                     if (!intParseSuccess)
                         return paramValue;
 
-                    Theme theme = map.Rules.Themes.GetByIndex(intValue);
+                    Theme theme = map.Rules.Themes.Get(intValue);
                     if (theme == null)
                         return paramValue + " - nonexistent theme";
 

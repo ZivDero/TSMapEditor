@@ -19,12 +19,12 @@ namespace TSMapEditor.Models
         [INI(false)]
         public int Index { get; }
 
-        public string Name { get; set; } = string.Empty;
-        public double Length { get; set; }
-        public bool Normal { get; set; }
-        public int Scenario { get; set; }
-        public int Side { get; set; }
-        public bool Repeat { get; set; }
+        public string Name { get; private set; } = string.Empty;
+        public double Length { get; private set; }
+        public bool Normal { get; private set; }
+        public int Scenario { get; private set; }
+        public int Side { get; private set; }
+        public bool Repeat { get; private set; }
 
         public override string ToString()
         {
@@ -46,7 +46,15 @@ namespace TSMapEditor.Models
 
         public ImmutableList<Theme> List { get; private set; }
 
-        public Theme GetByIndex(int index) => (index < 0 || index >= List.Count) ? null : List[index];
+        public Theme Get(int index)
+        {
+            return List.Find(theme => theme.Index == index);
+        }
+
+        public Theme Get(string name)
+        {
+            return List.Find(theme => theme.Name == name);
+        }
 
         private void Initialize(IniFileEx themeIni)
         {
