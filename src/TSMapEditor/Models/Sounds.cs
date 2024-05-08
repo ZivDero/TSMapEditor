@@ -4,7 +4,7 @@ using TSMapEditor.Extensions;
 
 namespace TSMapEditor.Models
 {
-    public struct Sound
+    public class Sound
     {
         public Sound(int index, string name)
         {
@@ -17,8 +17,8 @@ namespace TSMapEditor.Models
             return $"{Index} {Name}";
         }
 
-        public int Index;
-        public string Name;
+        public int Index { get; }
+        public string Name { get; }
     }
 
     public class Sounds
@@ -29,6 +29,16 @@ namespace TSMapEditor.Models
         }
 
         public ImmutableList<Sound> List { get; private set; }
+
+        public Sound Get(int index)
+        {
+            return List.Find(sound => sound.Index == index);
+        }
+
+        public Sound Get(string name)
+        {
+            return List.Find(sound => sound.Name == name);
+        }
 
         private void Initialize(IniFileEx evaIni)
         {

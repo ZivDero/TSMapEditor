@@ -5,7 +5,7 @@ using TSMapEditor.Models;
 
 namespace TSMapEditor.UI.Windows
 {
-    public class SelectSoundWindow : SelectObjectWindow<int>
+    public class SelectSoundWindow : SelectObjectWindow<Sound>
     {
         public SelectSoundWindow(WindowManager windowManager, Map map) : base(windowManager)
         {
@@ -22,13 +22,7 @@ namespace TSMapEditor.UI.Windows
 
         protected override void LbObjectList_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (lbObjectList.SelectedItem?.Tag == null)
-            {
-                SelectedObject = -1;
-                return;
-            }
-
-            SelectedObject = (int)lbObjectList.SelectedItem.Tag;
+            SelectedObject = (Sound)lbObjectList.SelectedItem?.Tag;
         }
 
         protected override void ListObjects()
@@ -37,8 +31,8 @@ namespace TSMapEditor.UI.Windows
 
             foreach (var sound in map.Rules.Sounds.List)
             {
-                lbObjectList.AddItem(new XNAListBoxItem() { Text = sound.ToString(), Tag = sound.Index });
-                if (sound.Index == SelectedObject)
+                lbObjectList.AddItem(new XNAListBoxItem() { Text = sound.ToString(), Tag = sound });
+                if (sound == SelectedObject)
                     lbObjectList.SelectedIndex = lbObjectList.Items.Count - 1;
             }
         }

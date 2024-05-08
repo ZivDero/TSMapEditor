@@ -23,13 +23,7 @@ namespace TSMapEditor.UI.Windows
 
         protected override void LbObjectList_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (lbObjectList.SelectedItem?.Tag == null)
-            {
-                SelectedObject = null;
-                return;
-            }
-
-            SelectedObject = (EvaSpeech)lbObjectList.SelectedItem.Tag;
+            SelectedObject = (EvaSpeech)lbObjectList.SelectedItem?.Tag;
         }
 
         protected override void ListObjects()

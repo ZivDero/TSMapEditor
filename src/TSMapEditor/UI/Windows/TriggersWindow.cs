@@ -952,7 +952,10 @@ namespace TSMapEditor.UI.Windows
                     break;
                 case TriggerParamType.Sound:
                     selectSoundWindow.IsForEvent = false;
-                    selectSoundWindow.Open(Conversions.IntFromString(triggerAction.Parameters[paramIndex], -1));
+                    Sound sound = Constants.IsRA2YR
+                        ? map.Rules.Sounds.Get(triggerAction.Parameters[paramIndex])
+                        : map.Rules.Sounds.Get(Conversions.IntFromString(triggerAction.Parameters[paramIndex], -1));
+                    selectSoundWindow.Open(sound);
                     break;
                 default:
                     break;
@@ -1068,10 +1071,17 @@ namespace TSMapEditor.UI.Windows
 
         private void SoundDarkeningPanel_Hidden(object sender, EventArgs e)
         {
-            if (selectSoundWindow.SelectedObject < 0)
+            if (selectSoundWindow.SelectedObject == null)
                 return;
 
-            AssignParamValue(selectSoundWindow.IsForEvent, selectSoundWindow.SelectedObject);
+            if (Constants.IsRA2YR)
+            {
+                AssignParamValue(selectSoundWindow.IsForEvent, selectSoundWindow.SelectedObject.Name);
+            }
+            else
+            {
+                AssignParamValue(selectSoundWindow.IsForEvent, selectSoundWindow.SelectedObject.Index);
+            }
         }
 
         private void AssignParamValue(bool isForEvent, int paramValue)
