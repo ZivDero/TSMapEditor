@@ -1,7 +1,6 @@
 ﻿using Rampastring.XNAUI;
 using Rampastring.XNAUI.XNAControls;
 using System;
-using System.Collections.Generic;
 using TSMapEditor.Models;
 
 namespace TSMapEditor.UI.Windows
@@ -30,7 +29,7 @@ namespace TSMapEditor.UI.Windows
         {
             lbObjectList.Clear();
 
-            IList<EvaSpeech> speechList = Constants.IsRA2YR ? map.Rules.Speeches.List : map.EditorConfig.Speeches.List;
+            var speechList = Constants.IsRA2YR ? map.Rules.Speeches.List : map.EditorConfig.Speeches.List;
             foreach (var evaSpeech in speechList)
             {
                 lbObjectList.AddItem(new XNAListBoxItem() { Text = evaSpeech.ToString(), Tag = evaSpeech });
