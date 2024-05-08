@@ -1,11 +1,12 @@
-﻿using Rampastring.XNAUI.XNAControls;
-using Rampastring.XNAUI;
+﻿using Rampastring.XNAUI;
+using Rampastring.XNAUI.XNAControls;
 using System;
+using System.Collections.Generic;
 using TSMapEditor.Models;
 
 namespace TSMapEditor.UI.Windows
 {
-    public class SelectSpeechWindow : SelectObjectWindow<int>
+    public class SelectSpeechWindow : SelectObjectWindow<EvaSpeech>
     {
         public SelectSpeechWindow(WindowManager windowManager, Map map) : base(windowManager)
         {
@@ -24,34 +25,23 @@ namespace TSMapEditor.UI.Windows
         {
             if (lbObjectList.SelectedItem?.Tag == null)
             {
-                SelectedObject = -1;
+                SelectedObject = null;
                 return;
             }
 
-            SelectedObject = (int)lbObjectList.SelectedItem.Tag;
+            SelectedObject = (EvaSpeech)lbObjectList.SelectedItem.Tag;
         }
 
         protected override void ListObjects()
         {
             lbObjectList.Clear();
 
-            if (Constants.IsRA2YR)
+            IList<EvaSpeech> speechList = Constants.IsRA2YR ? map.Rules.Speeches.List : map.EditorConfig.Speeches.List;
+            foreach (var evaSpeech in speechList)
             {
-                foreach (var evaSpeech in map.Rules.EvaSpeeches.List)
-                {
-                    lbObjectList.AddItem(new XNAListBoxItem() { Text = evaSpeech.ToString(), Tag = evaSpeech.Index });
-                    if (evaSpeech.Index == SelectedObject)
-                        lbObjectList.SelectedIndex = lbObjectList.Items.Count - 1;
-                }
-            }
-            else
-            {
-                foreach (var kvp in map.EditorConfig.Speeches)
-                {
-                    lbObjectList.AddItem(new XNAListBoxItem() { Text = $"{kvp.Key} {kvp.Value}", Tag = kvp.Key });
-                    if (kvp.Key == SelectedObject)
-                        lbObjectList.SelectedIndex = lbObjectList.Items.Count - 1;
-                }
+                lbObjectList.AddItem(new XNAListBoxItem() { Text = evaSpeech.ToString(), Tag = evaSpeech });
+                if (evaSpeech == SelectedObject)
+                    lbObjectList.SelectedIndex = lbObjectList.Items.Count - 1;
             }
         }
     }

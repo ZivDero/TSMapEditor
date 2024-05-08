@@ -72,7 +72,7 @@ namespace TSMapEditor.UI.Windows.MainMenuWindows
 
             map.Rules.TutorialLines = tutorialLines;
             map.Rules.Themes = themes;
-            map.Rules.EvaSpeeches = evaSpeeches;
+            map.Rules.Speeches = evaSpeeches;
             map.Rules.Sounds = sounds;
 
             Console.WriteLine();

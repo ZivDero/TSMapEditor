@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using TSMapEditor.Extensions;
 
 namespace TSMapEditor.Models
 {
-    public struct EvaSpeech
+    public class EvaSpeech
     {
         public EvaSpeech(int index, string name, string text)
         {
@@ -19,9 +20,9 @@ namespace TSMapEditor.Models
             return $"{Name} {Text}";
         }
 
-        public int Index;
-        public string Name;
-        public string Text;
+        public int Index { get; }
+        public string Name { get; }
+        public string Text { get; }
     }
 
     public class EvaSpeeches
@@ -31,7 +32,22 @@ namespace TSMapEditor.Models
             Initialize(evaIni);
         }
 
+        public EvaSpeeches(EvaSpeech[] speeches)
+        {
+            List = ImmutableList.Create(speeches);
+        }
+
         public ImmutableList<EvaSpeech> List { get; private set; }
+
+        public EvaSpeech Get(int index)
+        {
+            return List.Find(speech => speech.Index == index);
+        }
+
+        public EvaSpeech Get(string name)
+        {
+            return List.Find(speech => speech.Name == name);
+        }
 
         private void Initialize(IniFileEx evaIni)
         {

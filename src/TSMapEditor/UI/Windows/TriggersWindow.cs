@@ -945,7 +945,10 @@ namespace TSMapEditor.UI.Windows
                     break;
                 case TriggerParamType.Speech:
                     selectSpeechWindow.IsForEvent = false;
-                    selectSpeechWindow.Open(Conversions.IntFromString(triggerAction.Parameters[paramIndex], -1));
+                    EvaSpeech speech = Constants.IsRA2YR
+                        ? map.Rules.Speeches.Get(triggerAction.Parameters[paramIndex])
+                        : map.EditorConfig.Speeches.Get(Conversions.IntFromString(triggerAction.Parameters[paramIndex], -1));
+                    selectSpeechWindow.Open(speech);
                     break;
                 case TriggerParamType.Sound:
                     selectSoundWindow.IsForEvent = false;
@@ -1050,16 +1053,16 @@ namespace TSMapEditor.UI.Windows
 
         private void SpeechDarkeningPanel_Hidden(object sender, EventArgs e)
         {
-            if (selectSpeechWindow.SelectedObject < 0)
+            if (selectSpeechWindow.SelectedObject == null)
                 return;
 
             if (Constants.IsRA2YR)
             {
-                AssignParamValue(selectSpeechWindow.IsForEvent, map.Rules.EvaSpeeches.List[selectSpeechWindow.SelectedObject].Name);
+                AssignParamValue(selectSpeechWindow.IsForEvent, selectSpeechWindow.SelectedObject.Name);
             }
             else
             {
-                AssignParamValue(selectSpeechWindow.IsForEvent, selectSpeechWindow.SelectedObject);
+                AssignParamValue(selectSpeechWindow.IsForEvent, selectSpeechWindow.SelectedObject.Index);
             }
         }
 
@@ -1972,24 +1975,28 @@ namespace TSMapEditor.UI.Windows
 
                     return intValue + " " + map.Rules.SuperWeaponTypes[intValue].GetDisplayStringWithoutIndex();
                 case TriggerParamType.Speech:
+                    EvaSpeech speech;
+
                     if (Constants.IsRA2YR)
                     {
-                        int speechIndex = map.Rules.EvaSpeeches.List.FindIndex(speech => speech.Name == paramValue);
+                        speech = map.Rules.Speeches.Get(paramValue);
 
-                        if (speechIndex == -1)
+                        if (speech == null)
                             return paramValue + " - unknown speech";
 
-                        return map.Rules.EvaSpeeches.List[speechIndex].Name;
+                        return speech.Name;
                     }
                     else
                     {
                         if (!intParseSuccess)
                             return paramValue;
 
-                        if (!map.EditorConfig.Speeches.ContainsKey(intValue))
+                        speech = map.EditorConfig.Speeches.Get(intValue);
+
+                        if (speech == null)
                             return intValue + " - unknown speech";
 
-                        return intValue + " " + map.EditorConfig.Speeches[intValue];
+                        return speech.Name;
                     }
                 case TriggerParamType.Sound:
                     if (!intParseSuccess)
