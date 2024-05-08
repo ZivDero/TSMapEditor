@@ -2009,13 +2009,29 @@ namespace TSMapEditor.UI.Windows
                         return speech.Name;
                     }
                 case TriggerParamType.Sound:
-                    if (!intParseSuccess)
-                        return paramValue;
+                    Sound sound;
 
-                    if (intValue < 0 || intValue >= map.Rules.Sounds.List.Count)
-                        return intValue + " - unknown speech";
+                    if (Constants.IsRA2YR)
+                    {
+                        sound = map.Rules.Sounds.Get(paramValue);
 
-                    return map.Rules.Sounds.List[intValue].ToString();
+                        if (sound == null)
+                            return paramValue + " - unknown sound";
+
+                        return sound.Name;
+                    }
+                    else
+                    {
+                        if (!intParseSuccess)
+                            return paramValue;
+
+                        sound = map.Rules.Sounds.Get(intValue);
+
+                        if (sound == null)
+                            return intValue + " - unknown sound";
+
+                        return sound.Name;
+                    }
                 case TriggerParamType.Float:
                     if (!intParseSuccess)
                         return paramValue;
