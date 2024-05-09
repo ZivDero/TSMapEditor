@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Microsoft.Xna.Framework;
 using TSMapEditor.GameMath;
 using TSMapEditor.UI;
 
@@ -16,23 +17,26 @@ namespace TSMapEditor.Models
 
     public class CliffConnectionPoint
     {
-        public Point2D Coordinates { get; set; }
+        public Vector2 Coordinates { get; set; }
         public byte ConnectsTo { get; set; }
+        // Swap the first and last 4 bits to then and then with another point to get the directions they can connect
         public byte ReversedConnectsTo => (byte)((ConnectsTo >> 4) + (0b11110000 & (ConnectsTo << 4)));
 
         public List<PotentialCliffPlacement> ConnectTo(CliffTileConfig tile)
         {
-            var possibleConnections = tile.ConnectionPoints.Select(cp => (cp, GetDirectionsInMask((byte)(cp.ConnectsTo & ReversedConnectsTo)))).Where(tuple => tuple.Item2.Any()).ToList();
+            var possibleConnections = tile.ConnectionPoints.Select(cp =>
+            {
+                (CliffConnectionPoint cp, List<Direction> dirs) connection = (cp, GetDirectionsInMask((byte)(cp.ReversedConnectsTo & ConnectsTo)));
+                return connection;
+            }).Where(connection => connection.dirs.Count > 0).ToList();
 
-            List <PotentialCliffPlacement> potentialPlacements = new List<PotentialCliffPlacement>();
-            foreach ((CliffConnectionPoint cp, List<Direction> dirs) connection in possibleConnections)
+            var potentialPlacements = new List<PotentialCliffPlacement>();
+            foreach (var connection in possibleConnections)
             {
                 foreach (Direction dir in connection.dirs)
                 {
-                    Point2D placementCoords = Coordinates - connection.cp.Coordinates + Helpers.VisualDirectionToPoint(dir);
-                    var nextConnectionPoint =
-                        tile.ConnectionPoints.FirstOrDefault(cp => cp.Coordinates != connection.cp.Coordinates) ??
-                        connection.cp;
+                    Vector2 placementCoords = Coordinates - connection.cp.Coordinates + (Vector2)Helpers.VisualDirectionToPoint(dir);
+                    var nextConnectionPoint = tile.ConnectionPoints.FirstOrDefault(cp => cp.Coordinates != connection.cp.Coordinates) ?? connection.cp;
                     nextConnectionPoint = (CliffConnectionPoint)nextConnectionPoint.MemberwiseClone();
                     nextConnectionPoint.Coordinates += placementCoords;
 
@@ -64,7 +68,7 @@ namespace TSMapEditor.Models
 
     public struct PotentialCliffPlacement
     {
-        public Point2D PlacementCoords;
+        public Vector2 PlacementCoords;
         public CliffConnectionPoint NextConnectionPoint;
         public CliffTileConfig Tile;
     }
@@ -109,7 +113,7 @@ namespace TSMapEditor.Models
                         break;
 
                     var coordParts = coordsString.Split(',').Select(int.Parse).ToList();
-                    Point2D coords = new Point2D(coordParts[0], coordParts[1]);
+                    Vector2 coords = new Vector2(coordParts[0], coordParts[1]);
 
                     string directionsString = iniSection.GetStringValue($"ConnectionPoint{i}.Directions", null);
                     if (directionsString == null || directionsString.Length != (int)Direction.Count || Regex.IsMatch(directionsString, "[^01]"))

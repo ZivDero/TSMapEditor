@@ -4,6 +4,7 @@ using SharpDX.MediaFoundation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Xna.Framework;
 using TSMapEditor.CCEngine;
 using TSMapEditor.GameMath;
 using TSMapEditor.Models;
@@ -17,8 +18,6 @@ namespace TSMapEditor.Mutations.Classes
     /// </summary>
     public class DrawCliffMutation : Mutation
     {
-        
-
         public DrawCliffMutation(IMutationTarget mutationTarget, List<Point2D> cliffPath, CliffType cliffType) : base(mutationTarget)
         {
             if (cliffPath.Count < 2)
@@ -42,28 +41,29 @@ namespace TSMapEditor.Mutations.Classes
 
         private CliffConnectionPoint lastConnectionPoint;
         private HashSet<Point2D> occupiedTiles;
+        private Random random = new Random();
 
         public override void Perform()
         {
             lastConnectionPoint = new CliffConnectionPoint
             {
                 ConnectsTo = 0b11111111,
-                Coordinates = cliffPath[0]
+                Coordinates = (Vector2)cliffPath[0]
             };
 
             for (int i = 0; i < cliffPath.Count - 1; i++)
             {
-                DrawCliff(cliffPath[i], cliffPath[i + 1]);
+                DrawCliff((Vector2)cliffPath[i], (Vector2)cliffPath[i + 1]);
             }
 
             MutationTarget.InvalidateMap();
         }
 
-        private void DrawCliff(Point2D start, Point2D end)
+        private void DrawCliff(Vector2 start, Vector2 end)
         {
             // Temp until we properly handle changing the side
             var thisFace = cliffType.Tiles.Where(tile => tile.Side == currentSide).ToList();
-            int lastDistance = int.MaxValue;
+            float lastDistance = int.MaxValue;
             List<PotentialCliffPlacement> potentialPlacements = new List<PotentialCliffPlacement>();
 
             while (true)
@@ -75,11 +75,14 @@ namespace TSMapEditor.Mutations.Classes
                     potentialPlacements.AddRange(lastConnectionPoint.ConnectTo(tile));
                 }
 
-                var bestPlacement = potentialPlacements.MinBy(placement => placement.NextConnectionPoint.Coordinates.DistanceTo(end));
+                float minDistance = potentialPlacements
+                    .Select(placement => (end - placement.NextConnectionPoint.Coordinates).Length()).Min();
+                var bestPlacements = potentialPlacements.Where(placement => Math.Abs((end - placement.NextConnectionPoint.Coordinates).Length() - minDistance) < 0.01).ToList();
+                var bestPlacement = bestPlacements.ElementAt(random.Next(0, bestPlacements.Count - 1));
 
-                if (bestPlacement.NextConnectionPoint.Coordinates.DistanceTo(end) < lastDistance)
+                if (minDistance < lastDistance)
                 {
-                    lastDistance = bestPlacement.NextConnectionPoint.Coordinates.DistanceTo(end);
+                    lastDistance = minDistance;
                     lastConnectionPoint = bestPlacement.NextConnectionPoint;
                 }
                 else
@@ -88,7 +91,7 @@ namespace TSMapEditor.Mutations.Classes
                 }
 
                 var tileImage = MutationTarget.TheaterGraphics.GetTileGraphics(tileSet.StartTileIndex + bestPlacement.Tile.TileIndexInSet);
-                PlaceTile(tileImage, bestPlacement.PlacementCoords);
+                PlaceTile(tileImage, new Point2D((int)bestPlacement.PlacementCoords.X, (int)bestPlacement.PlacementCoords.Y));
             }
         }
 
@@ -113,8 +116,6 @@ namespace TSMapEditor.Mutations.Classes
 
         public override void Undo()
         {
-            
-
             MutationTarget.InvalidateMap();
         }
 
