@@ -14,24 +14,72 @@ namespace TSMapEditor.Models
         Back
     }
 
-    public struct CliffConnectionPoint
+    public class CliffConnectionPoint
     {
         public Point2D Coordinates { get; set; }
         public byte ConnectsTo { get; set; }
-        public CliffSide Side { get; set; }
+        public byte ReversedConnectsTo => (byte)((ConnectsTo >> 4) + (0b11110000 & (ConnectsTo << 4)));
 
+        public List<PotentialCliffPlacement> ConnectTo(CliffTileConfig tile)
+        {
+            var possibleConnections = tile.ConnectionPoints.Select(cp => (cp, GetDirectionsInMask((byte)(cp.ConnectsTo & ReversedConnectsTo)))).Where(tuple => tuple.Item2.Any()).ToList();
+
+            List <PotentialCliffPlacement> potentialPlacements = new List<PotentialCliffPlacement>();
+            foreach ((CliffConnectionPoint cp, List<Direction> dirs) connection in possibleConnections)
+            {
+                foreach (Direction dir in connection.dirs)
+                {
+                    Point2D placementCoords = Coordinates - connection.cp.Coordinates + Helpers.VisualDirectionToPoint(dir);
+                    var nextConnectionPoint =
+                        tile.ConnectionPoints.FirstOrDefault(cp => cp.Coordinates != connection.cp.Coordinates) ??
+                        connection.cp;
+                    nextConnectionPoint = (CliffConnectionPoint)nextConnectionPoint.MemberwiseClone();
+                    nextConnectionPoint.Coordinates += placementCoords;
+
+                    potentialPlacements.Add(new PotentialCliffPlacement
+                    {
+                        PlacementCoords = placementCoords,
+                        NextConnectionPoint = nextConnectionPoint,
+                        Tile = tile
+                    });
+                }
+            }
+            return potentialPlacements;
+        }
+
+        private List<Direction> GetDirectionsInMask(byte mask)
+        {
+            List <Direction> directions = new List<Direction>();
+
+            for (int direction = 0; direction < (int)Direction.Count; direction++)
+            {
+                if ((mask & (byte)(0b10000000 >> direction)) > 0)
+                    directions.Add((Direction)direction);
+            }
+
+            return directions;
+        }
+
+    }
+
+    public struct PotentialCliffPlacement
+    {
+        public Point2D PlacementCoords;
+        public CliffConnectionPoint NextConnectionPoint;
+        public CliffTileConfig Tile;
     }
 
     public class CliffTileConfig
     {
         public int TileIndexInSet { get; set; }
         public List<CliffConnectionPoint> ConnectionPoints { get; set; }
+        public CliffSide Side { get; set; }
 
     }
 
-    public class PaintedCliffType
+    public class CliffType
     {
-        public PaintedCliffType(IniFile iniConfig, string tileSet)
+        public CliffType(IniFile iniConfig, string tileSet)
         {
             TileSet = tileSet;
             Tiles = new List<CliffTileConfig>();
@@ -53,7 +101,8 @@ namespace TSMapEditor.Models
 
                 List<CliffConnectionPoint> connectionPoints = new List<CliffConnectionPoint>();
 
-                for (int i = 0; true; i++)
+                // I was going to allow infinite connection points, but to avoid complications I'm limiting them to 2
+                for (int i = 0; i < 2; i++)
                 {
                     string coordsString = iniSection.GetStringValue($"ConnectionPoint{i}", null);
                     if (coordsString == null || !Regex.IsMatch(coordsString, "^\\d+?,\\d+?$"))
@@ -71,15 +120,15 @@ namespace TSMapEditor.Models
                     connectionPoints.Add(new CliffConnectionPoint()
                     {
                         ConnectsTo = directions,
-                        Coordinates = coords,
-                        Side = side
+                        Coordinates = coords
                     });
                 }
 
                 Tiles.Add(new CliffTileConfig()
                 {
                     ConnectionPoints = connectionPoints,
-                    TileIndexInSet = tileIndexInSet
+                    TileIndexInSet = tileIndexInSet,
+                    Side = side
                 });
             }
         }

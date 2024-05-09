@@ -1,0 +1,123 @@
+﻿using Rampastring.XNAUI;
+using SharpDX.Direct2D1.Effects;
+using SharpDX.MediaFoundation;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using TSMapEditor.CCEngine;
+using TSMapEditor.GameMath;
+using TSMapEditor.Models;
+using TSMapEditor.Models.Enums;
+using TSMapEditor.Rendering;
+
+namespace TSMapEditor.Mutations.Classes
+{
+    /// <summary>
+    /// A mutation for drawing cliffs.
+    /// </summary>
+    public class DrawCliffMutation : Mutation
+    {
+        
+
+        public DrawCliffMutation(IMutationTarget mutationTarget, List<Point2D> cliffPath, CliffType cliffType) : base(mutationTarget)
+        {
+            if (cliffPath.Count < 2)
+            {
+                throw new ArgumentException(nameof(DrawCliffMutation) +
+                                            ": to draw a cliff at least 2 path vertices are required.");
+            }
+
+            this.cliffPath = cliffPath;
+            this.cliffType = cliffType;
+            this.originLevel = mutationTarget.Map.GetTile(cliffPath[0]).Level;
+            this.tileSet = mutationTarget.Map.TheaterInstance.Theater.FindTileSet(cliffType.TileSet);
+        }
+
+        private readonly List<Point2D> cliffPath;
+
+        private readonly CliffSide currentSide = CliffSide.Front;
+        private readonly CliffType cliffType;
+        private readonly int originLevel;
+        private readonly TileSet tileSet;
+
+        private CliffConnectionPoint lastConnectionPoint;
+        private HashSet<Point2D> occupiedTiles;
+
+        public override void Perform()
+        {
+            lastConnectionPoint = new CliffConnectionPoint
+            {
+                ConnectsTo = 0b11111111,
+                Coordinates = cliffPath[0]
+            };
+
+            for (int i = 0; i < cliffPath.Count - 1; i++)
+            {
+                DrawCliff(cliffPath[i], cliffPath[i + 1]);
+            }
+
+            MutationTarget.InvalidateMap();
+        }
+
+        private void DrawCliff(Point2D start, Point2D end)
+        {
+            // Temp until we properly handle changing the side
+            var thisFace = cliffType.Tiles.Where(tile => tile.Side == currentSide).ToList();
+            int lastDistance = int.MaxValue;
+            List<PotentialCliffPlacement> potentialPlacements = new List<PotentialCliffPlacement>();
+
+            while (true)
+            {
+                potentialPlacements.Clear();
+
+                foreach (var tile in thisFace)
+                {
+                    potentialPlacements.AddRange(lastConnectionPoint.ConnectTo(tile));
+                }
+
+                var bestPlacement = potentialPlacements.MinBy(placement => placement.NextConnectionPoint.Coordinates.DistanceTo(end));
+
+                if (bestPlacement.NextConnectionPoint.Coordinates.DistanceTo(end) < lastDistance)
+                {
+                    lastDistance = bestPlacement.NextConnectionPoint.Coordinates.DistanceTo(end);
+                    lastConnectionPoint = bestPlacement.NextConnectionPoint;
+                }
+                else
+                {
+                    break;
+                }
+
+                var tileImage = MutationTarget.TheaterGraphics.GetTileGraphics(tileSet.StartTileIndex + bestPlacement.Tile.TileIndexInSet);
+                PlaceTile(tileImage, bestPlacement.PlacementCoords);
+            }
+        }
+
+        private void PlaceTile(TileImage tile, Point2D targetCellCoords)
+        {
+            for (int i = 0; i < tile.TMPImages.Length; i++)
+            {
+                MGTMPImage image = tile.TMPImages[i];
+                if (image.TmpImage == null)
+                    continue;
+                int cx = targetCellCoords.X + i % tile.Width;
+                int cy = targetCellCoords.Y + i / tile.Width;
+
+                var mapTile = MutationTarget.Map.GetTile(cx, cy);
+                if (mapTile != null && (!MutationTarget.OnlyPaintOnClearGround || mapTile.IsClearGround()))
+                {
+                    mapTile.ChangeTileIndex(tile.TileID, (byte)i);
+                    mapTile.Level = (byte)Math.Min(originLevel + image.TmpImage.Height, Constants.MaxMapHeightLevel);
+                }
+            }
+        }
+
+        public override void Undo()
+        {
+            
+
+            MutationTarget.InvalidateMap();
+        }
+
+        
+    }
+}

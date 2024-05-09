@@ -28,7 +28,7 @@ namespace TSMapEditor.Models
         public List<Theater> Theaters { get; } = new List<Theater>();
         public List<BridgeType> Bridges { get; } = new List<BridgeType>();
         public List<ConnectedOverlayType> ConnectedOverlays { get; } = new List<ConnectedOverlayType>();
-        public List<PaintedCliffType> PaintedCliffs { get; } = new List<PaintedCliffType>();
+        public List<CliffType> PaintedCliffs { get; } = new List<CliffType>();
         public List<TeamTypeFlag> TeamTypeFlags { get; } = new List<TeamTypeFlag>();
         public EvaSpeeches Speeches { get; private set; }
 
@@ -413,7 +413,7 @@ namespace TSMapEditor.Models
                 //if (overlaySection == null)
                 //    continue;
 
-                PaintedCliffType cliffType = new PaintedCliffType(iniFile, paintedCliffName);
+                CliffType cliffType = new CliffType(iniFile, paintedCliffName);
                 PaintedCliffs.Add(cliffType);
             }
         }
