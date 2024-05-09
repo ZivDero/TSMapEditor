@@ -128,7 +128,7 @@ namespace TSMapEditor.UI.TopBar
             }
 
             editContextMenu.AddItem("Test Cliff", () => mapView.EditorState.CursorAction =
-                new DrawCliffCursorAction(mapView, map.EditorConfig.PaintedCliffs[0]), null, null, null);
+                new DrawCliffCursorAction(mapView, map.EditorConfig.Cliffs[0]), null, null, null);
 
             editContextMenu.AddItem("Toggle IceGrowth", () => { mapView.EditorState.CursorAction = toggleIceGrowthCursorAction; toggleIceGrowthCursorAction.ToggleIceGrowth = true; mapView.EditorState.HighlightIceGrowth = true; }, null, null, null);
             editContextMenu.AddItem("Clear IceGrowth", () => { mapView.EditorState.CursorAction = toggleIceGrowthCursorAction; toggleIceGrowthCursorAction.ToggleIceGrowth = false; mapView.EditorState.HighlightIceGrowth = true; }, null, null, null);

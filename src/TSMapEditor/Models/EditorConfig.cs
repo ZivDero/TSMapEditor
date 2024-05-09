@@ -28,7 +28,7 @@ namespace TSMapEditor.Models
         public List<Theater> Theaters { get; } = new List<Theater>();
         public List<BridgeType> Bridges { get; } = new List<BridgeType>();
         public List<ConnectedOverlayType> ConnectedOverlays { get; } = new List<ConnectedOverlayType>();
-        public List<CliffType> PaintedCliffs { get; } = new List<CliffType>();
+        public List<CliffType> Cliffs { get; } = new List<CliffType>();
         public List<TeamTypeFlag> TeamTypeFlags { get; } = new List<TeamTypeFlag>();
         public EvaSpeeches Speeches { get; private set; }
 
@@ -61,7 +61,7 @@ namespace TSMapEditor.Models
             ReadTheaters();
             ReadTeamTypeFlags();
             ReadSpeeches();
-            ReadPaintedCliffs();
+            ReadCliffs();
         }
 
         public void RulesDependentInit(Rules rules)
@@ -397,24 +397,24 @@ namespace TSMapEditor.Models
             Speeches = new EvaSpeeches(speeches.ToArray());
         }
 
-        private void ReadPaintedCliffs()
+        private void ReadCliffs()
         {
             ConnectedOverlays.Clear();
 
             var iniFile = new IniFile(Environment.CurrentDirectory + "/Config/CliffDrawer.ini");
-            var section = iniFile.GetSection("PaintedCliffs");
+            var section = iniFile.GetSection("Cliffs");
             if (section == null)
                 return;
 
             foreach (var kvp in section.Keys)
             {
-                string paintedCliffName = kvp.Value;
+                string cliffName = kvp.Value;
                 //IniSection overlaySection = iniFile.GetSection(paintedCliffName);
                 //if (overlaySection == null)
                 //    continue;
 
-                CliffType cliffType = new CliffType(iniFile, paintedCliffName);
-                PaintedCliffs.Add(cliffType);
+                CliffType cliffType = new CliffType(iniFile, cliffName);
+                Cliffs.Add(cliffType);
             }
         }
     }
