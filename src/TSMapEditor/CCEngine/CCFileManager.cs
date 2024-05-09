@@ -35,30 +35,7 @@ namespace TSMapEditor.CCEngine
 
             AddSearchDirectory(Environment.CurrentDirectory);
             iniFile.DoForEveryValueInSection("SearchDirectories", v => AddSearchDirectory(Path.Combine(GameDirectory, v)));
-
-            var mixesSection = iniFile.GetSection("MIXFiles");
-            foreach (var kvp in mixesSection.Keys)
-            {
-                var parts = kvp.Value.Split(',', StringSplitOptions.TrimEntries);
-                string mixName = parts[0];
-
-                if (IsSpecialMixName(mixName))
-                {
-                    HandleSpecialMixName(mixName);
-                    continue;
-                }
-
-                bool isRequired = false;
-
-                if (parts.Length > 1)
-                    isRequired = Conversions.BooleanFromString(parts[1], isRequired);
-
-                if (isRequired)
-                    LoadRequiredMixFile(mixName);
-                else
-                    LoadOptionalMixFile(mixName);
-            }
-
+            iniFile.DoForEveryValueInSection("MIXFiles", ProcessMixFileEntry);
             iniFile.DoForEveryValueInSection("StringTables", LoadStringTable);
         }
 
@@ -70,6 +47,34 @@ namespace TSMapEditor.CCEngine
         public void AddSearchDirectory(string path)
         {
             searchDirectories.Add(Helpers.NormalizePath(path));
+        }
+
+        /// <summary>
+        /// Processes an entry in the MIXFiles list.
+        /// Loads a required or optional MIX file
+        /// or handles a special entry.
+        /// </summary>
+        /// <param name="entry">Contents of an entry of the MIXFiles list.</param>
+        private void ProcessMixFileEntry(string entry)
+        {
+            var parts = entry.Split(',', StringSplitOptions.TrimEntries);
+            string mixName = parts[0];
+
+            if (IsSpecialMixName(mixName))
+            {
+                HandleSpecialMixName(mixName);
+                return;
+            }
+
+            bool isRequired = false;
+
+            if (parts.Length > 1)
+                isRequired = Conversions.BooleanFromString(parts[1], isRequired);
+
+            if (isRequired)
+                LoadRequiredMixFile(mixName);
+            else
+                LoadOptionalMixFile(mixName);
         }
 
         /// <summary>
