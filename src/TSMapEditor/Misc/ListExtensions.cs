@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Collections.Immutable;
 
 namespace TSMapEditor.Misc
 {
@@ -17,19 +16,7 @@ namespace TSMapEditor.Misc
         /// Fetches an element at the given index.
         /// If the element is out of bounds, returns null.
         /// </summary>
-        public static T GetElementIfInRange<T>(this List<T> list, int index)
-        {
-            if (index < 0 || index >= list.Count)
-                return default;
-
-            return list[index];
-        }
-
-        /// <summary>
-        /// Fetches an element at the given index.
-        /// If the element is out of bounds, returns null.
-        /// </summary>
-        public static T GetElementIfInRange<T>(this ImmutableList<T> list, int index)
+        public static T GetElementIfInRange<T>(this IList<T> list, int index)
         {
             if (index < 0 || index >= list.Count)
                 return default;
