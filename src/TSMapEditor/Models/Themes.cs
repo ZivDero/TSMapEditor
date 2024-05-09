@@ -20,12 +20,12 @@ namespace TSMapEditor.Models
         [INI(false)]
         public int Index { get; }
 
-        public string Name { get; } = string.Empty;
-        public double Length { get; }
-        public bool Normal { get; }
-        public int Scenario { get; }
-        public int Side { get; }
-        public bool Repeat { get; }
+        public string Name { get; set; } = string.Empty;
+        public double Length { get; set; }
+        public bool Normal { get; set; }
+        public int Scenario { get; set; }
+        public int Side { get; set; }
+        public bool Repeat { get; set; }
 
         public override string ToString()
         {
