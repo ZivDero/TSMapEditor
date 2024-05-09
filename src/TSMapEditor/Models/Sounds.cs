@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using TSMapEditor.Extensions;
+using TSMapEditor.Misc;
 
 namespace TSMapEditor.Models
 {
@@ -32,7 +33,7 @@ namespace TSMapEditor.Models
 
         public Sound Get(int index)
         {
-            return List.Find(sound => sound.Index == index);
+            return List.GetElementIfInRange(index);
         }
 
         public Sound Get(string name)

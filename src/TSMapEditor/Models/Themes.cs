@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using TSMapEditor.Extensions;
+using TSMapEditor.Misc;
 
 namespace TSMapEditor.Models
 {
@@ -19,12 +20,12 @@ namespace TSMapEditor.Models
         [INI(false)]
         public int Index { get; }
 
-        public string Name { get; private set; } = string.Empty;
-        public double Length { get; private set; }
-        public bool Normal { get; private set; }
-        public int Scenario { get; private set; }
-        public int Side { get; private set; }
-        public bool Repeat { get; private set; }
+        public string Name { get; } = string.Empty;
+        public double Length { get; }
+        public bool Normal { get; }
+        public int Scenario { get; }
+        public int Side { get; }
+        public bool Repeat { get; }
 
         public override string ToString()
         {
@@ -48,7 +49,7 @@ namespace TSMapEditor.Models
 
         public Theme Get(int index)
         {
-            return List.Find(theme => theme.Index == index);
+            return List.GetElementIfInRange(index);
         }
 
         public Theme Get(string name)

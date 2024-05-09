@@ -2006,7 +2006,7 @@ namespace TSMapEditor.UI.Windows
                         if (speech == null)
                             return intValue + " - unknown speech";
 
-                        return speech.Name;
+                        return $"{intValue} {speech.Name}";
                     }
                 case TriggerParamType.Sound:
                     Sound sound;
@@ -2030,7 +2030,7 @@ namespace TSMapEditor.UI.Windows
                         if (sound == null)
                             return intValue + " - unknown sound";
 
-                        return sound.Name;
+                        return $"{intValue} {sound.Name}";
                     }
                 case TriggerParamType.Float:
                     if (!intParseSuccess)

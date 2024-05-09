@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using TSMapEditor.Extensions;
+using TSMapEditor.Misc;
 
 namespace TSMapEditor.Models
 {
@@ -41,7 +42,7 @@ namespace TSMapEditor.Models
 
         public EvaSpeech Get(int index)
         {
-            return List.Find(speech => speech.Index == index);
+            return List.GetElementIfInRange(index);
         }
 
         public EvaSpeech Get(string name)
