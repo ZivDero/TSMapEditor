@@ -1059,14 +1059,8 @@ namespace TSMapEditor.UI.Windows
             if (selectSpeechWindow.SelectedObject == null)
                 return;
 
-            if (Constants.IsRA2YR)
-            {
-                AssignParamValue(selectSpeechWindow.IsForEvent, selectSpeechWindow.SelectedObject.Name);
-            }
-            else
-            {
-                AssignParamValue(selectSpeechWindow.IsForEvent, selectSpeechWindow.SelectedObject.Index);
-            }
+            var speech = selectSpeechWindow.SelectedObject;
+            AssignParamValue(selectSpeechWindow.IsForEvent, Constants.IsRA2YR ? speech.Name : speech.Index.ToString(CultureInfo.InvariantCulture));
         }
 
         private void SoundDarkeningPanel_Hidden(object sender, EventArgs e)
@@ -1074,14 +1068,8 @@ namespace TSMapEditor.UI.Windows
             if (selectSoundWindow.SelectedObject == null)
                 return;
 
-            if (Constants.IsRA2YR)
-            {
-                AssignParamValue(selectSoundWindow.IsForEvent, selectSoundWindow.SelectedObject.Name);
-            }
-            else
-            {
-                AssignParamValue(selectSoundWindow.IsForEvent, selectSoundWindow.SelectedObject.Index);
-            }
+            var sound = selectSoundWindow.SelectedObject;
+            AssignParamValue(selectSoundWindow.IsForEvent, Constants.IsRA2YR ? sound.Name : sound.Index.ToString(CultureInfo.InvariantCulture));
         }
 
         private void AssignParamValue(bool isForEvent, int paramValue)
