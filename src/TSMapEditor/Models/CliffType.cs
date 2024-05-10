@@ -17,6 +17,7 @@ namespace TSMapEditor.Models
 
     public class CliffConnectionPoint
     {
+        public int Index { get; set; }
         public Vector2 CoordinateOffset { get; set; }
         public byte ConnectsTo { get; set; }
         // Swap the first and last 4 bits to then and then with another point to get the directions they can connect
@@ -42,10 +43,10 @@ namespace TSMapEditor.Models
                     Vector2 placementOffset = (Vector2)Helpers.VisualDirectionToPoint(dir) - neighbor.cp.CoordinateOffset;
                     Vector2 placementCoords = node.ExitCoords + placementOffset;
 
-                    var exit = tile.GetExit(neighbor.cp.CoordinateOffset);
+                    var exit = tile.GetExit(neighbor.cp.Index);
                     exit = (CliffConnectionPoint)exit.MemberwiseClone();
 
-                    neighbors.Add(new CliffAStarNode(node, exit, placementCoords, tile));
+                    neighbors.Add(new CliffAStarNode(node, neighbor.cp, exit, placementCoords, tile));
                 }
             }
             return neighbors;
@@ -75,12 +76,13 @@ namespace TSMapEditor.Models
     {
         private CliffAStarNode() {}
 
-        public CliffAStarNode(CliffAStarNode parent, CliffConnectionPoint exit, Vector2 location, CliffTile tile)
+        public CliffAStarNode(CliffAStarNode parent, CliffConnectionPoint entry, CliffConnectionPoint exit, Vector2 location, CliffTile tile)
         {
             Location = location;
             Tile = tile;
 
             Parent = parent;
+            Entry = entry;
             Exit = exit;
             Destination = Parent.Destination;
         }
@@ -100,6 +102,7 @@ namespace TSMapEditor.Models
                 Tile = null,
 
                 Parent = null,
+                Entry = null,
                 Exit = connectionPoint,
                 Destination = destination
             };
@@ -138,17 +141,40 @@ namespace TSMapEditor.Models
         public Vector2 Destination;
 
         /// <summary>
-        /// Where this tile connects to other tiles
+        /// Where this tile connects to the previous tile
+        /// </summary>
+        public CliffConnectionPoint Entry;
+
+        /// <summary>
+        /// Where this tile connects to the next tile
         /// </summary>
         public CliffConnectionPoint Exit;
 
         // Distance from starting node
-        public float GScore => Parent == null ? 0 : Parent.GScore + Helpers.VectorDistance(Parent.ExitCoords, ExitCoords);
+        public float GScore
+        {
+            get
+            {
+                float result = 0;
+                if (Parent != null)
+                {
+                    result += Parent.GScore + Helpers.VectorDistance(Parent.ExitCoords, ExitCoords);
+                    if (Entry != null && Parent.Exit.Side != Entry.Side)
+                    {
+                        result *= 1.2f;
+                    }
+                }
+
+                return result;
+            }
+        }
 
         // Distance to end node
         public float HScore => Helpers.VectorDistance(Destination, ExitCoords);
         public float FScore => GScore + HScore;
         public CliffAStarNode Parent;
+
+        public List<Vector2> OccupiedTiles = new List<Vector2>();
     }
 
     public class CliffTile
@@ -157,9 +183,9 @@ namespace TSMapEditor.Models
         public int TileIndexInSet { get; set; }
         public List<CliffConnectionPoint> ConnectionPoints { get; set; }
 
-        public CliffConnectionPoint GetExit(Vector2 entryOffset)
+        public CliffConnectionPoint GetExit(int entryIndex)
         {
-            return ConnectionPoints.FirstOrDefault(cp => cp.CoordinateOffset != entryOffset) ?? ConnectionPoints.First();
+            return ConnectionPoints.FirstOrDefault(cp => cp.Index != entryIndex) ?? ConnectionPoints.First();
         }
     }
 
@@ -206,6 +232,7 @@ namespace TSMapEditor.Models
 
                     connectionPoints.Add(new CliffConnectionPoint()
                     {
+                        Index = i,
                         ConnectsTo = directions,
                         CoordinateOffset = coords,
                         Side = side

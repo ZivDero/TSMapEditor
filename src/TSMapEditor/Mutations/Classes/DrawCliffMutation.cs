@@ -43,19 +43,19 @@ namespace TSMapEditor.Mutations.Classes
 
         private const int MaxHScoreIterations = 500;
 
-        private CliffAStarNode lastNode;
+        private CliffAStarNode lastNode = null;
 
         public override void Perform()
         {
             for (int i = 0; i < cliffPath.Count - 1; i++)
             {
-                DrawCliffAStar((Vector2)cliffPath[i], (Vector2)cliffPath[i + 1], i == 0);
+                DrawCliffAStar((Vector2)cliffPath[i], (Vector2)cliffPath[i + 1]);
             }
 
             MutationTarget.InvalidateMap();
         }
 
-        private void DrawCliffAStar(Vector2 start, Vector2 end, bool isFirst)
+        private void DrawCliffAStar(Vector2 start, Vector2 end)
         {
             PriorityQueue<CliffAStarNode, float> openSet = new PriorityQueue<CliffAStarNode, float>();
 
@@ -64,7 +64,7 @@ namespace TSMapEditor.Mutations.Classes
 
             int hScoreIterations = 0;
 
-            if (isFirst)
+            if (lastNode == null)
             {
                 lastNode = CliffAStarNode.MakeStartNode(start, end, startingSide);
             }
