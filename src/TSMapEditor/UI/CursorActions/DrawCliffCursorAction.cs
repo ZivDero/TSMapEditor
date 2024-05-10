@@ -96,8 +96,7 @@ namespace TSMapEditor.UI.CursorActions
 
                 e.Handled = true;
             }
-            else if (e.PressedKey == Microsoft.Xna.Framework.Input.Keys.Enter &&
-                cliffPath.Count >= 2)
+            else if (e.PressedKey == Microsoft.Xna.Framework.Input.Keys.Enter && cliffPath.Count >= 2)
             {
                 CursorActionTarget.MutationManager.PerformMutation(new DrawCliffMutation(CursorActionTarget.MutationTarget, cliffPath, cliffType));
 

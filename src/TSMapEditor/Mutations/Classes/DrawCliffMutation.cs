@@ -39,64 +39,82 @@ namespace TSMapEditor.Mutations.Classes
         private readonly int originLevel;
         private readonly TileSet tileSet;
 
-        private CliffConnectionPoint lastConnectionPoint;
-        private HashSet<Point2D> occupiedTiles;
-        private Random random = new Random();
+        private const int MaxHScoreIterations = 500;
 
         public override void Perform()
         {
-            lastConnectionPoint = new CliffConnectionPoint
-            {
-                ConnectsTo = 0b11111111,
-                Coordinates = (Vector2)cliffPath[0]
-            };
-
             for (int i = 0; i < cliffPath.Count - 1; i++)
             {
-                DrawCliff((Vector2)cliffPath[i], (Vector2)cliffPath[i + 1]);
+                DrawCliffAStar((Vector2)cliffPath[i], (Vector2)cliffPath[i + 1]);
             }
 
             MutationTarget.InvalidateMap();
         }
 
-        private void DrawCliff(Vector2 start, Vector2 end)
+        private void DrawCliffAStar(Vector2 start, Vector2 end)
         {
+            //HashSet<CliffAStarNode> closedSet = new HashSet<CliffAStarNode>();
+            PriorityQueue<CliffAStarNode, float> openSet = new PriorityQueue<CliffAStarNode, float>();
+
+            CliffAStarNode bestNode = null;
+            float bestDistance = float.PositiveInfinity;
+
+            int hScoreIterations = 0;
+
+            var startNode = CliffAStarNode.MakeStartNode(start, end);
+
+            openSet.Enqueue(startNode, startNode.FScore);
+
             // Temp until we properly handle changing the side
             var thisFace = cliffType.Tiles.Where(tile => tile.Side == currentSide).ToList();
-            float lastDistance = int.MaxValue;
-            List<PotentialCliffPlacement> potentialPlacements = new List<PotentialCliffPlacement>();
 
-            while (true)
+            //float previousHScore = float.PositiveInfinity;
+
+            while (openSet.Count > 0)
             {
-                potentialPlacements.Clear();
-
-                foreach (var tile in thisFace)
+                CliffAStarNode currentNode = openSet.Dequeue();
+                openSet.EnqueueRange(currentNode.GetNeighbors(thisFace).Select(node => (node, node.FScore)));
+                
+                // keep track of how many times we've unsuccessfully tried to find a closer point
+                if (currentNode.HScore < bestDistance)
                 {
-                    potentialPlacements.AddRange(lastConnectionPoint.ConnectTo(tile));
-                }
-
-                float minDistance = potentialPlacements
-                    .Select(placement => (end - placement.NextConnectionPoint.Coordinates).Length()).Min();
-                var bestPlacements = potentialPlacements.Where(placement => Math.Abs((end - placement.NextConnectionPoint.Coordinates).Length() - minDistance) < 0.01).ToList();
-                var bestPlacement = bestPlacements.ElementAt(random.Next(0, bestPlacements.Count - 1));
-
-                if (minDistance < lastDistance)
-                {
-                    lastDistance = minDistance;
-                    lastConnectionPoint = bestPlacement.NextConnectionPoint;
+                    bestNode = currentNode;
+                    bestDistance = currentNode.HScore;
+                    hScoreIterations = 0;
                 }
                 else
                 {
-                    break;
+                    hScoreIterations++;
                 }
 
-                var tileImage = MutationTarget.TheaterGraphics.GetTileGraphics(tileSet.StartTileIndex + bestPlacement.Tile.TileIndexInSet);
-                PlaceTile(tileImage, new Point2D((int)bestPlacement.PlacementCoords.X, (int)bestPlacement.PlacementCoords.Y));
+                // terminate if we've been stuck for too long or we're at the destination
+                if (hScoreIterations > MaxHScoreIterations || bestDistance < 1)
+                    break;
+            }
+
+            PlaceAStarCliffs(bestNode);
+        }
+
+        private void PlaceAStarCliffs(CliffAStarNode endNode)
+        {
+            var node = endNode;
+            while (node != null)
+            {
+                if (node.Tile != null)
+                {
+                    var tileImage = MutationTarget.TheaterGraphics.GetTileGraphics(tileSet.StartTileIndex + node.Tile.TileIndexInSet);
+                    PlaceTile(tileImage, new Point2D((int)node.Location.X, (int)node.Location.Y));
+                }
+
+                node = node.Parent;
             }
         }
 
         private void PlaceTile(TileImage tile, Point2D targetCellCoords)
         {
+            if (tile == null)
+                return;
+
             for (int i = 0; i < tile.TMPImages.Length; i++)
             {
                 MGTMPImage image = tile.TMPImages[i];

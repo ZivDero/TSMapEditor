@@ -296,6 +296,11 @@ namespace TSMapEditor
             return new Vector2(length * (float)Math.Cos(angle), length * (float)Math.Sin(angle));
         }
 
+        public static float VectorDistance(Vector2 start, Vector2 end)
+        {
+            return (end - start).Length();
+        }
+
         public static Point2D ScreenCoordsFromWorldLeptons(Vector2 coords)
         {
             const int cellSideInLeptons = 256;
