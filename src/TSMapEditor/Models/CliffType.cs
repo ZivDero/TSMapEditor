@@ -21,6 +21,7 @@ namespace TSMapEditor.Models
         public byte ConnectsTo { get; set; }
         // Swap the first and last 4 bits to then and then with another point to get the directions they can connect
         public byte ReversedConnectsTo => (byte)((ConnectsTo >> 4) + (0b11110000 & (ConnectsTo << 4)));
+        public CliffSide Side { get; set; }
 
         public List<CliffAStarNode> ConnectTo(CliffAStarNode node, CliffTile tile)
         {
@@ -33,6 +34,9 @@ namespace TSMapEditor.Models
             var neighbors = new List<CliffAStarNode>();
             foreach (var neighbor in possibleNeighbors)
             {
+                if (neighbor.cp.Side != node.Exit.Side)
+                    continue;
+
                 foreach (Direction dir in neighbor.dirs)
                 {
                     Vector2 placementOffset = (Vector2)Helpers.VisualDirectionToPoint(dir) - neighbor.cp.CoordinateOffset;
@@ -81,12 +85,13 @@ namespace TSMapEditor.Models
             Destination = Parent.Destination;
         }
 
-        public static CliffAStarNode MakeStartNode(Vector2 location, Vector2 destination, byte connectsTo = 0b11111111)
+        public static CliffAStarNode MakeStartNode(Vector2 location, Vector2 destination, CliffSide startingSide)
         {
             CliffConnectionPoint connectionPoint = new CliffConnectionPoint
             {
-                ConnectsTo = connectsTo,
-                CoordinateOffset = new Vector2(0, 0)
+                ConnectsTo = 0b11111111,
+                CoordinateOffset = new Vector2(0, 0),
+                Side = startingSide
             };
 
             var startNode = new CliffAStarNode()
@@ -156,7 +161,6 @@ namespace TSMapEditor.Models
         {
             return ConnectionPoints.FirstOrDefault(cp => cp.CoordinateOffset != entryOffset) ?? ConnectionPoints.First();
         }
-        public CliffSide Side { get; set; }
     }
 
     public class CliffType
@@ -173,13 +177,6 @@ namespace TSMapEditor.Models
                     continue;
 
                 var iniSection = iniConfig.GetSection(sectionName);
-                string sideString = iniSection.GetStringValue("Side", string.Empty);
-                CliffSide side = sideString.ToLower() switch
-                {
-                    "front" => CliffSide.Front,
-                    "back" => CliffSide.Back,
-                    _ => throw new INIConfigException($"Cliff {sectionName} has an invalid Side {sideString}!")
-                };
 
                 List<CliffConnectionPoint> connectionPoints = new List<CliffConnectionPoint>();
 
@@ -199,18 +196,26 @@ namespace TSMapEditor.Models
 
                     byte directions = Convert.ToByte(directionsString, 2);
 
+                    string sideString = iniSection.GetStringValue($"ConnectionPoint{i}.Side", string.Empty);
+                    CliffSide side = sideString.ToLower() switch
+                    {
+                        "front" => CliffSide.Front,
+                        "back" => CliffSide.Back,
+                        _ => throw new INIConfigException($"Cliff {sectionName} has an invalid Side {sideString}!")
+                    };
+
                     connectionPoints.Add(new CliffConnectionPoint()
                     {
                         ConnectsTo = directions,
-                        CoordinateOffset = coords
+                        CoordinateOffset = coords,
+                        Side = side
                     });
                 }
 
                 Tiles.Add(new CliffTile()
                 {
                     ConnectionPoints = connectionPoints,
-                    TileIndexInSet = tileIndexInSet,
-                    Side = side
+                    TileIndexInSet = tileIndexInSet
                 });
             }
         }

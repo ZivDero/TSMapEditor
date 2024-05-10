@@ -18,7 +18,7 @@ namespace TSMapEditor.Mutations.Classes
     /// </summary>
     public class DrawCliffMutation : Mutation
     {
-        public DrawCliffMutation(IMutationTarget mutationTarget, List<Point2D> cliffPath, CliffType cliffType) : base(mutationTarget)
+        public DrawCliffMutation(IMutationTarget mutationTarget, List<Point2D> cliffPath, CliffType cliffType, CliffSide startingSide) : base(mutationTarget)
         {
             if (cliffPath.Count < 2)
             {
@@ -28,32 +28,35 @@ namespace TSMapEditor.Mutations.Classes
 
             this.cliffPath = cliffPath;
             this.cliffType = cliffType;
+            this.startingSide = startingSide;
+
             this.originLevel = mutationTarget.Map.GetTile(cliffPath[0]).Level;
             this.tileSet = mutationTarget.Map.TheaterInstance.Theater.FindTileSet(cliffType.TileSet);
         }
 
         private readonly List<Point2D> cliffPath;
-
-        private readonly CliffSide currentSide = CliffSide.Front;
         private readonly CliffType cliffType;
+        private readonly CliffSide startingSide;
+        
         private readonly int originLevel;
         private readonly TileSet tileSet;
 
         private const int MaxHScoreIterations = 500;
 
+        private CliffAStarNode lastNode;
+
         public override void Perform()
         {
             for (int i = 0; i < cliffPath.Count - 1; i++)
             {
-                DrawCliffAStar((Vector2)cliffPath[i], (Vector2)cliffPath[i + 1]);
+                DrawCliffAStar((Vector2)cliffPath[i], (Vector2)cliffPath[i + 1], i == 0);
             }
 
             MutationTarget.InvalidateMap();
         }
 
-        private void DrawCliffAStar(Vector2 start, Vector2 end)
+        private void DrawCliffAStar(Vector2 start, Vector2 end, bool isFirst)
         {
-            //HashSet<CliffAStarNode> closedSet = new HashSet<CliffAStarNode>();
             PriorityQueue<CliffAStarNode, float> openSet = new PriorityQueue<CliffAStarNode, float>();
 
             CliffAStarNode bestNode = null;
@@ -61,19 +64,22 @@ namespace TSMapEditor.Mutations.Classes
 
             int hScoreIterations = 0;
 
-            var startNode = CliffAStarNode.MakeStartNode(start, end);
+            if (isFirst)
+            {
+                lastNode = CliffAStarNode.MakeStartNode(start, end, startingSide);
+            }
+            else
+            {
+                lastNode.Parent = null;
+                lastNode.Destination = end;
+            }
 
-            openSet.Enqueue(startNode, startNode.FScore);
-
-            // Temp until we properly handle changing the side
-            var thisFace = cliffType.Tiles.Where(tile => tile.Side == currentSide).ToList();
-
-            //float previousHScore = float.PositiveInfinity;
+            openSet.Enqueue(lastNode, lastNode.FScore);
 
             while (openSet.Count > 0)
             {
                 CliffAStarNode currentNode = openSet.Dequeue();
-                openSet.EnqueueRange(currentNode.GetNeighbors(thisFace).Select(node => (node, node.FScore)));
+                openSet.EnqueueRange(currentNode.GetNeighbors(cliffType.Tiles).Select(node => (node, node.FScore)));
                 
                 // keep track of how many times we've unsuccessfully tried to find a closer point
                 if (currentNode.HScore < bestDistance)
@@ -92,6 +98,7 @@ namespace TSMapEditor.Mutations.Classes
                     break;
             }
 
+            lastNode = bestNode;
             PlaceAStarCliffs(bestNode);
         }
 
@@ -136,7 +143,5 @@ namespace TSMapEditor.Mutations.Classes
         {
             MutationTarget.InvalidateMap();
         }
-
-        
     }
 }
