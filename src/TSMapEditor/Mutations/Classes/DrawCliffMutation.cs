@@ -52,6 +52,8 @@ namespace TSMapEditor.Mutations.Classes
                 DrawCliffAStar((Vector2)cliffPath[i], (Vector2)cliffPath[i + 1]);
             }
 
+            PlaceAStarCliffs(lastNode);
+
             MutationTarget.InvalidateMap();
         }
 
@@ -70,7 +72,10 @@ namespace TSMapEditor.Mutations.Classes
             }
             else
             {
-                lastNode.Parent = null;
+                //lastNode.Parent = null;
+                // Go back one step if we can, since we didn't know we needed to turn yet
+                // and it's likely not gonna be very nice
+                lastNode = lastNode.Parent ?? lastNode;
                 lastNode.Destination = end;
             }
 
@@ -99,7 +104,6 @@ namespace TSMapEditor.Mutations.Classes
             }
 
             lastNode = bestNode;
-            PlaceAStarCliffs(bestNode);
         }
 
         private void PlaceAStarCliffs(CliffAStarNode endNode)

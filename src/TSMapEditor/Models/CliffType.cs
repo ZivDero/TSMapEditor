@@ -2,6 +2,7 @@
 using Rampastring.Tools;
 using System;
 using System.Collections.Generic;
+using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Text.RegularExpressions;
 using TSMapEditor.GameMath;
@@ -46,7 +47,11 @@ namespace TSMapEditor.Models
                     var exit = tile.GetExit(neighbor.cp.Index);
                     exit = (CliffConnectionPoint)exit.MemberwiseClone();
 
-                    neighbors.Add(new CliffAStarNode(node, neighbor.cp, exit, placementCoords, tile));
+                    var newNode = new CliffAStarNode(node, neighbor.cp, exit, placementCoords, tile);
+
+                    // Make sure that the new node doesn't overlap anything
+                    if (newNode.OccupiedTiles.Count - node.OccupiedTiles.Count == newNode.Tile.Foundation.Count)
+                        neighbors.Add(newNode);
                 }
             }
             return neighbors;
@@ -85,6 +90,9 @@ namespace TSMapEditor.Models
             Entry = entry;
             Exit = exit;
             Destination = Parent.Destination;
+
+            OccupiedTiles = new HashSet<Vector2>(parent.OccupiedTiles);
+            OccupiedTiles.UnionWith(tile.Foundation.Select(coord => coord + Location));
         }
 
         public static CliffAStarNode MakeStartNode(Vector2 location, Vector2 destination, CliffSide startingSide)
@@ -161,7 +169,7 @@ namespace TSMapEditor.Models
                     result += Parent.GScore + Helpers.VectorDistance(Parent.ExitCoords, ExitCoords);
                     if (Entry != null && Parent.Exit.Side != Entry.Side)
                     {
-                        result *= 1.2f;
+                        //result *= 1.2f;
                     }
                 }
 
@@ -174,7 +182,7 @@ namespace TSMapEditor.Models
         public float FScore => GScore + HScore;
         public CliffAStarNode Parent;
 
-        public List<Vector2> OccupiedTiles = new List<Vector2>();
+        public HashSet<Vector2> OccupiedTiles = new HashSet<Vector2>();
     }
 
     public class CliffTile
@@ -182,6 +190,7 @@ namespace TSMapEditor.Models
         public string TileSet { get; set; }
         public int TileIndexInSet { get; set; }
         public List<CliffConnectionPoint> ConnectionPoints { get; set; }
+        public List<Vector2> Foundation { get; set; }
 
         public CliffConnectionPoint GetExit(int entryIndex)
         {
@@ -239,10 +248,21 @@ namespace TSMapEditor.Models
                     });
                 }
 
+                string foundationString = iniSection.GetStringValue("Foundation", string.Empty);
+                if (!Regex.IsMatch(foundationString, "(\\d+?,\\d+?;)*(\\d+?,\\d+?)"))
+                    throw new INIConfigException($"Cliff {sectionName} has an invalid Foundation {foundationString}!");
+
+                var foundation = foundationString.Split(";").Select(coordinateString =>
+                {
+                    var coordinateParts = coordinateString.Split(",");
+                    return new Vector2(int.Parse(coordinateParts[0]), int.Parse(coordinateParts[1]));
+                }).ToList();
+
                 Tiles.Add(new CliffTile()
                 {
                     ConnectionPoints = connectionPoints,
-                    TileIndexInSet = tileIndexInSet
+                    TileIndexInSet = tileIndexInSet,
+                    Foundation = foundation
                 });
             }
         }
