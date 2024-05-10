@@ -7,6 +7,7 @@ using System.Linq;
 using Microsoft.Xna.Framework;
 using TSMapEditor.CCEngine;
 using TSMapEditor.GameMath;
+using TSMapEditor.Misc;
 using TSMapEditor.Models;
 using TSMapEditor.Models.Enums;
 using TSMapEditor.Rendering;
@@ -40,6 +41,7 @@ namespace TSMapEditor.Mutations.Classes
         
         private readonly int originLevel;
         private readonly TileSet tileSet;
+        private readonly Random random = new Random();
 
         private const int MaxHScoreIterations = 500;
 
@@ -99,7 +101,8 @@ namespace TSMapEditor.Mutations.Classes
                 }
 
                 // terminate if we've been stuck for too long or we're at the destination
-                if (hScoreIterations > MaxHScoreIterations || bestDistance < 1)
+                //if (hScoreIterations > MaxHScoreIterations || bestDistance < 1)
+                if (bestDistance < 3)
                     break;
             }
 
@@ -113,7 +116,7 @@ namespace TSMapEditor.Mutations.Classes
             {
                 if (node.Tile != null)
                 {
-                    var tileImage = MutationTarget.TheaterGraphics.GetTileGraphics(tileSet.StartTileIndex + node.Tile.TileIndexInSet);
+                    var tileImage = MutationTarget.TheaterGraphics.GetTileGraphics(tileSet.StartTileIndex + node.Tile.IndicesInTileSet.GetRandomElement(random));
                     PlaceTile(tileImage, new Point2D((int)node.Location.X, (int)node.Location.Y));
                 }
 

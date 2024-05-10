@@ -2,7 +2,6 @@
 using Rampastring.Tools;
 using System;
 using System.Collections.Generic;
-using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Text.RegularExpressions;
 using TSMapEditor.GameMath;
@@ -168,9 +167,9 @@ namespace TSMapEditor.Models
         //        if (Parent != null)
         //        {
         //            result += Parent.GScore + Helpers.VectorDistance(Parent.ExitCoords, ExitCoords);
-        //            if (Entry != null && Parent.Exit.Side != Entry.Side)
+        //            if (Entry != null && Exit.Side != Entry.Side)
         //            {
-        //                result *= 1.2f;
+        //                result *= 1.05f;
         //            }
         //        }
 
@@ -188,8 +187,70 @@ namespace TSMapEditor.Models
 
     public class CliffTile
     {
-        public string TileSet { get; set; }
-        public int TileIndexInSet { get; set; }
+        public CliffTile(IniSection iniSection, int index)
+        {
+            Index = index;
+
+            string indicesString = iniSection.GetStringValue("TileIndices", null);
+            if (indicesString == null || !Regex.IsMatch(indicesString, "^((?:\\d+?,)*(?:\\d+?))$"))
+                throw new INIConfigException($"Cliff {iniSection.SectionName} has invalid TileIndices list: {indicesString}!");
+
+            IndicesInTileSet = indicesString.Split(',').Select(int.Parse).ToList();
+
+            ConnectionPoints = new List<CliffConnectionPoint>();
+
+            for (int i = 0; i < 2; i++)
+            {
+                string coordsString = iniSection.GetStringValue($"ConnectionPoint{i}", null);
+                if (coordsString == null || !Regex.IsMatch(coordsString, "^\\d+?,\\d+?$"))
+                    throw new INIConfigException($"Cliff {iniSection.SectionName} has invalid ConnectionPoint{i} value: {coordsString}!");
+
+                var coordParts = coordsString.Split(',').Select(int.Parse).ToList();
+                Vector2 coords = new Vector2(coordParts[0], coordParts[1]);
+
+                string directionsString = iniSection.GetStringValue($"ConnectionPoint{i}.Directions", null);
+                if (directionsString == null || directionsString.Length != (int)Direction.Count || Regex.IsMatch(directionsString, "[^01]"))
+                    throw new INIConfigException($"Cliff {iniSection.SectionName} has invalid ConnectionPoint{i}.Directions value: {directionsString}!");
+
+                byte directions = Convert.ToByte(directionsString, 2);
+
+                string sideString = iniSection.GetStringValue($"ConnectionPoint{i}.Side", string.Empty);
+                CliffSide side = sideString.ToLower() switch
+                {
+                    "front" => CliffSide.Front,
+                    "back" => CliffSide.Back,
+                    _ => throw new INIConfigException($"Cliff {iniSection.SectionName} has an invalid ConnectionPoint{i}.Side value: {sideString}!")
+                };
+
+                ConnectionPoints.Add(new CliffConnectionPoint
+                {
+                    Index = i,
+                    ConnectsTo = directions,
+                    CoordinateOffset = coords,
+                    Side = side
+                });
+            }
+
+            string foundationString = iniSection.GetStringValue("Foundation", string.Empty);
+            if (!Regex.IsMatch(foundationString, "^((?:\\d+?,\\d+?\\|)*(?:\\d+?,\\d+?))$"))
+                throw new INIConfigException($"Cliff {iniSection.SectionName} has an invalid Foundation: {foundationString}!");
+
+            Foundation = foundationString.Split("|").Select(coordinateString =>
+            {
+                var coordinateParts = coordinateString.Split(",");
+                return new Vector2(int.Parse(coordinateParts[0]), int.Parse(coordinateParts[1]));
+            }).ToList();
+        }
+
+        /// <summary>
+        /// Tile's in-editor index
+        /// </summary>
+        public int Index { get; set; }
+        
+        /// <summary>
+        /// Indices of tiles relative to the Tile Set
+        /// </summary>
+        public List<int> IndicesInTileSet { get; set; }
         public List<CliffConnectionPoint> ConnectionPoints { get; set; }
         public List<Vector2> Foundation { get; set; }
 
@@ -201,75 +262,26 @@ namespace TSMapEditor.Models
 
     public class CliffType
     {
-        public CliffType(IniFile iniConfig, string tileSet)
+        public CliffType(IniFile iniConfig, string iniName, string name, string tileSet)
         {
+            IniName = iniName;
+            Name = name;
             TileSet = tileSet;
             Tiles = new List<CliffTile>();
 
             foreach (var sectionName in iniConfig.GetSections())
             {
                 var parts = sectionName.Split('.');
-                if (parts.Length != 2 || parts[0] != tileSet || !int.TryParse(parts[1], out int tileIndexInSet))
+                if (parts.Length != 2 || parts[0] != IniName || !int.TryParse(parts[1], out int index))
                     continue;
 
-                var iniSection = iniConfig.GetSection(sectionName);
-
-                List<CliffConnectionPoint> connectionPoints = new List<CliffConnectionPoint>();
-
-                // I was going to allow infinite connection points, but to avoid complications I'm limiting them to 2
-                for (int i = 0; i < 2; i++)
-                {
-                    string coordsString = iniSection.GetStringValue($"ConnectionPoint{i}", null);
-                    if (coordsString == null || !Regex.IsMatch(coordsString, "^\\d+?,\\d+?$"))
-                        break;
-
-                    var coordParts = coordsString.Split(',').Select(int.Parse).ToList();
-                    Vector2 coords = new Vector2(coordParts[0], coordParts[1]);
-
-                    string directionsString = iniSection.GetStringValue($"ConnectionPoint{i}.Directions", null);
-                    if (directionsString == null || directionsString.Length != (int)Direction.Count || Regex.IsMatch(directionsString, "[^01]"))
-                        break;
-
-                    byte directions = Convert.ToByte(directionsString, 2);
-
-                    string sideString = iniSection.GetStringValue($"ConnectionPoint{i}.Side", string.Empty);
-                    CliffSide side = sideString.ToLower() switch
-                    {
-                        "front" => CliffSide.Front,
-                        "back" => CliffSide.Back,
-                        _ => throw new INIConfigException($"Cliff {sectionName} has an invalid Side {sideString}!")
-                    };
-
-                    connectionPoints.Add(new CliffConnectionPoint()
-                    {
-                        Index = i,
-                        ConnectsTo = directions,
-                        CoordinateOffset = coords,
-                        Side = side
-                    });
-                }
-
-                string foundationString = iniSection.GetStringValue("Foundation", string.Empty);
-                if (!Regex.IsMatch(foundationString, "^((?:\\d+?,\\d+?\\|)*(?:\\d+?,\\d+?))$"))
-                    throw new INIConfigException($"Cliff {sectionName} has an invalid Foundation {foundationString}!");
-
-                var foundation = foundationString.Split("|").Select(coordinateString =>
-                {
-                    var coordinateParts = coordinateString.Split(",");
-                    return new Vector2(int.Parse(coordinateParts[0]), int.Parse(coordinateParts[1]));
-                }).ToList();
-
-                Tiles.Add(new CliffTile()
-                {
-                    ConnectionPoints = connectionPoints,
-                    TileIndexInSet = tileIndexInSet,
-                    Foundation = foundation
-                });
+                Tiles.Add(new CliffTile(iniConfig.GetSection(sectionName), index));
             }
         }
 
+        public string IniName { get; set; }
+        public string Name { get; set; }
         public string TileSet { get; set; }
-
         public List<CliffTile> Tiles { get; set; }
 
     }
