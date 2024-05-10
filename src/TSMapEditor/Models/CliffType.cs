@@ -92,7 +92,7 @@ namespace TSMapEditor.Models
             Destination = Parent.Destination;
 
             OccupiedTiles = new HashSet<Vector2>(parent.OccupiedTiles);
-            OccupiedTiles.UnionWith(tile.Foundation.Select(coord => coord + Location));
+            OccupiedTiles.UnionWith(tile.Foundation.Select(coordinate => coordinate + Location));
         }
 
         public static CliffAStarNode MakeStartNode(Vector2 location, Vector2 destination, CliffSide startingSide)
@@ -159,23 +159,24 @@ namespace TSMapEditor.Models
         public CliffConnectionPoint Exit;
 
         // Distance from starting node
-        public float GScore
-        {
-            get
-            {
-                float result = 0;
-                if (Parent != null)
-                {
-                    result += Parent.GScore + Helpers.VectorDistance(Parent.ExitCoords, ExitCoords);
-                    if (Entry != null && Parent.Exit.Side != Entry.Side)
-                    {
-                        //result *= 1.2f;
-                    }
-                }
+        public float GScore => Parent == null ? 0 : Parent.GScore + Helpers.VectorDistance(Parent.ExitCoords, ExitCoords);
+        //public float GScore
+        //{
+        //    get
+        //    {
+        //        float result = 0;
+        //        if (Parent != null)
+        //        {
+        //            result += Parent.GScore + Helpers.VectorDistance(Parent.ExitCoords, ExitCoords);
+        //            if (Entry != null && Parent.Exit.Side != Entry.Side)
+        //            {
+        //                result *= 1.2f;
+        //            }
+        //        }
 
-                return result;
-            }
-        }
+        //        return result;
+        //    }
+        //}
 
         // Distance to end node
         public float HScore => Helpers.VectorDistance(Destination, ExitCoords);
@@ -249,10 +250,10 @@ namespace TSMapEditor.Models
                 }
 
                 string foundationString = iniSection.GetStringValue("Foundation", string.Empty);
-                if (!Regex.IsMatch(foundationString, "(\\d+?,\\d+?;)*(\\d+?,\\d+?)"))
+                if (!Regex.IsMatch(foundationString, "^((?:\\d+?,\\d+?\\|)*(?:\\d+?,\\d+?))$"))
                     throw new INIConfigException($"Cliff {sectionName} has an invalid Foundation {foundationString}!");
 
-                var foundation = foundationString.Split(";").Select(coordinateString =>
+                var foundation = foundationString.Split("|").Select(coordinateString =>
                 {
                     var coordinateParts = coordinateString.Split(",");
                     return new Vector2(int.Parse(coordinateParts[0]), int.Parse(coordinateParts[1]));
