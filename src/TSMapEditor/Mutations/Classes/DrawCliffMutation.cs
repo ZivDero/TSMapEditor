@@ -43,9 +43,7 @@ namespace TSMapEditor.Mutations.Classes
         private readonly TileSet tileSet;
         private readonly Random random = new Random();
 
-        private const int MaxHScoreIterations = 500;
-
-        private CliffAStarNode lastNode = null;
+        private CliffAStarNode lastNode;
 
         public override void Perform()
         {
@@ -66,15 +64,12 @@ namespace TSMapEditor.Mutations.Classes
             CliffAStarNode bestNode = null;
             float bestDistance = float.PositiveInfinity;
 
-            int hScoreIterations = 0;
-
             if (lastNode == null)
             {
                 lastNode = CliffAStarNode.MakeStartNode(start, end, startingSide);
             }
             else
             {
-                //lastNode.Parent = null;
                 // Go back one step if we can, since we didn't know we needed to turn yet
                 // and it's likely not gonna be very nice
                 lastNode = lastNode.Parent ?? lastNode;
@@ -88,21 +83,13 @@ namespace TSMapEditor.Mutations.Classes
                 CliffAStarNode currentNode = openSet.Dequeue();
                 openSet.EnqueueRange(currentNode.GetNeighbors(cliffType.Tiles).Select(node => (node, node.FScore)));
                 
-                // keep track of how many times we've unsuccessfully tried to find a closer point
                 if (currentNode.HScore < bestDistance)
                 {
                     bestNode = currentNode;
                     bestDistance = currentNode.HScore;
-                    hScoreIterations = 0;
-                }
-                else
-                {
-                    hScoreIterations++;
                 }
 
-                // terminate if we've been stuck for too long or we're at the destination
-                //if (hScoreIterations > MaxHScoreIterations || bestDistance < 1)
-                if (bestDistance < 3)
+                if (bestDistance == 0)
                     break;
             }
 

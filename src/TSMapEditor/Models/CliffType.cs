@@ -179,7 +179,7 @@ namespace TSMapEditor.Models
 
         // Distance to end node
         public float HScore => Helpers.VectorDistance(Destination, ExitCoords);
-        public float FScore => GScore + HScore;
+        public float FScore => GScore * 0.8f + HScore;
         public CliffAStarNode Parent;
 
         public HashSet<Vector2> OccupiedTiles = new HashSet<Vector2>();
