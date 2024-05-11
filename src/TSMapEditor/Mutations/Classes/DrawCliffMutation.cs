@@ -19,7 +19,7 @@ namespace TSMapEditor.Mutations.Classes
     /// </summary>
     public class DrawCliffMutation : Mutation
     {
-        public DrawCliffMutation(IMutationTarget mutationTarget, List<Point2D> cliffPath, CliffType cliffType, CliffSide startingSide, int randomSeed) : base(mutationTarget)
+        public DrawCliffMutation(IMutationTarget mutationTarget, List<Point2D> cliffPath, CliffType cliffType, CliffSide startingSide, int randomSeed, byte extraHeight) : base(mutationTarget)
         {
             if (cliffPath.Count < 2)
             {
@@ -31,7 +31,7 @@ namespace TSMapEditor.Mutations.Classes
             this.cliffType = cliffType;
             this.startingSide = startingSide;
 
-            this.originLevel = mutationTarget.Map.GetTile(cliffPath[0]).Level;
+            this.originLevel = mutationTarget.Map.GetTile(cliffPath[0]).Level + extraHeight;
             this.tileSet = mutationTarget.Map.TheaterInstance.Theater.FindTileSet(cliffType.TileSet);
             this.random = new Random(randomSeed);
         }

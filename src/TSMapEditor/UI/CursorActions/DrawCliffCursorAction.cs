@@ -33,6 +33,7 @@ namespace TSMapEditor.UI.CursorActions
         private List<Point2D> cliffPath;
         private CliffSide cliffSide = CliffSide.Front;
         private DrawCliffMutation previewMutation;
+        private byte extraHeight = 0;
 
         private readonly int randomSeed = Guid.NewGuid().GetHashCode();
 
@@ -49,7 +50,7 @@ namespace TSMapEditor.UI.CursorActions
 
             cellTopLeftPoint = cellTopLeftPoint.ScaleBy(CursorActionTarget.Camera.ZoomLevel);
 
-            const string text = "Click on a cell to place a new vertex.\r\n\r\nENTER to confirm\r\nBackspace to go back one step\r\nTAB to change cliff side\r\nRight-click or ESC to exit";
+            const string text = "Click on a cell to place a new vertex.\r\n\r\nENTER to confirm\r\nBackspace to go back one step\r\nTAB to change cliff side\r\nPageUp to raise the cliff, PageDown to lower it\r\nRight-click or ESC to exit";
             var textDimensions = Renderer.GetTextDimensions(text, Constants.UIBoldFont);
             int x = cellTopLeftPoint.X - (int)(textDimensions.X - Constants.CellSizeX) / 2;
 
@@ -67,14 +68,28 @@ namespace TSMapEditor.UI.CursorActions
 
             Func<Point2D, Map, Point2D> getCellCenterPoint = Is2DMode ? CellMath.CellCenterPointFromCellCoords : CellMath.CellCenterPointFromCellCoords_3D;
 
+            if (cliffPath.Count > 0)
+            {
+                Point2D start = cliffPath[0];
+                start = getCellCenterPoint(start, CursorActionTarget.Map) - cameraTopLeftPoint;
+                start = start.ScaleBy(CursorActionTarget.Camera.ZoomLevel);
+
+                Color color = Color.Red;
+                int precision = 8;
+                int thickness = 3;
+                Renderer.DrawCircle(start.ToXNAVector(), Constants.CellSizeY * 0.25f, color, precision, thickness);
+            }
+
             // Draw cliff path
             for (int i = 0; i < cliffPath.Count - 1; i++)
             {
                 Point2D start = cliffPath[i];
                 start = getCellCenterPoint(start, CursorActionTarget.Map) - cameraTopLeftPoint;
+                start = start.ScaleBy(CursorActionTarget.Camera.ZoomLevel);
 
                 Point2D end = cliffPath[i + 1];
                 end = getCellCenterPoint(end, CursorActionTarget.Map) - cameraTopLeftPoint;
+                end = end.ScaleBy(CursorActionTarget.Camera.ZoomLevel);
 
 
                 Color color = Color.Goldenrod;
@@ -108,10 +123,34 @@ namespace TSMapEditor.UI.CursorActions
 
                 e.Handled = true;
             }
+            else if (e.PressedKey == Microsoft.Xna.Framework.Input.Keys.PageUp)
+            {
+                if (cliffPath.Count > 0)
+                {
+                    if (MutationTarget.Map.GetTile(cliffPath[0]).Level + extraHeight + 1 <= Constants.MaxMapHeightLevel)
+                        extraHeight++;
+                }
+
+                RedrawPreview();
+
+                e.Handled = true;
+            }
+            else if (e.PressedKey == Microsoft.Xna.Framework.Input.Keys.PageDown)
+            {
+                if (cliffPath.Count > 0)
+                {
+                    if (MutationTarget.Map.GetTile(cliffPath[0]).Level + extraHeight - 1 >= 0)
+                        extraHeight--;
+                }
+
+                RedrawPreview();
+
+                e.Handled = true;
+            }
             else if (e.PressedKey == Microsoft.Xna.Framework.Input.Keys.Enter && cliffPath.Count >= 2)
             {
                 previewMutation?.Undo();
-                CursorActionTarget.MutationManager.PerformMutation(new DrawCliffMutation(CursorActionTarget.MutationTarget, cliffPath, cliffType, cliffSide, randomSeed));
+                CursorActionTarget.MutationManager.PerformMutation(new DrawCliffMutation(CursorActionTarget.MutationTarget, cliffPath, cliffType, cliffSide, randomSeed, extraHeight));
 
                 ExitAction();
 
@@ -131,7 +170,7 @@ namespace TSMapEditor.UI.CursorActions
 
             if (cliffPath.Count >= 2)
             {
-                previewMutation = new DrawCliffMutation(MutationTarget, cliffPath, cliffType, cliffSide, randomSeed);
+                previewMutation = new DrawCliffMutation(MutationTarget, cliffPath, cliffType, cliffSide, randomSeed, extraHeight);
                 previewMutation.Perform();
             }
             else
