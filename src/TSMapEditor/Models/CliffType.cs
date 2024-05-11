@@ -159,23 +159,6 @@ namespace TSMapEditor.Models
 
         // Distance from starting node
         public float GScore => Parent == null ? 0 : Parent.GScore + Helpers.VectorDistance(Parent.ExitCoords, ExitCoords);
-        //public float GScore
-        //{
-        //    get
-        //    {
-        //        float result = 0;
-        //        if (Parent != null)
-        //        {
-        //            result += Parent.GScore + Helpers.VectorDistance(Parent.ExitCoords, ExitCoords);
-        //            if (Entry != null && Exit.Side != Entry.Side)
-        //            {
-        //                result *= 1.05f;
-        //            }
-        //        }
-
-        //        return result;
-        //    }
-        //}
 
         // Distance to end node
         public float HScore => Helpers.VectorDistance(Destination, ExitCoords);

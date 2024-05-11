@@ -19,6 +19,7 @@ namespace TSMapEditor.UI.CursorActions
         public DrawCliffCursorAction(ICursorActionTarget cursorActionTarget, CliffType cliffType) : base(cursorActionTarget)
         {
             this.cliffType = cliffType;
+            ActionExited += UndoOnExit;
         }
 
         public override string GetName() => "Draw Cliff";
@@ -33,35 +34,13 @@ namespace TSMapEditor.UI.CursorActions
         private CliffSide cliffSide = CliffSide.Front;
         private DrawCliffMutation previewMutation;
 
-        private int randomSeed = Guid.NewGuid().GetHashCode();
+        private readonly int randomSeed = Guid.NewGuid().GetHashCode();
 
         public override void OnActionEnter()
         {
             cliffPath = new List<Point2D>();
 
             base.OnActionEnter();
-        }
-
-        public override void PreMapDraw(Point2D cellCoords)
-        {
-            if (cliffPath.Count >= 2)
-            {
-                previewMutation = new DrawCliffMutation(MutationTarget, cliffPath, cliffType, cliffSide, randomSeed);
-                previewMutation.Perform();
-            }
-            else
-            {
-                previewMutation = null;
-            }
-        }
-
-
-        public override void PostMapDraw(Point2D cellCoords)
-        {
-            if (previewMutation != null)
-            {
-                previewMutation.Undo();
-            }
         }
 
         public override void DrawPreview(Point2D cellCoords, Point2D cameraTopLeftPoint)
@@ -116,20 +95,22 @@ namespace TSMapEditor.UI.CursorActions
             else if (e.PressedKey == Microsoft.Xna.Framework.Input.Keys.Tab)
             {
                 cliffSide = cliffSide == CliffSide.Front ? CliffSide.Back : CliffSide.Front;
+                RedrawPreview();
 
                 e.Handled = true;
             }
             else if (e.PressedKey == Microsoft.Xna.Framework.Input.Keys.Back)
             {
                 if (cliffPath.Count > 0)
-                {
                     cliffPath.RemoveAt(cliffPath.Count - 1);
-                }
+                
+                RedrawPreview();
 
                 e.Handled = true;
             }
             else if (e.PressedKey == Microsoft.Xna.Framework.Input.Keys.Enter && cliffPath.Count >= 2)
             {
+                previewMutation?.Undo();
                 CursorActionTarget.MutationManager.PerformMutation(new DrawCliffMutation(CursorActionTarget.MutationTarget, cliffPath, cliffType, cliffSide, randomSeed));
 
                 ExitAction();
@@ -141,6 +122,27 @@ namespace TSMapEditor.UI.CursorActions
         public override void LeftClick(Point2D cellCoords)
         {
             cliffPath.Add(cellCoords);
+            RedrawPreview();
+        }
+
+        private void RedrawPreview()
+        {
+            previewMutation?.Undo();
+
+            if (cliffPath.Count >= 2)
+            {
+                previewMutation = new DrawCliffMutation(MutationTarget, cliffPath, cliffType, cliffSide, randomSeed);
+                previewMutation.Perform();
+            }
+            else
+            {
+                previewMutation = null;
+            }
+        }
+
+        private void UndoOnExit(object sender, EventArgs e)
+        {
+            previewMutation?.Undo();
         }
 
         public override void LeftDown(Point2D cellCoords) => LeftClick(cellCoords);

@@ -59,6 +59,8 @@ namespace TSMapEditor.Mutations.Classes
 
         public override void Perform()
         {
+            lastNode = null;
+
             for (int i = 0; i < cliffPath.Count - 1; i++)
             {
                 DrawCliffAStar((Vector2)cliffPath[i], (Vector2)cliffPath[i + 1]);
