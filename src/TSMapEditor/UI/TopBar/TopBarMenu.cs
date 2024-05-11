@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using Rampastring.XNAUI;
 using TSMapEditor.Models;
 using TSMapEditor.Mutations;
@@ -51,6 +52,7 @@ namespace TSMapEditor.UI.TopBar
         private PlaceVeinholeMonsterCursorAction placeVeinholeMonsterCursorAction;
 
         private SelectBridgeWindow selectBridgeWindow;
+        private SelectCliffWindow selectCliffWindow;
 
         public override void Initialize()
         {
@@ -68,6 +70,10 @@ namespace TSMapEditor.UI.TopBar
             selectBridgeWindow = new SelectBridgeWindow(WindowManager, map);
             var selectBridgeDarkeningPanel = DarkeningPanel.InitializeAndAddToParentControlWithChild(WindowManager, Parent, selectBridgeWindow);
             selectBridgeDarkeningPanel.Hidden += SelectBridgeDarkeningPanel_Hidden;
+
+            selectCliffWindow = new SelectCliffWindow(WindowManager, map);
+            var selectCliffDarkeningPanel = DarkeningPanel.InitializeAndAddToParentControlWithChild(WindowManager, Parent, selectCliffWindow);
+            selectCliffDarkeningPanel.Hidden += SelectCliffDarkeningPanel_Hidden;
 
             var fileContextMenu = new EditorContextMenu(WindowManager);
             fileContextMenu.Name = nameof(fileContextMenu);
@@ -127,8 +133,21 @@ namespace TSMapEditor.UI.TopBar
                 }
             }
 
-            editContextMenu.AddItem("Test Cliff", () => mapView.EditorState.CursorAction =
-                new DrawCliffCursorAction(mapView, map.EditorConfig.Cliffs[0]), null, null, null);
+            var theaterMatchingCliffs = map.EditorConfig.Cliffs.Where(cliff => cliff.AllowedTheaters.Exists(
+                theaterName => theaterName.Equals(map.TheaterName, StringComparison.OrdinalIgnoreCase))).ToList();
+            int cliffCount = theaterMatchingCliffs.Count;
+            if (cliffCount > 0)
+            {
+                if (cliffCount == 1)
+                {
+                    editContextMenu.AddItem("Draw Cliff", () => mapView.EditorState.CursorAction =
+                        new DrawCliffCursorAction(mapView, theaterMatchingCliffs[0]), null, null, null);
+                }
+                else
+                {
+                    editContextMenu.AddItem("Draw Cliff...", SelectCliff, null, null, null);
+                }
+            }
 
             editContextMenu.AddItem("Toggle IceGrowth", () => { mapView.EditorState.CursorAction = toggleIceGrowthCursorAction; toggleIceGrowthCursorAction.ToggleIceGrowth = true; mapView.EditorState.HighlightIceGrowth = true; }, null, null, null);
             editContextMenu.AddItem("Clear IceGrowth", () => { mapView.EditorState.CursorAction = toggleIceGrowthCursorAction; toggleIceGrowthCursorAction.ToggleIceGrowth = false; mapView.EditorState.HighlightIceGrowth = true; }, null, null, null);
@@ -409,6 +428,17 @@ namespace TSMapEditor.UI.TopBar
         {
             if (selectBridgeWindow.Success && selectBridgeWindow.SelectedObject != null)
                 mapView.EditorState.CursorAction = new PlaceBridgeCursorAction(mapView, selectBridgeWindow.SelectedObject);
+        }
+
+        private void SelectCliff()
+        {
+            selectCliffWindow.Open();
+        }
+
+        private void SelectCliffDarkeningPanel_Hidden(object sender, EventArgs e)
+        {
+            if (selectCliffWindow.Success && selectCliffWindow.SelectedObject != null)
+                mapView.EditorState.CursorAction = new DrawCliffCursorAction(mapView, selectCliffWindow.SelectedObject);
         }
 
         private void Open()

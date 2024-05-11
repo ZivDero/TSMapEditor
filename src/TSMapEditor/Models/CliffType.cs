@@ -245,26 +245,46 @@ namespace TSMapEditor.Models
 
     public class CliffType
     {
-        public CliffType(IniFile iniConfig, string iniName, string name, string tileSet)
+        public static CliffType FromIniSection(IniFile iniFile, string sectionName)
+        {
+            IniSection cliffSection = iniFile.GetSection(sectionName);
+            if (cliffSection == null)
+                return null;
+
+            string cliffName = cliffSection.GetStringValue("Name", null);
+            string tileSet = cliffSection.GetStringValue("TileSet", null);
+
+            if (string.IsNullOrEmpty(cliffName) || string.IsNullOrEmpty(tileSet))
+                return null;
+
+            var allowedTheaters = cliffSection.GetListValue("AllowedTheaters", ',', s => s);
+
+            return new CliffType(iniFile, sectionName, cliffName, tileSet, allowedTheaters);
+        }
+
+        private CliffType(IniFile iniFile, string iniName, string name, string tileSet, List<string> allowedTheaters)
         {
             IniName = iniName;
             Name = name;
             TileSet = tileSet;
+            AllowedTheaters = allowedTheaters;
+
             Tiles = new List<CliffTile>();
 
-            foreach (var sectionName in iniConfig.GetSections())
+            foreach (var sectionName in iniFile.GetSections())
             {
                 var parts = sectionName.Split('.');
                 if (parts.Length != 2 || parts[0] != IniName || !int.TryParse(parts[1], out int index))
                     continue;
 
-                Tiles.Add(new CliffTile(iniConfig.GetSection(sectionName), index));
+                Tiles.Add(new CliffTile(iniFile.GetSection(sectionName), index));
             }
         }
 
         public string IniName { get; set; }
         public string Name { get; set; }
         public string TileSet { get; set; }
+        public List<string> AllowedTheaters { get; set; }
         public List<CliffTile> Tiles { get; set; }
 
     }

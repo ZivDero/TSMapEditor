@@ -409,18 +409,10 @@ namespace TSMapEditor.Models
             foreach (var kvp in section.Keys)
             {
                 string cliffIniName = kvp.Value;
-                IniSection cliffSection = iniFile.GetSection(cliffIniName);
-                if (cliffSection == null)
-                    continue;
 
-                string cliffName = cliffSection.GetStringValue("Name", null);
-                string tileSet = cliffSection.GetStringValue("TileSet", null);
-
-                if (string.IsNullOrEmpty(cliffName) || string.IsNullOrEmpty(tileSet))
-                    continue;
-
-                CliffType cliffType = new CliffType(iniFile, cliffIniName, cliffName, tileSet);
-                Cliffs.Add(cliffType);
+                CliffType cliffType = CliffType.FromIniSection(iniFile, cliffIniName);
+                if (cliffType != null)
+                    Cliffs.Add(cliffType);
             }
         }
     }
