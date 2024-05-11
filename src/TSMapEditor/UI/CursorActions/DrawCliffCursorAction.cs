@@ -30,6 +30,10 @@ namespace TSMapEditor.UI.CursorActions
         private readonly CliffType cliffType;
 
         private List<Point2D> cliffPath;
+        private CliffSide cliffSide = CliffSide.Front;
+        private DrawCliffMutation previewMutation;
+
+        private int randomSeed = Guid.NewGuid().GetHashCode();
 
         public override void OnActionEnter()
         {
@@ -38,13 +42,35 @@ namespace TSMapEditor.UI.CursorActions
             base.OnActionEnter();
         }
 
+        public override void PreMapDraw(Point2D cellCoords)
+        {
+            if (cliffPath.Count >= 2)
+            {
+                previewMutation = new DrawCliffMutation(MutationTarget, cliffPath, cliffType, cliffSide, randomSeed);
+                previewMutation.Perform();
+            }
+            else
+            {
+                previewMutation = null;
+            }
+        }
+
+
+        public override void PostMapDraw(Point2D cellCoords)
+        {
+            if (previewMutation != null)
+            {
+                previewMutation.Undo();
+            }
+        }
+
         public override void DrawPreview(Point2D cellCoords, Point2D cameraTopLeftPoint)
         {
             Point2D cellTopLeftPoint = CellMath.CellTopLeftPointFromCellCoords(cellCoords, CursorActionTarget.Map) - cameraTopLeftPoint;
 
             cellTopLeftPoint = cellTopLeftPoint.ScaleBy(CursorActionTarget.Camera.ZoomLevel);
 
-            const string text = "Click on a cell to place a new vertex.\r\n\r\nENTER to confirm\r\nBackspace to go back one step\r\nRight-click or ESC to exit";
+            const string text = "Click on a cell to place a new vertex.\r\n\r\nENTER to confirm\r\nBackspace to go back one step\r\nTAB to change cliff side\r\nRight-click or ESC to exit";
             var textDimensions = Renderer.GetTextDimensions(text, Constants.UIBoldFont);
             int x = cellTopLeftPoint.X - (int)(textDimensions.X - Constants.CellSizeX) / 2;
 
@@ -87,6 +113,12 @@ namespace TSMapEditor.UI.CursorActions
 
                 e.Handled = true;
             }
+            else if (e.PressedKey == Microsoft.Xna.Framework.Input.Keys.Tab)
+            {
+                cliffSide = cliffSide == CliffSide.Front ? CliffSide.Back : CliffSide.Front;
+
+                e.Handled = true;
+            }
             else if (e.PressedKey == Microsoft.Xna.Framework.Input.Keys.Back)
             {
                 if (cliffPath.Count > 0)
@@ -98,7 +130,7 @@ namespace TSMapEditor.UI.CursorActions
             }
             else if (e.PressedKey == Microsoft.Xna.Framework.Input.Keys.Enter && cliffPath.Count >= 2)
             {
-                CursorActionTarget.MutationManager.PerformMutation(new DrawCliffMutation(CursorActionTarget.MutationTarget, cliffPath, cliffType, CliffSide.Front));
+                CursorActionTarget.MutationManager.PerformMutation(new DrawCliffMutation(CursorActionTarget.MutationTarget, cliffPath, cliffType, cliffSide, randomSeed));
 
                 ExitAction();
 

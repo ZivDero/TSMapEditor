@@ -19,7 +19,7 @@ namespace TSMapEditor.Mutations.Classes
     /// </summary>
     public class DrawCliffMutation : Mutation
     {
-        public DrawCliffMutation(IMutationTarget mutationTarget, List<Point2D> cliffPath, CliffType cliffType, CliffSide startingSide) : base(mutationTarget)
+        public DrawCliffMutation(IMutationTarget mutationTarget, List<Point2D> cliffPath, CliffType cliffType, CliffSide startingSide, int randomSeed) : base(mutationTarget)
         {
             if (cliffPath.Count < 2)
             {
@@ -33,7 +33,18 @@ namespace TSMapEditor.Mutations.Classes
 
             this.originLevel = mutationTarget.Map.GetTile(cliffPath[0]).Level;
             this.tileSet = mutationTarget.Map.TheaterInstance.Theater.FindTileSet(cliffType.TileSet);
+            this.random = new Random(randomSeed);
         }
+
+        private struct CliffUndoData
+        {
+            public Point2D CellCoords;
+            public int TileIndex;
+            public byte SubTileIndex;
+            public byte Level;
+        }
+
+        private readonly List<CliffUndoData> undoData = new List<CliffUndoData>();
 
         private readonly List<Point2D> cliffPath;
         private readonly CliffType cliffType;
@@ -41,9 +52,10 @@ namespace TSMapEditor.Mutations.Classes
         
         private readonly int originLevel;
         private readonly TileSet tileSet;
-        private readonly Random random = new Random();
+        private readonly Random random;
 
         private CliffAStarNode lastNode;
+        private const int maxIterations = 50;
 
         public override void Perform()
         {
@@ -76,6 +88,7 @@ namespace TSMapEditor.Mutations.Classes
                 lastNode.Destination = end;
             }
 
+            int iterations = 0;
             openSet.Enqueue(lastNode, lastNode.FScore);
 
             while (openSet.Count > 0)
@@ -87,9 +100,15 @@ namespace TSMapEditor.Mutations.Classes
                 {
                     bestNode = currentNode;
                     bestDistance = currentNode.HScore;
+                    iterations = 0;
+                }
+                else
+                {
+                    iterations++;
                 }
 
-                if (bestDistance == 0)
+
+                if (bestDistance == 0 || iterations > maxIterations)
                     break;
             }
 
@@ -125,8 +144,16 @@ namespace TSMapEditor.Mutations.Classes
                 int cy = targetCellCoords.Y + i / tile.Width;
 
                 var mapTile = MutationTarget.Map.GetTile(cx, cy);
-                if (mapTile != null && (!MutationTarget.OnlyPaintOnClearGround || mapTile.IsClearGround()))
+                if (mapTile != null)
                 {
+                    undoData.Add(new CliffUndoData()
+                    {
+                        CellCoords = new Point2D(cx, cy),
+                        TileIndex = mapTile.TileIndex,
+                        SubTileIndex = mapTile.SubTileIndex,
+                        Level = mapTile.Level
+                    });
+
                     mapTile.ChangeTileIndex(tile.TileID, (byte)i);
                     mapTile.Level = (byte)Math.Min(originLevel + image.TmpImage.Height, Constants.MaxMapHeightLevel);
                 }
@@ -135,6 +162,19 @@ namespace TSMapEditor.Mutations.Classes
 
         public override void Undo()
         {
+            for (int i = undoData.Count - 1; i >= 0; i--)
+            {
+                var data = undoData[i];
+                var mapTile = MutationTarget.Map.GetTile(data.CellCoords);
+
+                if (mapTile != null)
+                {
+                    mapTile.ChangeTileIndex(data.TileIndex, data.SubTileIndex);
+                    mapTile.Level = data.Level;
+                }
+            }
+
+            undoData.Clear();
             MutationTarget.InvalidateMap();
         }
     }
