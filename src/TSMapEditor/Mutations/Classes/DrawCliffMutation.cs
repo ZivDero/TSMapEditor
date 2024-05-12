@@ -32,7 +32,6 @@ namespace TSMapEditor.Mutations.Classes
             this.startingSide = startingSide;
 
             this.originLevel = mutationTarget.Map.GetTile(cliffPath[0]).Level + extraHeight;
-            this.tileSet = mutationTarget.Map.TheaterInstance.Theater.FindTileSet(cliffType.TileSet);
             this.random = new Random(randomSeed);
         }
 
@@ -51,11 +50,10 @@ namespace TSMapEditor.Mutations.Classes
         private readonly CliffSide startingSide;
         
         private readonly int originLevel;
-        private readonly TileSet tileSet;
         private readonly Random random;
 
         private CliffAStarNode lastNode;
-        private const int maxIterations = 50;
+        private const int MaxIterations = 50;
 
         public override void Perform()
         {
@@ -110,7 +108,7 @@ namespace TSMapEditor.Mutations.Classes
                 }
 
 
-                if (bestDistance == 0 || iterations > maxIterations)
+                if (bestDistance == 0 || iterations > MaxIterations)
                     break;
             }
 
@@ -124,6 +122,8 @@ namespace TSMapEditor.Mutations.Classes
             {
                 if (node.Tile != null)
                 {
+                    var tileSet = MutationTarget.Map.TheaterInstance.Theater.FindTileSet(node.Tile.TileSet);
+
                     var tileImage = MutationTarget.TheaterGraphics.GetTileGraphics(tileSet.StartTileIndex + node.Tile.IndicesInTileSet.GetRandomElement(random));
                     PlaceTile(tileImage, new Point2D((int)node.Location.X, (int)node.Location.Y));
                 }

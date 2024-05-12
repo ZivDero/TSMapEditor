@@ -178,6 +178,13 @@ namespace TSMapEditor.Models
             if (indicesString == null || !Regex.IsMatch(indicesString, "^((?:\\d+?,)*(?:\\d+?))$"))
                 throw new INIConfigException($"Cliff {iniSection.SectionName} has invalid TileIndices list: {indicesString}!");
 
+
+            string tileSet = iniSection.GetStringValue("TileSet", null);
+            if (string.IsNullOrWhiteSpace(tileSet))
+                throw new INIConfigException($"Cliff {iniSection.SectionName} has no TileSet!");
+
+            TileSet = tileSet;
+
             IndicesInTileSet = indicesString.Split(',').Select(int.Parse).ToList();
 
             ConnectionPoints = new List<CliffConnectionPoint>();
@@ -229,7 +236,8 @@ namespace TSMapEditor.Models
         /// Tile's in-editor index
         /// </summary>
         public int Index { get; set; }
-        
+        public string TileSet { get; set; }
+
         /// <summary>
         /// Indices of tiles relative to the Tile Set
         /// </summary>
@@ -252,21 +260,19 @@ namespace TSMapEditor.Models
                 return null;
 
             string cliffName = cliffSection.GetStringValue("Name", null);
-            string tileSet = cliffSection.GetStringValue("TileSet", null);
 
-            if (string.IsNullOrEmpty(cliffName) || string.IsNullOrEmpty(tileSet))
+            if (string.IsNullOrEmpty(cliffName))
                 return null;
 
             var allowedTheaters = cliffSection.GetListValue("AllowedTheaters", ',', s => s);
 
-            return new CliffType(iniFile, sectionName, cliffName, tileSet, allowedTheaters);
+            return new CliffType(iniFile, sectionName, cliffName, allowedTheaters);
         }
 
-        private CliffType(IniFile iniFile, string iniName, string name, string tileSet, List<string> allowedTheaters)
+        private CliffType(IniFile iniFile, string iniName, string name, List<string> allowedTheaters)
         {
             IniName = iniName;
             Name = name;
-            TileSet = tileSet;
             AllowedTheaters = allowedTheaters;
 
             Tiles = new List<CliffTile>();
@@ -283,7 +289,6 @@ namespace TSMapEditor.Models
 
         public string IniName { get; set; }
         public string Name { get; set; }
-        public string TileSet { get; set; }
         public List<string> AllowedTheaters { get; set; }
         public List<CliffTile> Tiles { get; set; }
 
