@@ -5,12 +5,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
+using Rampastring.Tools;
 using TSMapEditor.CCEngine;
 using TSMapEditor.GameMath;
 using TSMapEditor.Misc;
 using TSMapEditor.Models;
 using TSMapEditor.Models.Enums;
 using TSMapEditor.Rendering;
+using TSMapEditor.UI;
 
 namespace TSMapEditor.Mutations.Classes
 {
@@ -123,9 +125,15 @@ namespace TSMapEditor.Mutations.Classes
                 if (node.Tile != null)
                 {
                     var tileSet = MutationTarget.Map.TheaterInstance.Theater.FindTileSet(node.Tile.TileSet);
-
-                    var tileImage = MutationTarget.TheaterGraphics.GetTileGraphics(tileSet.StartTileIndex + node.Tile.IndicesInTileSet.GetRandomElement(random));
-                    PlaceTile(tileImage, new Point2D((int)node.Location.X, (int)node.Location.Y));
+                    if (tileSet != null)
+                    {
+                        var tileImage = MutationTarget.TheaterGraphics.GetTileGraphics(tileSet.StartTileIndex + node.Tile.IndicesInTileSet.GetRandomElement(random));
+                        PlaceTile(tileImage, new Point2D((int)node.Location.X, (int)node.Location.Y));
+                    }
+                    else
+                    {
+                        throw new INIConfigException($"WARNING: Tile Set {node.Tile.TileSet} not found when placing cliffs!");
+                    }
                 }
 
                 node = node.Parent;
