@@ -183,7 +183,5 @@ namespace TSMapEditor.UI.CursorActions
         {
             previewMutation?.Undo();
         }
-
-        public override void LeftDown(Point2D cellCoords) => LeftClick(cellCoords);
     }
 }
