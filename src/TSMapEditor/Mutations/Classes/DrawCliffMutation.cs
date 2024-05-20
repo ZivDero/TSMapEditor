@@ -1,16 +1,10 @@
-﻿using Rampastring.XNAUI;
-using SharpDX.Direct2D1.Effects;
-using SharpDX.MediaFoundation;
+﻿using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Xna.Framework;
-using Rampastring.Tools;
-using TSMapEditor.CCEngine;
 using TSMapEditor.GameMath;
 using TSMapEditor.Misc;
 using TSMapEditor.Models;
-using TSMapEditor.Models.Enums;
 using TSMapEditor.Rendering;
 using TSMapEditor.UI;
 
@@ -132,7 +126,7 @@ namespace TSMapEditor.Mutations.Classes
                     }
                     else
                     {
-                        throw new INIConfigException($"WARNING: Tile Set {node.Tile.TileSet} not found when placing cliffs!");
+                        throw new INIConfigException($"Tile Set {node.Tile.TileSet} not found when placing cliffs!");
                     }
                 }
 
