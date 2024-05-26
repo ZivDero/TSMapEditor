@@ -57,7 +57,7 @@ namespace TSMapEditor.Mutations.Classes
 
             for (int i = 0; i < cliffPath.Count - 1; i++)
             {
-                DrawCliffAStar((Vector2)cliffPath[i], (Vector2)cliffPath[i + 1]);
+                DrawCliffAStar(cliffPath[i].ToXNAVector(), cliffPath[i + 1].ToXNAVector());
             }
 
             PlaceAStarCliffs(lastNode);

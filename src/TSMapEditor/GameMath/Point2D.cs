@@ -78,10 +78,6 @@ namespace TSMapEditor.GameMath
             return p1.X == p2.X && p1.Y == p2.Y;
         }
 
-        public static explicit operator Vector2(Point2D p)
-        {
-            return new Vector2(p.X, p.Y);
-        }
 
         public override bool Equals(object obj)
         {
