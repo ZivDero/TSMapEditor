@@ -57,15 +57,15 @@ namespace TSMapEditor.Mutations.Classes
 
             for (int i = 0; i < cliffPath.Count - 1; i++)
             {
-                DrawCliffAStar(cliffPath[i].ToXNAVector(), cliffPath[i + 1].ToXNAVector());
+                FindCliffPath(cliffPath[i].ToXNAVector(), cliffPath[i + 1].ToXNAVector());
             }
 
-            PlaceAStarCliffs(lastNode);
+            PlaceCliffs(lastNode);
 
             MutationTarget.InvalidateMap();
         }
 
-        private void DrawCliffAStar(Vector2 start, Vector2 end)
+        private void FindCliffPath(Vector2 start, Vector2 end)
         {
             PriorityQueue<CliffAStarNode, float> openSet = new PriorityQueue<CliffAStarNode, float>();
 
@@ -111,7 +111,7 @@ namespace TSMapEditor.Mutations.Classes
             lastNode = bestNode;
         }
 
-        private void PlaceAStarCliffs(CliffAStarNode endNode)
+        private void PlaceCliffs(CliffAStarNode endNode)
         {
             var node = endNode;
             while (node != null)
