@@ -17,18 +17,37 @@ namespace TSMapEditor.Models
 
     public class CliffConnectionPoint
     {
+        /// <summary>
+        /// Index of the connection point, 0 or 1
+        /// </summary>
         public int Index { get; set; }
+
+        /// <summary>
+        /// Offset of this connection point relative to the tile's (0,0) point
+        /// </summary>
         public Vector2 CoordinateOffset { get; set; }
-        public byte ConnectsTo { get; set; }
-        // Swap the first and last 4 bits to then and then with another point to get the directions they can connect
-        public byte ReversedConnectsTo => (byte)((ConnectsTo >> 4) + (0b11110000 & (ConnectsTo << 4)));
+
+        /// <summary>
+        /// Mask of bits determining which way the connection point "faces".
+        /// Ordered in the same way as the Directions enum
+        /// </summary>
+        public byte ConnectionMask { get; set; }
+
+        /// <summary>
+        /// Connection mask with its first and last half swapped to bitwise and it with the opposing cliff's mask
+        /// </summary>
+        public byte ReversedConnectionMask => (byte)((ConnectionMask >> 4) + (0b11110000 & (ConnectionMask << 4)));
+
+        /// <summary>
+        /// Whether the connection point faces "backwards" or "forwards"
+        /// </summary>
         public CliffSide Side { get; set; }
 
-        public List<CliffAStarNode> ConnectTo(CliffAStarNode node, CliffTile tile)
+        public List<CliffAStarNode> GetNextNodes(CliffAStarNode node, CliffTile tile)
         {
             var possibleNeighbors = tile.ConnectionPoints.Select(cp =>
             {
-                (CliffConnectionPoint cp, List<Direction> dirs) connection = (cp, GetDirectionsInMask((byte)(cp.ReversedConnectsTo & ConnectsTo)));
+                (CliffConnectionPoint cp, List<Direction> dirs) connection = (cp, GetDirectionsInMask((byte)(cp.ReversedConnectionMask & ConnectionMask)));
                 return connection;
             }).Where(connection => connection.dirs.Count > 0).ToList();
 
@@ -49,7 +68,7 @@ namespace TSMapEditor.Models
                     var newNode = new CliffAStarNode(node, neighbor.cp, exit, placementCoords, tile);
 
                     // Make sure that the new node doesn't overlap anything
-                    if (newNode.OccupiedTiles.Count - node.OccupiedTiles.Count == newNode.Tile.Foundation.Count)
+                    if (newNode.OccupiedCells.Count - node.OccupiedCells.Count == newNode.Tile.Foundation.Count)
                         neighbors.Add(newNode);
                 }
             }
@@ -58,7 +77,7 @@ namespace TSMapEditor.Models
 
         public List<CliffAStarNode> GetConnections(CliffAStarNode node, List<CliffTile> tiles)
         {
-            return tiles.SelectMany(tile => ConnectTo(node, tile)).ToList();
+            return tiles.SelectMany(tile => GetNextNodes(node, tile)).ToList();
         }
 
         private List<Direction> GetDirectionsInMask(byte mask)
@@ -90,15 +109,15 @@ namespace TSMapEditor.Models
             Exit = exit;
             Destination = Parent.Destination;
 
-            OccupiedTiles = new HashSet<Vector2>(parent.OccupiedTiles);
-            OccupiedTiles.UnionWith(tile.Foundation.Select(coordinate => coordinate + Location));
+            OccupiedCells = new HashSet<Vector2>(parent.OccupiedCells);
+            OccupiedCells.UnionWith(tile.Foundation.Select(coordinate => coordinate + Location));
         }
 
         public static CliffAStarNode MakeStartNode(Vector2 location, Vector2 destination, CliffSide startingSide)
         {
             CliffConnectionPoint connectionPoint = new CliffConnectionPoint
             {
-                ConnectsTo = 0b11111111,
+                ConnectionMask = 0b11111111,
                 CoordinateOffset = new Vector2(0, 0),
                 Side = startingSide
             };
@@ -123,20 +142,18 @@ namespace TSMapEditor.Models
             return neighbors;
         }
 
-        ///// Tile Config
-
         /// <summary>
-        /// Absolute world coordinates of the tile
+        /// Absolute world coordinates of the node's tile
         /// </summary>
         public Vector2 Location;
 
         /// <summary>
-        /// Absolute world coordinates of the tile's exit
+        /// Absolute world coordinates of the node's tile's exit
         /// </summary>
         public Vector2 ExitCoords => Location + Exit.CoordinateOffset;
 
         /// <summary>
-        /// Tile Data
+        /// Tile data
         /// </summary>
         public CliffTile Tile;
 
@@ -148,24 +165,35 @@ namespace TSMapEditor.Models
         public Vector2 Destination;
 
         /// <summary>
-        /// Where this tile connects to the previous tile
+        /// Where this node connects to the previous node
         /// </summary>
         public CliffConnectionPoint Entry;
 
         /// <summary>
-        /// Where this tile connects to the next tile
+        /// Where this node connects to the next node
         /// </summary>
         public CliffConnectionPoint Exit;
 
-        // Distance from starting node
+        /// <summary>
+        /// Distance from starting node
+        /// </summary>
         public float GScore => Parent == null ? 0 : Parent.GScore + Vector2.Distance(Parent.ExitCoords, ExitCoords);
 
-        // Distance to end node
+        /// <summary>
+        /// Distance to end node
+        /// </summary>
         public float HScore => Vector2.Distance(Destination, ExitCoords);
         public float FScore => GScore * 0.8f + HScore;
+
+        /// <summary>
+        /// Previous node
+        /// </summary>
         public CliffAStarNode Parent;
 
-        public HashSet<Vector2> OccupiedTiles = new HashSet<Vector2>();
+        /// <summary>
+        /// Accumulated set of all cell coordinates occupied up to this node
+        /// </summary>
+        public HashSet<Vector2> OccupiedCells = new HashSet<Vector2>();
     }
 
     public class CliffTile
@@ -187,7 +215,7 @@ namespace TSMapEditor.Models
 
             IndicesInTileSet = indicesString.Split(',').Select(int.Parse).ToList();
 
-            ConnectionPoints = new List<CliffConnectionPoint>();
+            ConnectionPoints = new CliffConnectionPoint[2];
 
             for (int i = 0; i < 2; i++)
             {
@@ -212,13 +240,13 @@ namespace TSMapEditor.Models
                     _ => throw new INIConfigException($"Cliff {iniSection.SectionName} has an invalid ConnectionPoint{i}.Side value: {sideString}!")
                 };
 
-                ConnectionPoints.Add(new CliffConnectionPoint
+                ConnectionPoints[i] = new CliffConnectionPoint
                 {
                     Index = i,
-                    ConnectsTo = directions,
+                    ConnectionMask = directions,
                     CoordinateOffset = coords,
                     Side = side
-                });
+                };
             }
 
             string foundationString = iniSection.GetStringValue("Foundation", string.Empty);
@@ -236,13 +264,17 @@ namespace TSMapEditor.Models
         /// Tile's in-editor index
         /// </summary>
         public int Index { get; set; }
+
+        /// <summary>
+        /// Tile's Tile Set
+        /// </summary>
         public string TileSet { get; set; }
 
         /// <summary>
         /// Indices of tiles relative to the Tile Set
         /// </summary>
         public List<int> IndicesInTileSet { get; set; }
-        public List<CliffConnectionPoint> ConnectionPoints { get; set; }
+        public CliffConnectionPoint[] ConnectionPoints { get; set; }
         public List<Vector2> Foundation { get; set; }
 
         public CliffConnectionPoint GetExit(int entryIndex)
