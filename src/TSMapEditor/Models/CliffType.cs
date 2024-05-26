@@ -48,7 +48,7 @@ namespace TSMapEditor.Models
     {
         private CliffAStarNode() {}
 
-        public CliffAStarNode(CliffAStarNode parent, CliffConnectionPoint entry, CliffConnectionPoint exit, Vector2 location, CliffTile tile)
+        public CliffAStarNode(CliffAStarNode parent, CliffConnectionPoint exit, Vector2 location, CliffTile tile)
         {
             Location = location;
             Tile = tile;
@@ -108,7 +108,7 @@ namespace TSMapEditor.Models
                     Vector2 placementCoords = ExitCoords + placementOffset;
 
                     var exit = tile.GetExit(connectionPoint.Index);
-                    var newNode = new CliffAStarNode(this, connectionPoint, exit, placementCoords, tile);
+                    var newNode = new CliffAStarNode(this, exit, placementCoords, tile);
 
                     // Make sure that the new node doesn't overlap anything
                     if (newNode.OccupiedCells.Count - OccupiedCells.Count == newNode.Tile.Foundation.Count)
@@ -246,7 +246,7 @@ namespace TSMapEditor.Models
             {
                 var coordinateParts = coordinateString.Split(",");
                 return new Vector2(int.Parse(coordinateParts[0]), int.Parse(coordinateParts[1]));
-            }).ToList();
+            }).ToHashSet();
         }
 
         /// <summary>
@@ -263,8 +263,16 @@ namespace TSMapEditor.Models
         /// Indices of tiles relative to the Tile Set
         /// </summary>
         public List<int> IndicesInTileSet { get; set; }
+
+        /// <summary>
+        /// Places this tile connects to other tiles
+        /// </summary>
         public CliffConnectionPoint[] ConnectionPoints { get; set; }
-        public List<Vector2> Foundation { get; set; }
+
+        /// <summary>
+        /// Set of all relative cell coordinates this tile occupies
+        /// </summary>
+        public HashSet<Vector2> Foundation { get; set; }
 
         public CliffConnectionPoint GetExit(int entryIndex)
         {
@@ -312,6 +320,5 @@ namespace TSMapEditor.Models
         public string Name { get; set; }
         public List<string> AllowedTheaters { get; set; }
         public List<CliffTile> Tiles { get; set; }
-
     }
 }
