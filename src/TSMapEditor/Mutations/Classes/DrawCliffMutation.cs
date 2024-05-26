@@ -90,7 +90,7 @@ namespace TSMapEditor.Mutations.Classes
             while (openSet.Count > 0)
             {
                 CliffAStarNode currentNode = openSet.Dequeue();
-                openSet.EnqueueRange(currentNode.GetNeighbors(cliffType.Tiles).Select(node => (node, node.FScore)));
+                openSet.EnqueueRange(currentNode.GetNextNodes(cliffType.Tiles).Select(node => (node, node.FScore)));
                 
                 if (currentNode.HScore < bestDistance)
                 {

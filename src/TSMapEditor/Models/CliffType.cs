@@ -15,7 +15,7 @@ namespace TSMapEditor.Models
         Back
     }
 
-    public class CliffConnectionPoint
+    public struct CliffConnectionPoint
     {
         /// <summary>
         /// Index of the connection point, 0 or 1
@@ -42,57 +42,6 @@ namespace TSMapEditor.Models
         /// Whether the connection point faces "backwards" or "forwards"
         /// </summary>
         public CliffSide Side { get; set; }
-
-        public List<CliffAStarNode> GetNextNodes(CliffAStarNode node, CliffTile tile)
-        {
-            var possibleNeighbors = tile.ConnectionPoints.Select(cp =>
-            {
-                (CliffConnectionPoint cp, List<Direction> dirs) connection = (cp, GetDirectionsInMask((byte)(cp.ReversedConnectionMask & ConnectionMask)));
-                return connection;
-            }).Where(connection => connection.dirs.Count > 0).ToList();
-
-            var neighbors = new List<CliffAStarNode>();
-            foreach (var neighbor in possibleNeighbors)
-            {
-                if (neighbor.cp.Side != node.Exit.Side)
-                    continue;
-
-                foreach (Direction dir in neighbor.dirs)
-                {
-                    Vector2 placementOffset = Helpers.VisualDirectionToPoint(dir).ToXNAVector() - neighbor.cp.CoordinateOffset;
-                    Vector2 placementCoords = node.ExitCoords + placementOffset;
-
-                    var exit = tile.GetExit(neighbor.cp.Index);
-                    exit = (CliffConnectionPoint)exit.MemberwiseClone();
-
-                    var newNode = new CliffAStarNode(node, neighbor.cp, exit, placementCoords, tile);
-
-                    // Make sure that the new node doesn't overlap anything
-                    if (newNode.OccupiedCells.Count - node.OccupiedCells.Count == newNode.Tile.Foundation.Count)
-                        neighbors.Add(newNode);
-                }
-            }
-            return neighbors;
-        }
-
-        public List<CliffAStarNode> GetConnections(CliffAStarNode node, List<CliffTile> tiles)
-        {
-            return tiles.SelectMany(tile => GetNextNodes(node, tile)).ToList();
-        }
-
-        private List<Direction> GetDirectionsInMask(byte mask)
-        {
-            List <Direction> directions = new List<Direction>();
-
-            for (int direction = 0; direction < (int)Direction.Count; direction++)
-            {
-                if ((mask & (byte)(0b10000000 >> direction)) > 0)
-                    directions.Add((Direction)direction);
-            }
-
-            return directions;
-        }
-
     }
 
     public class CliffAStarNode
@@ -105,7 +54,6 @@ namespace TSMapEditor.Models
             Tile = tile;
 
             Parent = parent;
-            Entry = entry;
             Exit = exit;
             Destination = Parent.Destination;
 
@@ -128,7 +76,6 @@ namespace TSMapEditor.Models
                 Tile = null,
 
                 Parent = null,
-                Entry = null,
                 Exit = connectionPoint,
                 Destination = destination
             };
@@ -136,10 +83,57 @@ namespace TSMapEditor.Models
             return startNode;
         }
 
-        public List<CliffAStarNode> GetNeighbors(List<CliffTile> tiles)
+        public List<CliffAStarNode> GetNextNodes(CliffTile tile)
         {
-            var neighbors = Exit.GetConnections(this, tiles);
+            List<(CliffConnectionPoint, List<Direction>)> possibleNeighbors = new();
+
+            foreach (CliffConnectionPoint cp in tile.ConnectionPoints)
+            {
+                var possibleDirections = GetDirectionsInMask((byte)(cp.ReversedConnectionMask & Exit.ConnectionMask));
+                if (possibleDirections.Count == 0)
+                    continue;
+
+                possibleNeighbors.Add((cp, possibleDirections));
+            }
+
+            var neighbors = new List<CliffAStarNode>();
+            foreach (var (connectionPoint, directions) in possibleNeighbors)
+            {
+                if (connectionPoint.Side != Exit.Side)
+                    continue;
+
+                foreach (Direction dir in directions)
+                {
+                    Vector2 placementOffset = Helpers.VisualDirectionToPoint(dir).ToXNAVector() - connectionPoint.CoordinateOffset;
+                    Vector2 placementCoords = ExitCoords + placementOffset;
+
+                    var exit = tile.GetExit(connectionPoint.Index);
+                    var newNode = new CliffAStarNode(this, connectionPoint, exit, placementCoords, tile);
+
+                    // Make sure that the new node doesn't overlap anything
+                    if (newNode.OccupiedCells.Count - OccupiedCells.Count == newNode.Tile.Foundation.Count)
+                        neighbors.Add(newNode);
+                }
+            }
             return neighbors;
+        }
+
+        public List<CliffAStarNode> GetNextNodes(List<CliffTile> tiles)
+        {
+            return tiles.SelectMany(GetNextNodes).ToList();
+        }
+
+        private List<Direction> GetDirectionsInMask(byte mask)
+        {
+            List<Direction> directions = new List<Direction>();
+
+            for (int direction = 0; direction < (int)Direction.Count; direction++)
+            {
+                if ((mask & (byte)(0b10000000 >> direction)) > 0)
+                    directions.Add((Direction)direction);
+            }
+
+            return directions;
         }
 
         /// <summary>
@@ -163,11 +157,6 @@ namespace TSMapEditor.Models
         /// A* end point
         /// </summary>
         public Vector2 Destination;
-
-        /// <summary>
-        /// Where this node connects to the previous node
-        /// </summary>
-        public CliffConnectionPoint Entry;
 
         /// <summary>
         /// Where this node connects to the next node
@@ -279,7 +268,7 @@ namespace TSMapEditor.Models
 
         public CliffConnectionPoint GetExit(int entryIndex)
         {
-            return ConnectionPoints.FirstOrDefault(cp => cp.Index != entryIndex) ?? ConnectionPoints.First();
+            return ConnectionPoints[0].Index == entryIndex ? ConnectionPoints[1] : ConnectionPoints[0];
         }
     }
 
