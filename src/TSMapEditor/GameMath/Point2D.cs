@@ -78,7 +78,6 @@ namespace TSMapEditor.GameMath
             return p1.X == p2.X && p1.Y == p2.Y;
         }
 
-
         public override bool Equals(object obj)
         {
             if (obj is Point2D objAsPoint)

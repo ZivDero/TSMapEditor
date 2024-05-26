@@ -40,7 +40,7 @@ namespace TSMapEditor.Models
 
                 foreach (Direction dir in neighbor.dirs)
                 {
-                    Vector2 placementOffset = (Vector2)Helpers.VisualDirectionToPoint(dir) - neighbor.cp.CoordinateOffset;
+                    Vector2 placementOffset = Helpers.VisualDirectionToPoint(dir).ToXNAVector() - neighbor.cp.CoordinateOffset;
                     Vector2 placementCoords = node.ExitCoords + placementOffset;
 
                     var exit = tile.GetExit(neighbor.cp.Index);
@@ -158,10 +158,10 @@ namespace TSMapEditor.Models
         public CliffConnectionPoint Exit;
 
         // Distance from starting node
-        public float GScore => Parent == null ? 0 : Parent.GScore + Helpers.VectorDistance(Parent.ExitCoords, ExitCoords);
+        public float GScore => Parent == null ? 0 : Parent.GScore + Vector2.Distance(Parent.ExitCoords, ExitCoords);
 
         // Distance to end node
-        public float HScore => Helpers.VectorDistance(Destination, ExitCoords);
+        public float HScore => Vector2.Distance(Destination, ExitCoords);
         public float FScore => GScore * 0.8f + HScore;
         public CliffAStarNode Parent;
 
