@@ -235,8 +235,7 @@ namespace TSMapEditor.Models
                 if (coordsString == null || !Regex.IsMatch(coordsString, "^\\d+?,\\d+?$"))
                     throw new INIConfigException($"Cliff {iniSection.SectionName} has invalid ConnectionPoint{i} value: {coordsString}!");
 
-                var coordParts = coordsString.Split(',').Select(s => int.Parse(s, CultureInfo.InvariantCulture)).ToList();
-                Point2D coords = new Point2D(coordParts[0], coordParts[1]);
+                Point2D coords = Point2D.FromString(coordsString);
 
                 string directionsString = iniSection.GetStringValue($"ConnectionPoint{i}.Directions", null);
                 if (directionsString == null || directionsString.Length != (int)Direction.Count || Regex.IsMatch(directionsString, "[^01]"))
@@ -286,11 +285,7 @@ namespace TSMapEditor.Models
             if (!Regex.IsMatch(foundationString, "^((?:\\d+?,\\d+?\\|)*(?:\\d+?,\\d+?))$"))
                 throw new INIConfigException($"Cliff {iniSection.SectionName} has an invalid Foundation: {foundationString}!");
 
-            Foundation = foundationString.Split("|").Select(coordinateString =>
-            {
-                var coordinateParts = coordinateString.Split(",");
-                return new Point2D(int.Parse(coordinateParts[0]), int.Parse(coordinateParts[1]));
-            }).ToHashSet();
+            Foundation = foundationString.Split("|").Select(coordinateString => Point2D.FromString(coordinateString)).ToHashSet();
         }
 
         /// <summary>
