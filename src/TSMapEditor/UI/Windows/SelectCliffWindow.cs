@@ -12,7 +12,6 @@ namespace TSMapEditor.UI.Windows
         public SelectCliffWindow(WindowManager windowManager, Map map) : base(windowManager)
         {
             this.map = map;
-            lbObjectList.DoubleLeftClick += (s, e) => { Success = true; };
         }
 
         private readonly Map map;
@@ -24,6 +23,7 @@ namespace TSMapEditor.UI.Windows
             base.Initialize();
 
             FindChild<EditorButton>("btnSelect").LeftClick += BtnSelect_LeftClick;
+            lbObjectList.DoubleLeftClick += (s, e) => { Success = true; };
         }
 
         protected override void LbObjectList_SelectedIndexChanged(object sender, EventArgs e)
