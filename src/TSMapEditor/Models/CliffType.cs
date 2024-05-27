@@ -15,23 +15,23 @@ namespace TSMapEditor.Models
         Back
     }
 
-    public struct CliffConnectionPoint
+    public readonly struct CliffConnectionPoint
     {
         /// <summary>
         /// Index of the connection point, 0 or 1
         /// </summary>
-        public int Index { get; set; }
+        public int Index { get; init; }
 
         /// <summary>
         /// Offset of this connection point relative to the tile's (0,0) point
         /// </summary>
-        public Vector2 CoordinateOffset { get; set; }
+        public Vector2 CoordinateOffset { get; init; }
 
         /// <summary>
         /// Mask of bits determining which way the connection point "faces".
         /// Ordered in the same way as the Directions enum
         /// </summary>
-        public byte ConnectionMask { get; set; }
+        public byte ConnectionMask { get; init; }
 
         /// <summary>
         /// Connection mask with its first and last half swapped to bitwise and it with the opposing cliff's mask
@@ -41,17 +41,17 @@ namespace TSMapEditor.Models
         /// <summary>
         /// List of tiles this connection point must connect to. RequiredTiles take priority over ForbiddenTiles
         /// </summary>
-        public int[] RequiredTiles { get; set; }
+        public int[] RequiredTiles { get; init; }
 
         /// <summary>
         /// List of tiles this connection point cannot connect to. RequiredTiles take priority over ForbiddenTiles
         /// </summary>
-        public int[] ForbiddenTiles { get; set; }
+        public int[] ForbiddenTiles { get; init; }
 
         /// <summary>
         /// Whether the connection point faces "backwards" or "forwards"
         /// </summary>
-        public CliffSide Side { get; set; }
+        public CliffSide Side { get; init; }
     }
 
     public class CliffAStarNode
