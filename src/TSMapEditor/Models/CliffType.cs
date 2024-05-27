@@ -216,12 +216,12 @@ namespace TSMapEditor.Models
 
             string indicesString = iniSection.GetStringValue("TileIndices", null);
             if (indicesString == null || !Regex.IsMatch(indicesString, "^((?:\\d+?,)*(?:\\d+?))$"))
-                throw new INIConfigException($"Cliff {iniSection.SectionName} has invalid TileIndices list: {indicesString}!");
+                throw new INIConfigException($"Connected Tile {iniSection.SectionName} has invalid TileIndices list: {indicesString}!");
 
 
             string tileSet = iniSection.GetStringValue("TileSet", null);
             if (string.IsNullOrWhiteSpace(tileSet))
-                throw new INIConfigException($"Cliff {iniSection.SectionName} has no TileSet!");
+                throw new INIConfigException($"Connected Tile {iniSection.SectionName} has no TileSet!");
 
             TileSetName = tileSet;
 
@@ -233,13 +233,13 @@ namespace TSMapEditor.Models
             {
                 string coordsString = iniSection.GetStringValue($"ConnectionPoint{i}", null);
                 if (coordsString == null || !Regex.IsMatch(coordsString, "^\\d+?,\\d+?$"))
-                    throw new INIConfigException($"Cliff {iniSection.SectionName} has invalid ConnectionPoint{i} value: {coordsString}!");
+                    throw new INIConfigException($"Connected Tile {iniSection.SectionName} has invalid ConnectionPoint{i} value: {coordsString}!");
 
                 Point2D coords = Point2D.FromString(coordsString);
 
                 string directionsString = iniSection.GetStringValue($"ConnectionPoint{i}.Directions", null);
                 if (directionsString == null || directionsString.Length != (int)Direction.Count || Regex.IsMatch(directionsString, "[^01]"))
-                    throw new INIConfigException($"Cliff {iniSection.SectionName} has invalid ConnectionPoint{i}.Directions value: {directionsString}!");
+                    throw new INIConfigException($"Connected Tile {iniSection.SectionName} has invalid ConnectionPoint{i}.Directions value: {directionsString}!");
 
                 byte directions = Convert.ToByte(directionsString, 2);
 
@@ -248,7 +248,7 @@ namespace TSMapEditor.Models
                 {
                     "front" => CliffSide.Front,
                     "back" => CliffSide.Back,
-                    _ => throw new INIConfigException($"Cliff {iniSection.SectionName} has an invalid ConnectionPoint{i}.Side value: {sideString}!")
+                    _ => throw new INIConfigException($"Connected Tile {iniSection.SectionName} has an invalid ConnectionPoint{i}.Side value: {sideString}!")
                 };
 
                 int[] requiredTiles, forbiddenTiles;
@@ -283,7 +283,7 @@ namespace TSMapEditor.Models
 
             string foundationString = iniSection.GetStringValue("Foundation", string.Empty);
             if (!Regex.IsMatch(foundationString, "^((?:\\d+?,\\d+?\\|)*(?:\\d+?,\\d+?))$"))
-                throw new INIConfigException($"Cliff {iniSection.SectionName} has an invalid Foundation: {foundationString}!");
+                throw new INIConfigException($"Connected Tile {iniSection.SectionName} has an invalid Foundation: {foundationString}!");
 
             Foundation = foundationString.Split("|").Select(coordinateString => Point2D.FromString(coordinateString)).ToHashSet();
         }
@@ -350,6 +350,12 @@ namespace TSMapEditor.Models
                 var parts = sectionName.Split('.');
                 if (parts.Length != 2 || parts[0] != IniName || !int.TryParse(parts[1], out int index))
                     continue;
+
+                if (Tiles.Exists(tile => tile.Index == index))
+                {
+                    throw new INIConfigException(
+                        $"Connected Tile {iniName} has multiple tiles with the same index {index}!");
+                }
 
                 Tiles.Add(new CliffTile(iniFile.GetSection(sectionName), index));
             }

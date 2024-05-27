@@ -399,7 +399,7 @@ namespace TSMapEditor.Models
 
         private void ReadCliffs()
         {
-            ConnectedOverlays.Clear();
+            Cliffs.Clear();
 
             var iniFile = new IniFile(Environment.CurrentDirectory + "/Config/ConnectedTileDrawer.ini");
             var section = iniFile.GetSection("ConnectedTiles");

@@ -20,7 +20,7 @@ namespace TSMapEditor.Mutations.Classes
             if (cliffPath.Count < 2)
             {
                 throw new ArgumentException(nameof(DrawCliffMutation) +
-                    ": to draw a cliff at least 2 path vertices are required.");
+                    ": to draw a connected tile at least 2 path vertices are required.");
             }
 
             this.cliffPath = cliffPath;
@@ -144,6 +144,7 @@ namespace TSMapEditor.Mutations.Classes
                 MGTMPImage image = tile.TMPImages[i];
                 if (image.TmpImage == null)
                     continue;
+
                 int cx = targetCellCoords.X + i % tile.Width;
                 int cy = targetCellCoords.Y + i / tile.Width;
 
