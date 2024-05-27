@@ -14,15 +14,11 @@ namespace TSMapEditor.UI.Windows
         }
 
         private readonly Map map;
-        public bool Success = false;
 
         public override void Initialize()
         {
             Name = nameof(SelectBridgeWindow);
             base.Initialize();
-
-            FindChild<EditorButton>("btnSelect").LeftClick += BtnSelect_LeftClick;
-            lbObjectList.DoubleLeftClick += (s, e) => { Success = true; };
         }
 
         protected override void LbObjectList_SelectedIndexChanged(object sender, EventArgs e)
@@ -36,14 +32,8 @@ namespace TSMapEditor.UI.Windows
             SelectedObject = (BridgeType)lbObjectList.SelectedItem.Tag;
         }
 
-        protected void BtnSelect_LeftClick(object sender, EventArgs e)
-        {
-            Success = true;
-        }
-
         public void Open()
         {
-            Success = false;
             Open(null);
         }
 

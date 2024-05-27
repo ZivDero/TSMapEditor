@@ -426,13 +426,13 @@ namespace TSMapEditor.UI.TopBar
 
         private void SelectBridgeDarkeningPanel_Hidden(object sender, EventArgs e)
         {
-            if (selectBridgeWindow.Success && selectBridgeWindow.SelectedObject != null)
+            if (selectBridgeWindow.SelectedObject != null)
                 mapView.EditorState.CursorAction = new PlaceBridgeCursorAction(mapView, selectBridgeWindow.SelectedObject);
         }
 
         private void SelectCliffDarkeningPanel_Hidden(object sender, EventArgs e)
         {
-            if (selectCliffWindow.Success && selectCliffWindow.SelectedObject != null)
+            if (selectCliffWindow.SelectedObject != null)
                 mapView.EditorState.CursorAction = new DrawCliffCursorAction(mapView, selectCliffWindow.SelectedObject);
         }
 
