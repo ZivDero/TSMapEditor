@@ -145,7 +145,7 @@ namespace TSMapEditor.UI.TopBar
                 }
                 else
                 {
-                    editContextMenu.AddItem("Draw Cliff...", SelectCliff, null, null, null);
+                    editContextMenu.AddItem("Draw Cliff...", () => selectCliffWindow.Open(), null, null, null);
                 }
             }
 

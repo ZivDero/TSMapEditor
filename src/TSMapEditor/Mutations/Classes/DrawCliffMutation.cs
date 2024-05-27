@@ -20,7 +20,7 @@ namespace TSMapEditor.Mutations.Classes
             if (cliffPath.Count < 2)
             {
                 throw new ArgumentException(nameof(DrawCliffMutation) +
-                                            ": to draw a cliff at least 2 path vertices are required.");
+                    ": to draw a cliff at least 2 path vertices are required.");
             }
 
             this.cliffPath = cliffPath;

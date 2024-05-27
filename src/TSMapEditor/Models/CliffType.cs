@@ -114,6 +114,7 @@ namespace TSMapEditor.Models
             }
 
             var neighbors = new List<CliffAStarNode>();
+            
             foreach (var (connectionPoint, directions) in possibleNeighbors)
             {
                 if (connectionPoint.Side != Exit.Side)
@@ -132,6 +133,7 @@ namespace TSMapEditor.Models
                         neighbors.Add(newNode);
                 }
             }
+            
             return neighbors;
         }
 
@@ -223,7 +225,7 @@ namespace TSMapEditor.Models
 
             ConnectionPoints = new CliffConnectionPoint[2];
 
-            for (int i = 0; i < 2; i++)
+            for (int i = 0; i < ConnectionPoints.Length; i++)
             {
                 string coordsString = iniSection.GetStringValue($"ConnectionPoint{i}", null);
                 if (coordsString == null || !Regex.IsMatch(coordsString, "^\\d+?,\\d+?$"))

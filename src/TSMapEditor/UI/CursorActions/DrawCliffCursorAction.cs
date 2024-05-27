@@ -35,7 +35,7 @@ namespace TSMapEditor.UI.CursorActions
         private DrawCliffMutation previewMutation;
         private byte extraHeight = 0;
 
-        private readonly int randomSeed = Guid.NewGuid().GetHashCode();
+        private readonly int randomSeed = new Random().Next();
 
         public override void OnActionEnter()
         {
