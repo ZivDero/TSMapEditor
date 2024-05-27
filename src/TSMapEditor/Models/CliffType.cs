@@ -38,7 +38,14 @@ namespace TSMapEditor.Models
         /// </summary>
         public byte ReversedConnectionMask => (byte)((ConnectionMask >> 4) + (0b11110000 & (ConnectionMask << 4)));
 
+        /// <summary>
+        /// List of tiles this connection point must connect to. RequiredTiles take priority over ForbiddenTiles
+        /// </summary>
         public int[] RequiredTiles { get; set; }
+
+        /// <summary>
+        /// List of tiles this connection point cannot connect to. RequiredTiles take priority over ForbiddenTiles
+        /// </summary>
         public int[] ForbiddenTiles { get; set; }
 
         /// <summary>
