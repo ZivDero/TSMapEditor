@@ -124,9 +124,12 @@ namespace TSMapEditor.Models
         {
             CliffConnectionPoint connectionPoint = new CliffConnectionPoint
             {
+                Index = 0,
                 ConnectionMask = 0b11111111,
                 CoordinateOffset = Point2D.Zero,
-                Side = startingSide
+                Side = startingSide,
+                RequiredTiles = Array.Empty<int>(),
+                ForbiddenTiles = Array.Empty<int>()
             };
 
             var startNode = new CliffAStarNode()
@@ -150,8 +153,8 @@ namespace TSMapEditor.Models
             {
                 if (Tile != null)
                 {
-                    if ((cp.RequiredTiles.Length > 0 && !cp.RequiredTiles.Contains(Tile.Index)) ||
-                        (cp.ForbiddenTiles.Length > 0 && cp.ForbiddenTiles.Contains(Tile.Index)))
+                    if ((cp.RequiredTiles?.Length > 0 && !cp.RequiredTiles.Contains(Tile.Index)) ||
+                        (cp.ForbiddenTiles?.Length > 0 && cp.ForbiddenTiles.Contains(Tile.Index)))
                         continue;
                 }
                 
