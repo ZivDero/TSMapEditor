@@ -25,7 +25,7 @@ namespace TSMapEditor.Models
         /// <summary>
         /// Offset of this connection point relative to the tile's (0,0) point
         /// </summary>
-        public Vector2 CoordinateOffset { get; init; }
+        public Point2D CoordinateOffset { get; init; }
 
         /// <summary>
         /// Mask of bits determining which way the connection point "faces".
@@ -58,7 +58,7 @@ namespace TSMapEditor.Models
     {
         private CliffAStarNode() {}
 
-        public CliffAStarNode(CliffAStarNode parent, CliffConnectionPoint exit, Vector2 location, CliffTile tile)
+        public CliffAStarNode(CliffAStarNode parent, CliffConnectionPoint exit, Point2D location, CliffTile tile)
         {
             Location = location;
             Tile = tile;
@@ -67,16 +67,16 @@ namespace TSMapEditor.Models
             Exit = exit;
             Destination = Parent.Destination;
 
-            OccupiedCells = new HashSet<Vector2>(parent.OccupiedCells);
+            OccupiedCells = new HashSet<Point2D>(parent.OccupiedCells);
             OccupiedCells.UnionWith(tile.Foundation.Select(coordinate => coordinate + Location));
         }
 
-        public static CliffAStarNode MakeStartNode(Vector2 location, Vector2 destination, CliffSide startingSide)
+        public static CliffAStarNode MakeStartNode(Point2D location, Point2D destination, CliffSide startingSide)
         {
             CliffConnectionPoint connectionPoint = new CliffConnectionPoint
             {
                 ConnectionMask = 0b11111111,
-                CoordinateOffset = new Vector2(0, 0),
+                CoordinateOffset = Point2D.Zero,
                 Side = startingSide
             };
 
@@ -122,8 +122,8 @@ namespace TSMapEditor.Models
 
                 foreach (Direction dir in directions)
                 {
-                    Vector2 placementOffset = Helpers.VisualDirectionToPoint(dir).ToXNAVector() - connectionPoint.CoordinateOffset;
-                    Vector2 placementCoords = ExitCoords + placementOffset;
+                    Point2D placementOffset = Helpers.VisualDirectionToPoint(dir) - connectionPoint.CoordinateOffset;
+                    Point2D placementCoords = ExitCoords + placementOffset;
 
                     var exit = tile.GetExit(connectionPoint.Index);
                     var newNode = new CliffAStarNode(this, exit, placementCoords, tile);
@@ -158,12 +158,12 @@ namespace TSMapEditor.Models
         /// <summary>
         /// Absolute world coordinates of the node's tile
         /// </summary>
-        public Vector2 Location;
+        public Point2D Location;
 
         /// <summary>
         /// Absolute world coordinates of the node's tile's exit
         /// </summary>
-        public Vector2 ExitCoords => Location + Exit.CoordinateOffset;
+        public Point2D ExitCoords => Location + Exit.CoordinateOffset;
 
         /// <summary>
         /// Tile data
@@ -175,7 +175,7 @@ namespace TSMapEditor.Models
         /// <summary>
         /// A* end point
         /// </summary>
-        public Vector2 Destination;
+        public Point2D Destination;
 
         /// <summary>
         /// Where this node connects to the next node
@@ -185,12 +185,12 @@ namespace TSMapEditor.Models
         /// <summary>
         /// Distance from starting node
         /// </summary>
-        public float GScore => Parent == null ? 0 : Parent.GScore + Vector2.Distance(Parent.ExitCoords, ExitCoords);
+        public float GScore => Parent == null ? 0 : Parent.GScore + Vector2.Distance(Parent.ExitCoords.ToXNAVector(), ExitCoords.ToXNAVector());
 
         /// <summary>
         /// Distance to end node
         /// </summary>
-        public float HScore => Vector2.Distance(Destination, ExitCoords);
+        public float HScore => Vector2.Distance(Destination.ToXNAVector(), ExitCoords.ToXNAVector());
         public float FScore => GScore * 0.8f + HScore;
 
         /// <summary>
@@ -201,7 +201,7 @@ namespace TSMapEditor.Models
         /// <summary>
         /// Accumulated set of all cell coordinates occupied up to this node
         /// </summary>
-        public HashSet<Vector2> OccupiedCells = new HashSet<Vector2>();
+        public HashSet<Point2D> OccupiedCells = new HashSet<Point2D>();
     }
 
     public class CliffTile
@@ -232,7 +232,7 @@ namespace TSMapEditor.Models
                     throw new INIConfigException($"Cliff {iniSection.SectionName} has invalid ConnectionPoint{i} value: {coordsString}!");
 
                 var coordParts = coordsString.Split(',').Select(int.Parse).ToList();
-                Vector2 coords = new Vector2(coordParts[0], coordParts[1]);
+                Point2D coords = new Point2D(coordParts[0], coordParts[1]);
 
                 string directionsString = iniSection.GetStringValue($"ConnectionPoint{i}.Directions", null);
                 if (directionsString == null || directionsString.Length != (int)Direction.Count || Regex.IsMatch(directionsString, "[^01]"))
@@ -285,7 +285,7 @@ namespace TSMapEditor.Models
             Foundation = foundationString.Split("|").Select(coordinateString =>
             {
                 var coordinateParts = coordinateString.Split(",");
-                return new Vector2(int.Parse(coordinateParts[0]), int.Parse(coordinateParts[1]));
+                return new Point2D(int.Parse(coordinateParts[0]), int.Parse(coordinateParts[1]));
             }).ToHashSet();
         }
 
@@ -312,7 +312,7 @@ namespace TSMapEditor.Models
         /// <summary>
         /// Set of all relative cell coordinates this tile occupies
         /// </summary>
-        public HashSet<Vector2> Foundation { get; set; }
+        public HashSet<Point2D> Foundation { get; set; }
 
         public CliffConnectionPoint GetExit(int entryIndex)
         {
