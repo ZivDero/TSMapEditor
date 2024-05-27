@@ -22,7 +22,7 @@ namespace TSMapEditor.UI.CursorActions
             ActionExited += UndoOnExit;
         }
 
-        public override string GetName() => "Draw Cliff";
+        public override string GetName() => "Draw Connected Tiles";
 
         public override bool HandlesKeyboardInput => true;
 
@@ -46,25 +46,8 @@ namespace TSMapEditor.UI.CursorActions
 
         public override void DrawPreview(Point2D cellCoords, Point2D cameraTopLeftPoint)
         {
-            Point2D cellTopLeftPoint = CellMath.CellTopLeftPointFromCellCoords(cellCoords, CursorActionTarget.Map) - cameraTopLeftPoint;
-
-            cellTopLeftPoint = cellTopLeftPoint.ScaleBy(CursorActionTarget.Camera.ZoomLevel);
-
             const string text = "Click on a cell to place a new vertex.\r\n\r\nENTER to confirm\r\nBackspace to go back one step\r\nTAB to change cliff side\r\nPageUp to raise the cliff, PageDown to lower it\r\nRight-click or ESC to exit";
-            var textDimensions = Renderer.GetTextDimensions(text, Constants.UIBoldFont);
-            int x = cellTopLeftPoint.X - (int)(textDimensions.X - Constants.CellSizeX) / 2;
-
-            Vector2 textPosition = new Vector2(x + 60, cellTopLeftPoint.Y - 150);
-
-            Rectangle textBackgroundRectangle = new Rectangle((int)textPosition.X - Constants.UIEmptySideSpace,
-                (int)textPosition.Y - Constants.UIEmptyTopSpace,
-                (int)textDimensions.X + Constants.UIEmptySideSpace * 2,
-                (int)textDimensions.Y + Constants.UIEmptyBottomSpace + Constants.UIEmptyTopSpace);
-
-            Renderer.FillRectangle(textBackgroundRectangle, UISettings.ActiveSettings.PanelBackgroundColor);
-            Renderer.DrawRectangle(textBackgroundRectangle, UISettings.ActiveSettings.PanelBorderColor);
-
-            Renderer.DrawStringWithShadow(text, Constants.UIBoldFont, textPosition, Color.Yellow);
+            DrawText(cellCoords, cameraTopLeftPoint, 60, -150, text, Color.Yellow);
 
             Func<Point2D, Map, Point2D> getCellCenterPoint = Is2DMode ? CellMath.CellCenterPointFromCellCoords : CellMath.CellCenterPointFromCellCoords_3D;
 

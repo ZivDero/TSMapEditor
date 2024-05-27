@@ -47,7 +47,7 @@
     <None Update="Config\Bridges.ini">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Config\CliffDrawer.ini">
+    <None Update="Config\ConnectedTileDrawer.ini">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Config\Constants.ini">

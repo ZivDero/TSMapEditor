@@ -12,6 +12,7 @@ namespace TSMapEditor.UI.Windows
         public SelectCliffWindow(WindowManager windowManager, Map map) : base(windowManager)
         {
             this.map = map;
+            lbObjectList.DoubleLeftClick += (s, e) => { Success = true; };
         }
 
         private readonly Map map;

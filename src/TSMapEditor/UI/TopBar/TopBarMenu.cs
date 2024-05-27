@@ -140,12 +140,12 @@ namespace TSMapEditor.UI.TopBar
             {
                 if (cliffCount == 1)
                 {
-                    editContextMenu.AddItem("Draw Cliff", () => mapView.EditorState.CursorAction =
+                    editContextMenu.AddItem("Draw Connected Tiles", () => mapView.EditorState.CursorAction =
                         new DrawCliffCursorAction(mapView, theaterMatchingCliffs[0]), null, null, null);
                 }
                 else
                 {
-                    editContextMenu.AddItem("Draw Cliff...", () => selectCliffWindow.Open(), null, null, null);
+                    editContextMenu.AddItem("Draw Connected Tiles...", () => selectCliffWindow.Open(), null, null, null);
                 }
             }
 
@@ -428,11 +428,6 @@ namespace TSMapEditor.UI.TopBar
         {
             if (selectBridgeWindow.Success && selectBridgeWindow.SelectedObject != null)
                 mapView.EditorState.CursorAction = new PlaceBridgeCursorAction(mapView, selectBridgeWindow.SelectedObject);
-        }
-
-        private void SelectCliff()
-        {
-            selectCliffWindow.Open();
         }
 
         private void SelectCliffDarkeningPanel_Hidden(object sender, EventArgs e)

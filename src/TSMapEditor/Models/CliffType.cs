@@ -2,6 +2,7 @@
 using Rampastring.Tools;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using TSMapEditor.GameMath;
@@ -70,6 +71,54 @@ namespace TSMapEditor.Models
             OccupiedCells = new HashSet<Point2D>(parent.OccupiedCells);
             OccupiedCells.UnionWith(tile.Foundation.Select(coordinate => coordinate + Location));
         }
+
+        /// <summary>
+        /// Absolute world coordinates of the node's tile
+        /// </summary>
+        public Point2D Location;
+
+        /// <summary>
+        /// Absolute world coordinates of the node's tile's exit
+        /// </summary>
+        public Point2D ExitCoords => Location + Exit.CoordinateOffset;
+
+        /// <summary>
+        /// Tile data
+        /// </summary>
+        public CliffTile Tile;
+
+        ///// A* Stuff
+
+        /// <summary>
+        /// A* end point
+        /// </summary>
+        public Point2D Destination;
+
+        /// <summary>
+        /// Where this node connects to the next node
+        /// </summary>
+        public CliffConnectionPoint Exit;
+
+        /// <summary>
+        /// Distance from starting node
+        /// </summary>
+        public float GScore => Parent == null ? 0 : Parent.GScore + Vector2.Distance(Parent.ExitCoords.ToXNAVector(), ExitCoords.ToXNAVector());
+
+        /// <summary>
+        /// Distance to end node
+        /// </summary>
+        public float HScore => Vector2.Distance(Destination.ToXNAVector(), ExitCoords.ToXNAVector());
+        public float FScore => GScore * 0.8f + HScore;
+
+        /// <summary>
+        /// Previous node
+        /// </summary>
+        public CliffAStarNode Parent;
+
+        /// <summary>
+        /// Accumulated set of all cell coordinates occupied up to this node
+        /// </summary>
+        public HashSet<Point2D> OccupiedCells = new HashSet<Point2D>();
 
         public static CliffAStarNode MakeStartNode(Point2D location, Point2D destination, CliffSide startingSide)
         {
@@ -154,54 +203,6 @@ namespace TSMapEditor.Models
 
             return directions;
         }
-
-        /// <summary>
-        /// Absolute world coordinates of the node's tile
-        /// </summary>
-        public Point2D Location;
-
-        /// <summary>
-        /// Absolute world coordinates of the node's tile's exit
-        /// </summary>
-        public Point2D ExitCoords => Location + Exit.CoordinateOffset;
-
-        /// <summary>
-        /// Tile data
-        /// </summary>
-        public CliffTile Tile;
-
-        ///// A* Stuff
-
-        /// <summary>
-        /// A* end point
-        /// </summary>
-        public Point2D Destination;
-
-        /// <summary>
-        /// Where this node connects to the next node
-        /// </summary>
-        public CliffConnectionPoint Exit;
-
-        /// <summary>
-        /// Distance from starting node
-        /// </summary>
-        public float GScore => Parent == null ? 0 : Parent.GScore + Vector2.Distance(Parent.ExitCoords.ToXNAVector(), ExitCoords.ToXNAVector());
-
-        /// <summary>
-        /// Distance to end node
-        /// </summary>
-        public float HScore => Vector2.Distance(Destination.ToXNAVector(), ExitCoords.ToXNAVector());
-        public float FScore => GScore * 0.8f + HScore;
-
-        /// <summary>
-        /// Previous node
-        /// </summary>
-        public CliffAStarNode Parent;
-
-        /// <summary>
-        /// Accumulated set of all cell coordinates occupied up to this node
-        /// </summary>
-        public HashSet<Point2D> OccupiedCells = new HashSet<Point2D>();
     }
 
     public class CliffTile
@@ -219,9 +220,9 @@ namespace TSMapEditor.Models
             if (string.IsNullOrWhiteSpace(tileSet))
                 throw new INIConfigException($"Cliff {iniSection.SectionName} has no TileSet!");
 
-            TileSet = tileSet;
+            TileSetName = tileSet;
 
-            IndicesInTileSet = indicesString.Split(',').Select(int.Parse).ToList();
+            IndicesInTileSet = indicesString.Split(',').Select(s => int.Parse(s, CultureInfo.InvariantCulture)).ToList();
 
             ConnectionPoints = new CliffConnectionPoint[2];
 
@@ -231,7 +232,7 @@ namespace TSMapEditor.Models
                 if (coordsString == null || !Regex.IsMatch(coordsString, "^\\d+?,\\d+?$"))
                     throw new INIConfigException($"Cliff {iniSection.SectionName} has invalid ConnectionPoint{i} value: {coordsString}!");
 
-                var coordParts = coordsString.Split(',').Select(int.Parse).ToList();
+                var coordParts = coordsString.Split(',').Select(s => int.Parse(s, CultureInfo.InvariantCulture)).ToList();
                 Point2D coords = new Point2D(coordParts[0], coordParts[1]);
 
                 string directionsString = iniSection.GetStringValue($"ConnectionPoint{i}.Directions", null);
@@ -295,9 +296,9 @@ namespace TSMapEditor.Models
         public int Index { get; set; }
 
         /// <summary>
-        /// Tile's Tile Set
+        /// The name of the tile's Tile Set
         /// </summary>
-        public string TileSet { get; set; }
+        public string TileSetName { get; set; }
 
         /// <summary>
         /// Indices of tiles relative to the Tile Set

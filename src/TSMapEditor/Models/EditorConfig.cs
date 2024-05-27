@@ -401,8 +401,8 @@ namespace TSMapEditor.Models
         {
             ConnectedOverlays.Clear();
 
-            var iniFile = new IniFile(Environment.CurrentDirectory + "/Config/CliffDrawer.ini");
-            var section = iniFile.GetSection("Cliffs");
+            var iniFile = new IniFile(Environment.CurrentDirectory + "/Config/ConnectedTileDrawer.ini");
+            var section = iniFile.GetSection("ConnectedTiles");
             if (section == null)
                 return;
 

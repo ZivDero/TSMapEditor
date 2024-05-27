@@ -57,7 +57,7 @@ namespace TSMapEditor.Mutations.Classes
 
             for (int i = 0; i < cliffPath.Count - 1; i++)
             {
-                FindCliffPath(cliffPath[i].ToXNAVector(), cliffPath[i + 1].ToXNAVector());
+                FindCliffPath(cliffPath[i], cliffPath[i + 1]);
             }
 
             PlaceCliffs(lastNode);
@@ -65,7 +65,7 @@ namespace TSMapEditor.Mutations.Classes
             MutationTarget.InvalidateMap();
         }
 
-        private void FindCliffPath(Vector2 start, Vector2 end)
+        private void FindCliffPath(Point2D start, Point2D end)
         {
             PriorityQueue<CliffAStarNode, float> openSet = new PriorityQueue<CliffAStarNode, float>();
 
@@ -118,7 +118,7 @@ namespace TSMapEditor.Mutations.Classes
             {
                 if (node.Tile != null)
                 {
-                    var tileSet = MutationTarget.Map.TheaterInstance.Theater.FindTileSet(node.Tile.TileSet);
+                    var tileSet = MutationTarget.Map.TheaterInstance.Theater.FindTileSet(node.Tile.TileSetName);
                     if (tileSet != null)
                     {
                         var tileImage = MutationTarget.TheaterGraphics.GetTileGraphics(tileSet.StartTileIndex + node.Tile.IndicesInTileSet.GetRandomElement(random));
@@ -126,7 +126,7 @@ namespace TSMapEditor.Mutations.Classes
                     }
                     else
                     {
-                        throw new INIConfigException($"Tile Set {node.Tile.TileSet} not found when placing cliffs!");
+                        throw new INIConfigException($"Tile Set {node.Tile.TileSetName} not found when placing cliffs!");
                     }
                 }
 
