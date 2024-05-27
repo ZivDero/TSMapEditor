@@ -38,6 +38,9 @@ namespace TSMapEditor.Models
         /// </summary>
         public byte ReversedConnectionMask => (byte)((ConnectionMask >> 4) + (0b11110000 & (ConnectionMask << 4)));
 
+        public int[] RequiredTiles { get; set; }
+        public int[] ForbiddenTiles { get; set; }
+
         /// <summary>
         /// Whether the connection point faces "backwards" or "forwards"
         /// </summary>
@@ -89,6 +92,13 @@ namespace TSMapEditor.Models
 
             foreach (CliffConnectionPoint cp in tile.ConnectionPoints)
             {
+                if (Tile != null)
+                {
+                    if ((cp.RequiredTiles.Length > 0 && !cp.RequiredTiles.Contains(Tile.Index)) ||
+                        (cp.ForbiddenTiles.Length > 0 && cp.ForbiddenTiles.Contains(Tile.Index)))
+                        continue;
+                }
+                
                 var possibleDirections = GetDirectionsInMask((byte)(cp.ReversedConnectionMask & Exit.ConnectionMask));
                 if (possibleDirections.Count == 0)
                     continue;
@@ -229,12 +239,33 @@ namespace TSMapEditor.Models
                     _ => throw new INIConfigException($"Cliff {iniSection.SectionName} has an invalid ConnectionPoint{i}.Side value: {sideString}!")
                 };
 
+                int[] requiredTiles, forbiddenTiles;
+
+                var requiredTilesList =
+                    iniSection.GetListValue($"ConnectionPoint{i}.RequiredTiles", ',', int.Parse);
+
+                if (requiredTilesList.Count > 0)
+                {
+                    requiredTiles = requiredTilesList.ToArray();
+                    forbiddenTiles = Array.Empty<int>();
+                }
+                else
+                {
+                    var forbiddenTilesList =
+                        iniSection.GetListValue($"ConnectionPoint{i}.ForbiddenTiles", ',', int.Parse);
+
+                    forbiddenTiles = forbiddenTilesList.ToArray();
+                    requiredTiles = Array.Empty<int>();
+                }
+
                 ConnectionPoints[i] = new CliffConnectionPoint
                 {
                     Index = i,
                     ConnectionMask = directions,
                     CoordinateOffset = coords,
-                    Side = side
+                    Side = side,
+                    RequiredTiles = requiredTiles,
+                    ForbiddenTiles = forbiddenTiles
                 };
             }
 
