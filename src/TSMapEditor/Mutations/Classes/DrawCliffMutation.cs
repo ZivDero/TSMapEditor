@@ -68,7 +68,7 @@ namespace TSMapEditor.Mutations.Classes
 
         private void FindCliffPath(Point2D start, Point2D end)
         {
-            PriorityQueue<CliffAStarNode, float> openSet = new PriorityQueue<CliffAStarNode, float>();
+            PriorityQueue<CliffAStarNode, (float FScore, int ExtraPriority)> openSet = new();
 
             CliffAStarNode bestNode = null;
             float bestDistance = float.PositiveInfinity;
@@ -85,15 +85,15 @@ namespace TSMapEditor.Mutations.Classes
                 lastNode.Destination = end;
             }
 
-            Stopwatch stopwatch = new Stopwatch();
+            openSet.Enqueue(lastNode, (lastNode.FScore, lastNode.Tile?.ExtraPriority ?? 0));
             stopwatch.Start();
-            openSet.Enqueue(lastNode, lastNode.FScore);
+            Stopwatch stopwatch = new Stopwatch();
 
             while (openSet.Count > 0)
             {
                 CliffAStarNode currentNode = openSet.Dequeue();
-                openSet.EnqueueRange(currentNode.GetNextNodes(cliffType.Tiles).Select(node => (node, node.FScore)));
-
+                openSet.EnqueueRange(currentNode.GetNextNodes(cliffType.Tiles).Select(node => (node, (node.FScore, node.Tile?.ExtraPriority ?? 0))));
+                
                 if (currentNode.HScore < bestDistance)
                 {
                     bestNode = currentNode;
