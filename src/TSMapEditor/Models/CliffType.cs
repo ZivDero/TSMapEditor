@@ -281,11 +281,14 @@ namespace TSMapEditor.Models
                 };
             }
 
-            string foundationString = iniSection.GetStringValue("Foundation", string.Empty);
-            if (!Regex.IsMatch(foundationString, "^((?:\\d+?,\\d+?\\|)*(?:\\d+?,\\d+?))$"))
-                throw new INIConfigException($"Connected Tile {iniSection.SectionName} has an invalid Foundation: {foundationString}!");
+            if (iniSection.KeyExists("Foundation"))
+            {
+                string foundationString = iniSection.GetStringValue("Foundation", string.Empty);
+                if (!Regex.IsMatch(foundationString, "^((?:\\d+?,\\d+?\\|)*(?:\\d+?,\\d+?))$"))
+                    throw new INIConfigException($"Connected Tile {iniSection.SectionName} has an invalid Foundation: {foundationString}!");
 
-            Foundation = foundationString.Split("|").Select(coordinateString => Point2D.FromString(coordinateString)).ToHashSet();
+                Foundation = foundationString.Split("|").Select(Point2D.FromString).ToHashSet();
+            }
 
             ExtraPriority = -iniSection.GetIntValue("ExtraPriority", 0); // negated because sorting is in ascending order by default, but it's more intuitive to have larger numbers be more important
         }
