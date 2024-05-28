@@ -85,9 +85,9 @@ namespace TSMapEditor.Mutations.Classes
                 lastNode.Destination = end;
             }
 
-            openSet.Enqueue(lastNode, (lastNode.FScore, lastNode.Tile?.ExtraPriority ?? 0));
-            stopwatch.Start();
             Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+            openSet.Enqueue(lastNode, (lastNode.FScore, lastNode.Tile?.ExtraPriority ?? 0));
 
             while (openSet.Count > 0)
             {
