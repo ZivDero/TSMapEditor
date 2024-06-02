@@ -189,9 +189,18 @@ namespace TSMapEditor.Models
             return neighbors;
         }
 
-        public List<CliffAStarNode> GetNextNodes(List<CliffTile> tiles)
+        public List<CliffAStarNode> GetNextNodes(List<CliffTile> tiles, bool allowTurn)
         {
-            return tiles.SelectMany(GetNextNodes).ToList();
+            List <CliffAStarNode > nextNodes = new List<CliffAStarNode>();
+            foreach (var tile in tiles)
+            {
+                if (!allowTurn && tile.ConnectionPoints[0].Side != tile.ConnectionPoints[1].Side)
+                    continue;
+
+                nextNodes.AddRange(GetNextNodes(tile));
+            }
+
+            return nextNodes;
         }
     }
 
