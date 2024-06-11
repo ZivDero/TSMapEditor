@@ -16,6 +16,7 @@ namespace TSMapEditor
 
         public static bool IsFlatWorld = false;
         public static bool TheaterPaletteForTiberium = false;
+        public static bool TheaterPaletteForVeins = false;
         public static bool TiberiumAffectedByLighting = false;
         public static bool TiberiumTreesAffectedByLighting = false;
         public static bool TerrainPaletteBuildingsAffectedByLighting = false;
