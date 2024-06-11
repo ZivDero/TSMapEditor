@@ -123,6 +123,7 @@ namespace TSMapEditor
 
             IsFlatWorld = constantsIni.GetBooleanValue(ConstantsSectionName, nameof(IsFlatWorld), IsFlatWorld);
             TheaterPaletteForTiberium = constantsIni.GetBooleanValue(ConstantsSectionName, nameof(TheaterPaletteForTiberium), TheaterPaletteForTiberium);
+            TheaterPaletteForVeins = constantsIni.GetBooleanValue(ConstantsSectionName, nameof(TheaterPaletteForVeins), TheaterPaletteForVeins);
             TiberiumAffectedByLighting = constantsIni.GetBooleanValue(ConstantsSectionName, nameof(TiberiumAffectedByLighting), TiberiumAffectedByLighting);
             TiberiumTreesAffectedByLighting = constantsIni.GetBooleanValue(ConstantsSectionName, nameof(TiberiumTreesAffectedByLighting), TiberiumTreesAffectedByLighting);
             TerrainPaletteBuildingsAffectedByLighting = constantsIni.GetBooleanValue(ConstantsSectionName, nameof(TerrainPaletteBuildingsAffectedByLighting), TerrainPaletteBuildingsAffectedByLighting);
