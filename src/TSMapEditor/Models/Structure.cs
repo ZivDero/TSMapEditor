@@ -197,7 +197,7 @@ namespace TSMapEditor.Models
                             continue;
 
                         if (!litTiles.ContainsKey(tile) ||
-                            litTiles.ContainsKey(tile) && litTiles[tile] > distanceInLeptons)
+                            (litTiles.ContainsKey(tile) && litTiles[tile] > distanceInLeptons))
                         {
                             litTiles[tile] = distanceInLeptons;
                         }
