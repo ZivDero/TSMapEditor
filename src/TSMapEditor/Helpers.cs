@@ -180,7 +180,7 @@ namespace TSMapEditor
                 int c = str[i];
 
                 if (c is < 'A' or > 'Z')
-                    throw new InvalidOperationException("Waypoints may only contain characters A through Z: " + str); ;
+                    throw new InvalidOperationException("Waypoints may only contain characters A through Z, invalid input: " + str); ;
 
                 n += (c - 64) * j;
             }
@@ -191,12 +191,9 @@ namespace TSMapEditor
         public static string WaypointNumberToAlphabeticalString(int waypointNumber)
         {
             if (waypointNumber < 0)
-                return "0";
+                return string.Empty;
 
-            if (waypointNumber == int.MaxValue)
-                return "FXSHRXX";
-
-            waypointNumber += 1;
+            waypointNumber++;
             StringBuilder sb = new StringBuilder();
 
             while (waypointNumber > 0)
