@@ -180,7 +180,7 @@ namespace TSMapEditor
                 int c = str[i];
 
                 if (c is < 'A' or > 'Z')
-                    throw new InvalidOperationException("Waypoints may only contains characters A through Z: " + str); ;
+                    throw new InvalidOperationException("Waypoints may only contain characters A through Z: " + str); ;
 
                 n += (c - 64) * j;
             }
