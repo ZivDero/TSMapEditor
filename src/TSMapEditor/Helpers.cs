@@ -171,6 +171,9 @@ namespace TSMapEditor
 
         public static int GetWaypointNumberFromAlphabeticalString(string str)
         {
+            if (string.IsNullOrEmpty(str))
+                return -1;
+
             const int charCount = 26;
             str = str.ToUpperInvariant();
 
