@@ -185,7 +185,7 @@ namespace TSMapEditor
                 if (c is < 'A' or > 'Z')
                     throw new InvalidOperationException("Waypoints may only contain characters A through Z, invalid input: " + str); ;
 
-                n += (c - 64) * j;
+                n += (c - '@') * j; // '@' = 'A' - 1
             }
 
             return (n - 1);
@@ -199,12 +199,14 @@ namespace TSMapEditor
             waypointNumber++;
             StringBuilder sb = new StringBuilder();
 
+            const int charCount = 26;
+
             while (waypointNumber > 0)
             {
-                int m = waypointNumber % 26;
-                if (m == 0) m = 26;
+                int m = waypointNumber % charCount;
+                if (m == 0) m = charCount;
                 sb.Insert(0, (char)(m + '@')); // '@' = 'A' - 1
-                waypointNumber = (waypointNumber - m) / 26;
+                waypointNumber = (waypointNumber - m) / charCount;
             }
 
             return sb.ToString();
