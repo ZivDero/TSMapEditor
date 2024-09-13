@@ -233,10 +233,48 @@ namespace TSMapEditor.Models
                 Point2D coords = Point2D.FromString(coordsString);
 
                 string directionsString = iniSection.GetStringValue($"ConnectionPoint{i}.Directions", null);
-                if (directionsString == null || directionsString.Length != (int)Direction.Count || Regex.IsMatch(directionsString, "[^01]"))
-                    throw new INIConfigException($"Connected Tile {iniSection.SectionName} has invalid ConnectionPoint{i}.Directions value: {directionsString}!");
+                byte directions;
+                switch (directionsString)
+                {
+                    case "North":
+                        directions = 1 << 7;
+                        break;
 
-                byte directions = Convert.ToByte(directionsString, 2);
+                    case "NorthEast":
+                        directions = 1 << 6;
+                        break;
+
+                    case "East":
+                        directions = 1 << 5;
+                        break;
+
+                    case "SouthEast":
+                        directions = 1 << 4;
+                        break;
+
+                    case "South":
+                        directions = 1 << 3;
+                        break;
+
+                    case "SouthWest":
+                        directions = 1 << 2;
+                        break;
+
+                    case "West":
+                        directions = 1 << 1;
+                        break;
+
+                    case "NorthWest":
+                        directions = 1 << 0;
+                        break;
+
+                    default:
+                        if (directionsString == null || directionsString.Length != (int)Direction.Count || Regex.IsMatch(directionsString, "[^01]"))
+                            throw new INIConfigException($"Connected Tile {iniSection.SectionName} has invalid ConnectionPoint{i}.Directions value: {directionsString}!");
+
+                        directions = Convert.ToByte(directionsString, 2);
+                        break;
+                }
 
                 string sideString = iniSection.GetStringValue($"ConnectionPoint{i}.Side", string.Empty);
                 CliffSide side = sideString.ToLower() switch
