@@ -193,23 +193,25 @@ namespace TSMapEditor
 
         public static string WaypointNumberToAlphabeticalString(int waypointNumber)
         {
-            if (waypointNumber < 0)
+            char[] buffer = new char[8];
+            const int charCount = 26;
+
+           if (waypointNumber < 0)
                 return string.Empty;
 
             waypointNumber++;
-            StringBuilder sb = new StringBuilder();
-
-            const int charCount = 26;
+            int pos = buffer.Length;
 
             while (waypointNumber > 0)
             {
+                pos--;
                 int m = waypointNumber % charCount;
                 if (m == 0) m = charCount;
-                sb.Insert(0, (char)(m + '@')); // '@' = 'A' - 1
+                buffer[pos] = (char)(m + '@'); // '@' = 'A' - 1
                 waypointNumber = (waypointNumber - m) / charCount;
             }
 
-            return sb.ToString();
+            return new string(buffer, pos, buffer.Length - pos);
         }
 
         private static Point2D[] visualDirectionToPointTable = new Point2D[]
