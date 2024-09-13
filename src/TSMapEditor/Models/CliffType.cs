@@ -233,47 +233,27 @@ namespace TSMapEditor.Models
                 Point2D coords = Point2D.FromString(coordsString);
 
                 string directionsString = iniSection.GetStringValue($"ConnectionPoint{i}.Directions", null);
-                byte directions;
-                switch (directionsString)
+                string[] directionParts = directionsString.Split(',');
+                byte directions = 0;
+
+                // Try parsing the string as a comma-separated list of named directions
+                if (directionParts.Length > 0)
                 {
-                    case "North":
-                        directions = 1 << 7;
-                        break;
+                    foreach (string part in directionParts)
+                    {
+                        byte dir = DirectionFromString(part);
+                        if (dir != byte.MaxValue)
+                            directions |= dir;
+                    }
+                }
+                
+                // We failed to read any named directions, try as a bit mask
+                if (directions == 0)
+                {
+                    if (directionsString == null || directionsString.Length != (int)Direction.Count || Regex.IsMatch(directionsString, "[^01]"))
+                        throw new INIConfigException($"Connected Tile {iniSection.SectionName} has invalid ConnectionPoint{i}.Directions value: {directionsString}!");
 
-                    case "NorthEast":
-                        directions = 1 << 6;
-                        break;
-
-                    case "East":
-                        directions = 1 << 5;
-                        break;
-
-                    case "SouthEast":
-                        directions = 1 << 4;
-                        break;
-
-                    case "South":
-                        directions = 1 << 3;
-                        break;
-
-                    case "SouthWest":
-                        directions = 1 << 2;
-                        break;
-
-                    case "West":
-                        directions = 1 << 1;
-                        break;
-
-                    case "NorthWest":
-                        directions = 1 << 0;
-                        break;
-
-                    default:
-                        if (directionsString == null || directionsString.Length != (int)Direction.Count || Regex.IsMatch(directionsString, "[^01]"))
-                            throw new INIConfigException($"Connected Tile {iniSection.SectionName} has invalid ConnectionPoint{i}.Directions value: {directionsString}!");
-
-                        directions = Convert.ToByte(directionsString, 2);
-                        break;
+                    directions = Convert.ToByte(directionsString, 2);
                 }
 
                 string sideString = iniSection.GetStringValue($"ConnectionPoint{i}.Side", string.Empty);
@@ -383,6 +363,46 @@ namespace TSMapEditor.Models
                    directions.Contains(Direction.S) ||
                    directions.Contains(Direction.W) ||
                    directions.Contains(Direction.N);
+        }
+
+        private static byte DirectionFromString(string str)
+        {
+            switch (str.Trim().ToUpperInvariant())
+            {
+                case "NORTH":
+                case "TOPRIGHT":
+                    return 1 << 7;
+
+                case "NORTHEAST":
+                case "RIGHT":
+                    return 1 << 6;
+
+                case "EAST":
+                case "BOTTOMRIGHT":
+                    return 1 << 5;
+
+                case "SOUTHEAST":
+                case "BOTTOM":
+                    return 1 << 4;
+
+                case "SOUTH":
+                case "BOTTOMLEFT":
+                    return 1 << 3;
+
+                case "SOUTHWEST":
+                case "LEFT":
+                    return 1 << 2;
+
+                case "WEST":
+                case "TOPLEFT":
+                    return 1 << 1;
+
+                case "NORTHWEST":
+                case "TOP":
+                    return 1 << 0;
+            }
+
+            return byte.MaxValue;
         }
     }
 
